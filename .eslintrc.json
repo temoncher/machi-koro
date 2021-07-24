@@ -69,9 +69,7 @@
           2,
           {
             "props": true,
-            "ignorePropertyModificationsFor": [
-              "acc"
-            ]
+            "ignorePropertyModificationsFor": ["acc"]
           }
         ],
 
@@ -143,6 +141,7 @@
 
         "@typescript-eslint/array-type": 1,
         "@typescript-eslint/consistent-indexed-object-style": [1, "record"],
+        "@typescript-eslint/no-namespace": 0,
         "@typescript-eslint/consistent-type-assertions": [
           2,
           {
@@ -183,8 +182,11 @@
           },
           {
             "selector": "interface",
-            "prefix": ["I"],
-            "format": ["PascalCase"]
+            "format": ["PascalCase"],
+            "custom": {
+              "regex": "^I[A-Z]", // To forbid `I-` prefix
+              "match": false
+            }
           },
           {
             "selector": "enumMember",

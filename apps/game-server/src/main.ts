@@ -3,6 +3,8 @@ import * as http from 'http';
 import * as express from 'express';
 import * as SocketIO from 'socket.io';
 
+import { initListeners } from './websocket';
+
 const PORT = process.env.port || 3333;
 
 const app = express();
@@ -21,14 +23,4 @@ server.listen(PORT, () => {
 // eslint-disable-next-line no-console
 server.on('error', console.error);
 
-io.on('connection', (socket) => {
-  // eslint-disable-next-line no-console
-  console.log('a user connected', socket.id);
-
-  socket.on('greeting', () => {
-    // eslint-disable-next-line no-console
-    console.log(`socket by id ${socket.id} greets us!`);
-
-    socket.emit('greet-back');
-  });
-});
+initListeners(io);

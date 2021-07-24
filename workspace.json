@@ -51,6 +51,27 @@
         }
       }
     },
+    "game-server-contracts": {
+      "root": "libs/game-server-contracts",
+      "sourceRoot": "libs/game-server-contracts/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/game-server-contracts/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/game-server-contracts"],
+          "options": {
+            "jestConfig": "libs/game-server-contracts/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "web-client": {
       "root": "apps/web-client",
       "sourceRoot": "apps/web-client/src",

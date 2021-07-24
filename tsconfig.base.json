@@ -15,7 +15,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@machikoro/game-server-contracts": [
+        "libs/game-server-contracts/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
