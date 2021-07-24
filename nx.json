@@ -30,6 +30,9 @@
     "game-server": {
       "tags": []
     },
+    "game-server-contracts": {
+      "tags": []
+    },
     "web-client": {
       "tags": []
     },

@@ -1,8 +1,9 @@
+import { ClientSentEventsMap, ServerSentEventsMap } from '@machikoro/game-server-contracts';
 import * as SocketIOClient from 'socket.io-client';
 
-let socket: SocketIOClient.Socket | undefined;
+let socket: SocketIOClient.Socket<ServerSentEventsMap, ClientSentEventsMap> | undefined;
 
-export const initializeSocket = () => {
+export const initializeSocket = (): void => {
   socket = SocketIOClient.io('http://localhost:3333');
 
   socket.on('connect', () => {
@@ -16,4 +17,6 @@ export const initializeSocket = () => {
   });
 };
 
-export const greet = () => socket?.emit('greeting');
+export const greet = (): void => {
+  socket?.emit('greeting');
+};

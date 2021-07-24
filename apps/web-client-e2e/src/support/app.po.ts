@@ -1,1 +1,1 @@
-export const getGreeting = () => cy.get('h1');
+export const testId = <ID extends string>(id: ID): `[data-test-id=${ID}]` => `[data-test-id=${id}]`;

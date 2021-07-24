@@ -1,13 +1,15 @@
-import { getGreeting } from '../support/app.po';
+import { testId } from '../support/app.po';
 
 describe('web-client', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => cy.visit('http://localhost:4200/'));
 
-  it('should display welcome message', () => {
-    // Custom command example, see `../support/commands.ts` file
-    cy.login('my-email@something.com', 'myPassword');
+  it('should greet the server', () => {
+    cy.get(testId('connect_button'))
+      .should('contain.text', 'CONNECT')
+      .click();
 
-    // Function helper example, see `../support/app.po.ts` file
-    getGreeting().contains('Welcome to web-client!');
+    cy.get(testId('greet_button'))
+      .should('contain.text', 'Greet')
+      .click();
   });
 });

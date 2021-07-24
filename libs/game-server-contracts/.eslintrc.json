@@ -1,0 +1,20 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": "libs/game-server-contracts/tsconfig.lib.json"
+      },
+      "rules": {}
+    },
+    {
+      "files": ["*.spec.ts"],
+      "parserOptions": {
+        "project": "libs/game-server-contracts/tsconfig.spec.json"
+      },
+      "rules": {}
+    }
+  ]
+}
