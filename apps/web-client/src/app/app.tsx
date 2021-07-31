@@ -16,7 +16,7 @@ const App: React.FC = () => {
       <Logo width="75" height="75" />
       {isConnected
         ? <button type="button" onClick={greet} data-test-id="greet_button">Greet the server!</button>
-        : <button type="button" onClick={connect} data-test-id="connect_button">CONNECT</button>}
+        : <button type="button" onClick={connect} data-test-id="connect_button" className={'font-lithos font-black'}>CONNECT</button>}
     </div>
   );
 };
