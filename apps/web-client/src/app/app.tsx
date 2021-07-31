@@ -17,6 +17,7 @@ const App: React.FC = () => {
       {isConnected
         ? <button type="button" onClick={greet} data-test-id="greet_button">Greet the server!</button>
         : <button type="button" onClick={connect} data-test-id="connect_button" className={'font-lithos font-black'}>CONNECT</button>}
+      <a href="http://localhost:3333/static/rules/rules-of-the-game.pdf" target="_blank" rel="noreferrer">Rules of the game</a>
     </div>
   );
 };
