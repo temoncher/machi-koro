@@ -1,25 +1,21 @@
-import * as React from 'react';
+import React from 'react';
+import {
+  Switch,
+  Route,
+} from 'react-router-dom';
 
-import { ReactComponent as Logo } from './logo.svg';
-import { greet, initializeSocket } from './socket';
+import { HomePage } from './home/HomePage';
+import { LoginPage } from './login/LoginPage';
 
-const App: React.FC = () => {
-  const [isConnected, setIsConnected] = React.useState(false);
-
-  const connect = () => {
-    initializeSocket();
-    setIsConnected(true);
-  };
-
-  return (
-    <div style={{ backgroundColor: 'grey' }}>
-      <Logo width="75" height="75" />
-      {isConnected
-        ? <button type="button" onClick={greet} data-test-id="greet_button">Greet the server!</button>
-        : <button type="button" onClick={connect} data-test-id="connect_button" className={'font-lithos font-black'}>CONNECT</button>}
-      <a href="http://localhost:3333/static/rules/rules-of-the-game.pdf" target="_blank" rel="noreferrer">Rules of the game</a>
-    </div>
-  );
-};
-
-export default App;
+export const App: React.FC = () => (
+  <div className="App">
+    <Switch>
+      <Route path="/" exact>
+        <HomePage />
+      </Route>
+      <Route path="/login">
+        <LoginPage />
+      </Route>
+    </Switch>
+  </div>
+);
