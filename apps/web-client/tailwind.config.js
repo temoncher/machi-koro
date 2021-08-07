@@ -1,6 +1,4 @@
-const {
-  createGlobPatternsForDependencies
-} = require('@nrwl/react/tailwind');
+const { createGlobPatternsForDependencies } = require('@nrwl/react/tailwind');
 
 module.exports = {
   purge: createGlobPatternsForDependencies(__dirname),
@@ -9,14 +7,12 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['dosis', 'sans-serif'],
-        lithos: ['lithos', 'sans-serif']
-      }
+        lithos: ['lithos', 'sans-serif'],
+      },
     },
   },
   variants: {
     extend: {},
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
+  plugins: [require('@tailwindcss/forms')],
 };
