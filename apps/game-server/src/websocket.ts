@@ -1,4 +1,4 @@
-import { ClientSentEventsMap, ServerSentEventsMap } from '@machikoro/game-server-contracts';
+import { ClientSentEventsMap, ServerSentEventsMap } from '@machikoro/game-server-contracts/websocket-messages';
 import * as SocketIO from 'socket.io';
 
 import { ServerSideEventsMap } from './types/server-side-events';

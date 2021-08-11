@@ -3,5 +3,5 @@ export type ServerSentEventsMap = {
 };
 
 export type ClientSentEventsMap = {
-  'greeting': () => void;
+  greeting: () => void;
 };
