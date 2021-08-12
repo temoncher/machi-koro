@@ -1,4 +1,4 @@
-import { ClientSentEventsMap, ServerSentEventsMap } from '@machikoro/game-server-contracts';
+import { ClientSentEventsMap, ServerSentEventsMap } from '@machikoro/game-server-contracts/websocket-messages';
 import * as SocketIOClient from 'socket.io-client';
 
 let socket: SocketIOClient.Socket<ServerSentEventsMap, ClientSentEventsMap> | undefined;

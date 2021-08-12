@@ -15,6 +15,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "@machikoro/game-server-contracts/*": [
         "libs/game-server-contracts/src/*.ts"
