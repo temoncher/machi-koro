@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.card-view-wrapper {
+    @apply relative flex items-center justify-center;
+}
+
+.card-view {
+    max-width: 196px;
+    min-width: 196px;
+    min-height: 300px;
+    max-height: 300px;
+    @apply rounded-md flex flex-col items-center relative shadow-lg bg-gray-500 bg-cover;
+}
+
+.card-view--faded {
+    @apply filter grayscale
+}
+
+.card-view--purple {
+    @apply bg-brand-purple-light;
+}
+
+.card-view--red {
+    @apply bg-brand-red-light;
+}
+
+.card-view--blue {
+    @apply bg-brand-blue-light;
+}
+
+.card-view--green {
+    @apply bg-brand-green-light;
+}
+
+.card-view--yellow {
+    @apply bg-brand-yellow-light;
+}
+
+.card-view__sum-dice {
+    min-height: 32px;
+    @apply text-3xl text-center text-white font-lithos flex-initial z-10;
+}
+
+.card-view__name {
+    min-height: 32px;
+    max-height: 32px;
+    @apply text-base text-center font-lithos font-extrabold text-gray-800 mt-3 flex-initial max-w-11/12 relative z-10 inline-block;
+}
+
+.card-view__name--purple {
+    @apply text-brand-purple-dark;
+}
+
+.card-view__name--red {
+    @apply text-brand-red-dark;
+}
+
+.card-view__name--blue {
+    @apply text-brand-blue-dark;
+}
+
+.card-view__name--green {
+    @apply text-brand-green-dark;
+}
+
+.card-view__name--yellow {
+    @apply text-brand-yellow-dark;
+}
+
+.card-view__name--disabled {
+    @apply filter grayscale;
+}
+
+.card-view__name::before {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  height: 24px;
+  width: 24px;
+  content: "";
+  background-size: 100%;
+  background-image: var(--bg-image);
+}
+.card-view__card-image-container {
+    min-height: 90px;
+    @apply flex-auto flex items-end justify-center mb-4 relative;
+}
+
+.card-view__card-image {
+    max-height: 180px;
+    @apply max-w-3/4 object-contain;
+}
+
+.card-view__effect {
+    flex: 0 0 76px;
+    height: 76px;
+    @apply text-center text-white text-xxs font-sans py-1 px-2 z-10;
+}
+
+.card-view__cost-container {
+    height: 100%;
+    shape-outside: inset(calc(100% - 32px) 0 0);  
+    @apply flex items-end mr-2;
+}
+
+.card-view__cost-container_left { 
+    @apply float-left;
+}
+
+.card-view__cost-container_right { 
+    @apply float-right;
+}
+
+.card-view__cost-background {
+    height: 32px;
+    width: 32px;
+    @apply bg-soft-yellow border-vivid-orange border-4 rounded-full bg-cover flex items-center justify-center;
+}
+
+.card-view__cost-container_right .card-view__cost-background {
+    @apply bg-transparent border-transparent;
+}
+
+.card-view__cost {
+    @apply text-base text-black align-middle font-lithos font-bold;
+}
+
+.card-view-wrapper__under-construction-icon {
+    height: 120px;
+    @apply max-w-3/4 object-contain absolute z-20;
+}
