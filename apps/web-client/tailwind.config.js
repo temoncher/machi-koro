@@ -9,6 +9,46 @@ module.exports = {
         sans: ['dosis', 'sans-serif'],
         lithos: ['lithos', 'sans-serif'],
       },
+      colors: {
+        "brand-purple": {
+          light: '#ae81ae',
+          DEFAULT: '#7a2d83',
+          dark: '#5b245e'
+        },
+        "brand-red": {
+          light: '#c77f80',
+          DEFAULT: '#9e1e2b',
+          dark: '#8e1d2f'
+        },
+        "brand-blue": {
+          light: '#7baed4',
+          DEFAULT: '#136ba5',
+          dark: '#0965a3'
+        },
+        "brand-green": {
+          light: '#9ab36c',
+          DEFAULT: '#427830',
+          dark: '#0e6737'
+        },
+        "brand-yellow": {
+          light: '#f8e48e',
+          DEFAULT: '#daa26f',
+          dark: '#ae5522'
+        },
+        "soft-yellow": {
+          DEFAULT: '#eecc4e',
+        },
+        "vivid-orange": {
+          DEFAULT: '#dd9e1b',
+        },
+      },
+      maxWidth: {
+        '3/4': '75%',
+        '11/12': '91.7%',
+      },
+      fontSize: {
+        'xxs': ['.625rem', '.83rem'],
+      },
     },
   },
   variants: {
