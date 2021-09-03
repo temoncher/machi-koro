@@ -1,17 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 .card-view-wrapper {
     @apply relative flex items-center justify-center;
 }
 
 .card-view {
-    max-width: 196px;
-    min-width: 196px;
-    min-height: 300px;
-    max-height: 300px;
-    @apply rounded-md flex flex-col items-center relative shadow-lg bg-gray-500 bg-cover;
+    max-width: calc(196px * var(--card-scale));
+    min-width: calc(196px * var(--card-scale));
+    min-height: calc(300px * var(--card-scale));
+    max-height: calc(300px * var(--card-scale));
+
+    border-radius: calc(8px * var(--card-scale));
+    @apply flex flex-col items-center relative shadow-lg bg-gray-500 bg-cover;
 }
 
 .card-view--faded {
@@ -39,14 +37,32 @@
 }
 
 .card-view__sum-dice {
-    min-height: 32px;
-    @apply text-3xl text-center text-white font-lithos flex-initial z-10;
+    min-height: calc(36px * var(--card-scale));
+
+    font-size: calc(30px * var(--card-scale));
+    line-height: calc(36px * var(--card-scale));
+    @apply text-center text-white font-lithos flex-initial z-10;
+}
+
+.card-view__count {
+    min-height: calc(36px * var(--card-scale));
+
+    font-size: calc(24px * var(--card-scale));
+    line-height: calc(30px * var(--card-scale));
+
+    top: calc(4px * var(--card-scale));
+    left: calc(4px * var(--card-scale));
+    @apply absolute text-center text-white font-sans flex-initial z-10;
 }
 
 .card-view__name {
-    min-height: 32px;
-    max-height: 32px;
-    @apply text-base text-center font-lithos font-extrabold text-gray-800 mt-3 flex-initial max-w-11/12 relative z-10 inline-block;
+    min-height: calc(32px * var(--card-scale));
+    max-height: calc(32px * var(--card-scale));
+
+    font-size: calc(16px * var(--card-scale));
+    line-height: calc(24px * var(--card-scale));
+    margin-top: calc(12px * var(--card-scale));
+    @apply text-center font-lithos font-extrabold text-gray-800 flex-initial max-w-11/12 relative z-10 inline-block;
 }
 
 .card-view__name--purple {
@@ -76,58 +92,69 @@
 .card-view__name::before {
   display: inline-block;
   vertical-align: middle;
-  margin-right: 5px;
-  height: 24px;
-  width: 24px;
+  margin-right: calc(4px * var(--card-scale));
+  height: calc(24px * var(--card-scale));
+  width: calc(24px * var(--card-scale));
   content: "";
   background-size: 100%;
   background-image: var(--bg-image);
 }
 .card-view__card-image-container {
-    min-height: 90px;
-    @apply flex-auto flex items-end justify-center mb-4 relative;
+    min-height: calc(92px * var(--card-scale));
+
+    margin-bottom: calc(16px * var(--card-scale));
+    @apply flex-auto flex items-end justify-center relative;
 }
 
 .card-view__card-image {
-    max-height: 180px;
+    max-height: calc(180px * var(--card-scale));
     @apply max-w-3/4 object-contain;
 }
 
 .card-view__effect {
-    flex: 0 0 76px;
-    height: 76px;
-    @apply text-center text-white text-xxs font-sans py-1 px-2 z-10;
+    flex: 0 0  calc(76px * var(--card-scale));
+    height: calc(76px * var(--card-scale));
+
+    font-size: calc(10px * var(--card-scale));
+    line-height: calc(12px * var(--card-scale));
+    padding:  calc(4px * var(--card-scale))  calc(8px * var(--card-scale)) calc(4px * var(--card-scale)) calc(8px * var(--card-scale));
+    @apply text-center text-white font-sans z-10;
 }
 
 .card-view__cost-container {
     height: 100%;
-    shape-outside: inset(calc(100% - 32px) 0 0);  
-    @apply flex items-end mr-2;
+    shape-outside: inset(calc(100% - ( 32px * var(--card-scale))) 0 0); 
+    margin-right: calc(8px * var(--card-scale)); 
+    @apply flex items-end;
 }
 
-.card-view__cost-container_left { 
+.card-view__cost-container--left { 
     @apply float-left;
 }
 
-.card-view__cost-container_right { 
+.card-view__cost-container--right { 
     @apply float-right;
 }
 
 .card-view__cost-background {
-    height: 32px;
-    width: 32px;
-    @apply bg-soft-yellow border-vivid-orange border-4 rounded-full bg-cover flex items-center justify-center;
+    height: calc(32px * var(--card-scale));
+    width: calc(32px * var(--card-scale));
+
+    border-width: calc(4px * var(--card-scale));
+    @apply bg-soft-yellow border-vivid-orange rounded-full bg-cover flex items-center justify-center;
 }
 
-.card-view__cost-container_right .card-view__cost-background {
+.card-view__cost-container--right .card-view__cost-background {
     @apply bg-transparent border-transparent;
 }
 
 .card-view__cost {
-    @apply text-base text-black align-middle font-lithos font-bold;
+    font-size: calc(16px * var(--card-scale));
+    line-height: calc(24px * var(--card-scale));
+    @apply text-black align-middle font-lithos font-bold;
 }
 
 .card-view-wrapper__under-construction-icon {
-    height: 120px;
+    height: calc(120px * var(--card-scale));
     @apply max-w-3/4 object-contain absolute z-20;
 }

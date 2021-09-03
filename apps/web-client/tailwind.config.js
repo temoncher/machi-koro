@@ -10,6 +10,11 @@ module.exports = {
         lithos: ['lithos', 'sans-serif'],
       },
       colors: {
+        tertiary: {
+          light: '#F6F2B9',
+          DEFAULT: '#F2EC94',
+          dark: '#E5D930'
+        },
         "brand-purple": {
           light: '#ae81ae',
           DEFAULT: '#7a2d83',
@@ -40,6 +45,12 @@ module.exports = {
         },
         "vivid-orange": {
           DEFAULT: '#dd9e1b',
+        },
+        "nutmeg": {
+          DEFAULT: "#7d4835",
+        },
+        "terracotta": {
+          DEFAULT: "#bb714b",
         },
       },
       maxWidth: {
