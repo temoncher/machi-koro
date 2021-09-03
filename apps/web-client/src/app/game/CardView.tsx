@@ -1,70 +1,63 @@
 import clsx from 'clsx';
 import React, { memo, useMemo } from 'react';
 
+import { Landmark, CommonEstablishment } from '../types/types';
 import { URLUtils } from '../utils/url.utils';
 
 import './CardView.css';
 
-type LandmarkType = 'landmarks';
+type CardSize = 'base' | 'lg' | 'sm' | 'xs';
 
-type CommonEstablishmentType = 'majorEstablishments' | 'industry' | 'shopsFactoriesAndMarkets' | 'restaurants';
-
-type CardType = LandmarkType | CommonEstablishmentType;
-
-type CardInfo = {
-  type: CardType;
-  activationDice?: [number, number?];
-  name: string;
-  tagIcon: string;
-  cardImage: string;
-  buildCost?: number;
-  descriptionText: string;
-  underConstruction?: boolean;
-};
+type CardInfo = Landmark | CommonEstablishment;
 
 type CardViewProps = {
+  className?: string;
   cardInfo: CardInfo;
+  size?: CardSize;
 };
 
-type LandmarkInfo = Omit<CardInfo, 'type' | 'buildCost' | 'underConstruction'>
-& {
-  type: LandmarkType;
-  buildCost: number;
-  underConstruction: boolean;
+type LandmarkViewProps = Omit<CardViewProps, 'cardInfo'> & {
+  cardInfo: Landmark;
 };
 
-type LandmarkViewProps = {
-  cardInfo: LandmarkInfo;
+type CommonEstablishmentViewProps = Omit<CardViewProps, 'cardInfo'> & {
+  cardInfo: CommonEstablishment;
 };
 
-type CommonEstablishmentInfo = Omit<CardInfo, 'type' >
-& {
-  type: CommonEstablishmentType;
-};
-
-type CommonEstablishmentViewProps = {
-  cardInfo: CommonEstablishmentInfo;
-};
-
-const cardTypeToColorMap = {
-  majorEstablishments: 'purple',
-  restaurants: 'red',
-  industry: 'blue',
-  shopsFactoriesAndMarkets: 'green',
-  landmarks: 'yellow',
+const cardSizeToScaleMap = {
+  xs: 0.25,
+  base: 0.6,
+  sm: 0.5,
+  lg: 1,
 } as const;
 
-const CardView: React.FC<CardViewProps> = memo(({ cardInfo }: CardViewProps) => {
+const cardTypeToColorMap = {
+  majorEstablishment: 'purple',
+  restaurant: 'red',
+  industry: 'blue',
+  shopsFactoriesAndMarket: 'green',
+  landmark: 'yellow',
+} as const;
+
+const getCommonProps = (cardInfo: CardInfo) => ({
+  ...cardInfo,
+  activationDice: 'activationDice' in cardInfo ? cardInfo.activationDice : undefined,
+  count: 'count' in cardInfo ? cardInfo.count : undefined,
+  underConstruction: 'underConstruction' in cardInfo ? cardInfo.underConstruction : undefined,
+});
+
+const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: CardViewProps) => {
   const {
     type,
+    count,
     activationDice,
     name,
-    tagIcon,
-    cardImage,
+    tagSrc,
+    establishmentImageSrc,
     buildCost,
     descriptionText,
     underConstruction,
-  } = cardInfo;
+  } = getCommonProps(cardInfo);
 
   const activationDiceRange = useMemo((): string => (activationDice ? activationDice.join('-') : ''), [activationDice]);
   const cardColor = useMemo(() => cardTypeToColorMap[type], [type]);
@@ -77,8 +70,10 @@ const CardView: React.FC<CardViewProps> = memo(({ cardInfo }: CardViewProps) => 
 
   const underConstructionIcon = useMemo((): string => URLUtils.getStaticImageURL('under-construction'), []);
 
+  const scale = useMemo((): number => (size ? cardSizeToScaleMap[size] : cardSizeToScaleMap.base), [size]);
+
   return (
-    <div className="card-view-wrapper">
+    <div className={clsx('card-view-wrapper', className)} style={{ ['--card-scale' as string]: scale }}>
       <article
         className={clsx({
           /* eslint-disable @typescript-eslint/naming-convention */
@@ -92,14 +87,20 @@ const CardView: React.FC<CardViewProps> = memo(({ cardInfo }: CardViewProps) => 
         style={{ backgroundImage }}
       >
 
-        {activationDice && (
-        <p className="card-view__sum-dice">
-          {activationDiceRange}
+        {type !== 'landmark' && (
+          <p className="card-view__sum-dice">
+            {activationDiceRange}
+          </p>
+        )}
+
+        {count && (
+        <p className="card-view__count">
+          {count}
         </p>
         )}
 
         <h2
-          style={{ ['--bg-image' as string]: `url('${tagIcon}')` }}
+          style={{ ['--bg-image' as string]: `url('${tagSrc}')` }}
           className={clsx({
           /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -116,7 +117,7 @@ const CardView: React.FC<CardViewProps> = memo(({ cardInfo }: CardViewProps) => 
         <div className="card-view__card-image-container">
           <img
             className="card-view__card-image"
-            src={cardImage}
+            src={establishmentImageSrc}
             alt="card"
           />
         </div>
@@ -125,40 +126,40 @@ const CardView: React.FC<CardViewProps> = memo(({ cardInfo }: CardViewProps) => 
           className="card-view__effect"
         >
           {buildCost && (
-          <span className={clsx({
-          /* eslint-disable @typescript-eslint/naming-convention */
+            <>
+              <span className={clsx({
+                /* eslint-disable @typescript-eslint/naming-convention */
 
-            'card-view__cost-container': true,
-            'card-view__cost-container_left': true,
+                'card-view__cost-container': true,
+                'card-view__cost-container--left': true,
 
-          /* eslint-disable @typescript-eslint/naming-convention */
-          })}
-          >
-            <span className="card-view__cost-background">
-              <span className="card-view__cost">{buildCost}</span>
-            </span>
-          </span>
+                /* eslint-disable @typescript-eslint/naming-convention */
+              })}
+              >
+                <span className="card-view__cost-background">
+                  <span className="card-view__cost">{buildCost}</span>
+                </span>
+              </span>
 
-          )}
-          {buildCost && (
-          <span className={clsx({
-            /* eslint-disable @typescript-eslint/naming-convention */
+              <span className={clsx({
+                /* eslint-disable @typescript-eslint/naming-convention */
 
-            'card-view__cost-container': true,
-            'card-view__cost-container_right': true,
+                'card-view__cost-container': true,
+                'card-view__cost-container--right': true,
 
-            /* eslint-disable @typescript-eslint/naming-convention */
-          })}
-          >
-            <span className="card-view__cost-background" />
-          </span>
+                /* eslint-disable @typescript-eslint/naming-convention */
+              })}
+              >
+                <span className="card-view__cost-background" />
+              </span>
+            </>
           )}
           {descriptionText}
         </p>
 
       </article>
 
-      { underConstruction && (
+      {underConstruction && (
       <img
         className="card-view-wrapper__under-construction-icon"
         src={underConstructionIcon}
@@ -169,12 +170,24 @@ const CardView: React.FC<CardViewProps> = memo(({ cardInfo }: CardViewProps) => 
   );
 });
 
-export const LandmarkView: React.FC<LandmarkViewProps> = ({ cardInfo }: LandmarkViewProps) => (
-  <CardView cardInfo={cardInfo} />
+export const LandmarkView: React.FC<LandmarkViewProps> = (landmarkViewProps: LandmarkViewProps) => (
+  <CardView
+  /*  eslint-disable react/destructuring-assignment */
+    className={landmarkViewProps.className}
+    cardInfo={landmarkViewProps.cardInfo}
+    size={landmarkViewProps.size}
+  /*  eslint-enable react/destructuring-assignment */
+  />
 );
 
 export const CommonEstablishmentView:
-React.FC<CommonEstablishmentViewProps> = ({ cardInfo }:
+React.FC<CommonEstablishmentViewProps> = (commonEstablishmentViewProps:
 CommonEstablishmentViewProps) => (
-  <CardView cardInfo={cardInfo} />
+  <CardView
+  /*  eslint-disable react/destructuring-assignment */
+    className={commonEstablishmentViewProps.className}
+    cardInfo={commonEstablishmentViewProps.cardInfo}
+    size={commonEstablishmentViewProps.size}
+    /*  eslint-enable react/destructuring-assignment */
+  />
 );
