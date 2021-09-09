@@ -1,0 +1,65 @@
+.game-page {
+    padding: 16px;
+
+    @apply w-full bg-secondary flex flex-col overflow-y-hidden;
+}
+.game-page__game-view {
+    flex: 1;
+    padding-bottom: 16px;
+
+    @apply w-full flex overflow-y-hidden;
+}
+
+.game-page__game-view::-webkit-scrollbar {
+  width: 0px;
+  height: 8px;
+
+  @apply cursor-pointer;
+}
+
+.game-page__game-view::-webkit-scrollbar-track {
+    border-radius: 8px;
+
+    @apply bg-primary-dark;
+}
+
+.game-page__game-view::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+
+    @apply bg-primary-light;
+}
+
+.game-page__activation-cards {
+    flex: 1 1;
+}
+
+.game-page__dice-container {
+    flex: 0 0;
+}
+
+.game-page__players {
+    flex: 0 0;
+}
+
+.game-page__game-control {
+    flex: 0; 
+    padding-top: 16px;
+
+    @apply flex items-center justify-end;
+}
+
+.game-page__button {
+    padding: 0 16px;
+    height: 32px;
+    border-radius: 8px;
+
+    @apply bg-primary-dark text-white;
+}
+
+.game-page__button:hover {
+    @apply bg-primary;
+}
+
+.game-page__button:not(:first-child) {
+    margin-left: 16px;
+}
