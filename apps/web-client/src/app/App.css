@@ -3,5 +3,13 @@
 @tailwind utilities;
 
 .app {
-  @apply min-h-screen flex flex-col;
+  @apply min-h-screen max-h-screen flex flex-col;
+}
+
+.app__header {
+  flex: 0;
+}
+
+.app__game-page {
+  flex: 1;
 }

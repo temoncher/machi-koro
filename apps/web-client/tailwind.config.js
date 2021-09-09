@@ -10,6 +10,16 @@ module.exports = {
         lithos: ['lithos', 'sans-serif'],
       },
       colors: {
+        primary: {
+          light: '#AEE4EA',
+          DEFAULT: '#71CED9',
+          dark: '#2D9CA8'
+        },
+        secondary: {
+          light: '#049DBF',
+          DEFAULT: '#03738C',
+          dark: '#025A6E'
+        },
         tertiary: {
           light: '#F6F2B9',
           DEFAULT: '#F2EC94',

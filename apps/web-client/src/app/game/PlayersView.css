@@ -1,0 +1,6 @@
+.players {
+    @apply flex;
+}
+.players__player-view:not(:first-child) {
+    margin-left: 4px;
+}

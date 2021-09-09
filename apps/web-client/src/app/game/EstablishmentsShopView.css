@@ -1,0 +1,18 @@
+.activation-cards {
+    min-width: 238px;
+    padding: 16px;
+
+    grid-template-columns: repeat(auto-fill, 196px);
+    grid-template-rows: 300px;
+    grid-column-gap: 16px;
+    grid-row-gap: 16px;
+
+    border-radius: 16px;
+    
+    @apply bg-primary grid items-center justify-center overflow-y-scroll;
+
+}
+
+.activation-cards::-webkit-scrollbar {
+    width: 0;
+}
