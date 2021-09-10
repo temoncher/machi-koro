@@ -1,5 +1,7 @@
-import { loginActions } from './login/login.actions';
+import { RouterAction } from 'connected-react-router';
 
-export const rootActions = {
-  loginActions,
-};
+import { LoadingAction } from './loading/loading.actions';
+import { LobbyAction } from './lobby/lobby.actions';
+import { LoginAction } from './login/login.actions';
+
+export type RootAction = LoginAction | LoadingAction | LobbyAction | RouterAction;

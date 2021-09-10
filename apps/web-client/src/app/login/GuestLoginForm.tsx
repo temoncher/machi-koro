@@ -1,26 +1,21 @@
 import {
   FIRST_CHAR_USERNAME_REGEXP,
   USERNAME_REGEXP,
-} from '@machikoro/game-server-contracts/username-validation';
+} from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { LoginApi } from './login.api';
 import { useLoginActions } from './useLoginActions';
-
 import './GuestLoginForm.css';
 
-type GuestLoginFormProps = {
-  submitForm: () => void;
-};
 type GuestFormInputs = {
   username: string;
 };
 
-export const GuestLoginForm: React.FC<GuestLoginFormProps> = ({
-  submitForm,
-}: GuestLoginFormProps) => {
+export const GuestLoginForm: React.FC = () => {
   const {
     register,
     // eslint-disable-next-line id-denylist
@@ -31,7 +26,7 @@ export const GuestLoginForm: React.FC<GuestLoginFormProps> = ({
     defaultValues: { username: '' },
   });
 
-  const { setUsername } = useLoginActions();
+  const { registerGuest } = useLoginActions();
   const { t } = useTranslation();
 
   const validateUsername = useCallback((name: string) => {
@@ -51,8 +46,12 @@ export const GuestLoginForm: React.FC<GuestLoginFormProps> = ({
   }, [t]);
 
   const login = ({ username }: GuestFormInputs) => {
-    setUsername(username);
-    submitForm();
+    const loginRequestBody: LoginApi.AuthRequestBody = {
+      username,
+      type: 'guest',
+    };
+
+    registerGuest(loginRequestBody);
   };
 
   return (

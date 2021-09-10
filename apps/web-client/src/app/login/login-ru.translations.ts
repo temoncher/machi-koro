@@ -5,7 +5,6 @@ export const LOGIN_RU_TRANSLATIONS: typeof LOGIN_EN_TRANSLATIONS = {
   guestFormTitle: 'Вход',
   guestFormLableUsername: 'Укажите имя',
   guestFormButton: 'Войти',
-  greeting: 'Здравствуйте, {{username}}!',
   usernameEmptyErrorMessage: 'Поле обязательное для заполнения',
   usernameFirstCharacterErrorMessage: 'Имя должно начинаться с латинского символа',
   usernameRestrictedCharactersErrorMessage: 'Имя должно состоять только из латинских символов, пробелов и дефисов',

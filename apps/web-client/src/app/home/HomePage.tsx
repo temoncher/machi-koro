@@ -1,28 +1,25 @@
-import * as React from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { ReactComponent as Logo } from '../logo.svg';
-import { greet, initializeSocket } from '../socket';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import { useLobbyActions } from '../lobby/useLobbyActions';
+
+import './HomePage.css';
 
 export const HomePage: React.FC = () => {
-  const [isConnected, setIsConnected] = React.useState(false);
+  const { createLobbyThunk } = useLobbyActions();
+  const { username, userId } = useTypedSelector((state) => state.loginReducer);
+  const { t } = useTranslation();
 
-  const connect = () => {
-    initializeSocket();
-    setIsConnected(true);
-  };
+  const createLobbyRequest = () => { createLobbyThunk({ hostId: userId }); };
 
   return (
-    <div style={{ backgroundColor: 'grey' }}>
-      <Logo width="75" height="75" />
-      {isConnected ? (
-        <button type="button" onClick={greet} data-test-id="greet_button">
-          Greet the server!
-        </button>
-      ) : (
-        <button type="button" onClick={connect} data-test-id="connect_button">
-          CONNECT
-        </button>
-      )}
+    <div className="home-container">
+      <h2 className="text-2xl">{t('home.greeting', { username })}</h2>
+      <p className="p-4 text-center">
+        {t('home.welcomeText')}
+      </p>
+      <button type="button" className="new-lobby-button" onClick={createLobbyRequest}>{t('home.createNewLobbyButtonText')}</button>
     </div>
   );
 };
