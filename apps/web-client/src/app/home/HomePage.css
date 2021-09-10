@@ -1,0 +1,8 @@
+.home-container {
+  @apply flex items-center justify-center flex-col py-12 px-4 sm:px-6 lg:px-8 gap-4;
+  margin: auto;
+}
+
+.new-lobby-button {
+  @apply w-56 bg-primary rounded-md p-4 text-center text-white hover:bg-primary-light;
+}

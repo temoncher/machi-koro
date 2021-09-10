@@ -1,0 +1,23 @@
+.player-card__container {
+  @apply max-w-sm box-border bg-primary shadow-md flex flex-col rounded-md p-4 text-white gap-2 border-0
+}
+
+.player-card__container--highlighted {
+  @apply max-w-sm box-border bg-primary shadow-md flex flex-col rounded-md p-4 text-white gap-2 border-2 border-tertiary
+}
+
+.player-card-header {
+  @apply flex flex-row items-center gap-4
+}
+
+.player-card-header__img {
+  @apply rounded-full h-10 w-10 overflow-hidden
+}
+
+.player-card-header__name {
+  @apply text-lg font-bold
+}
+
+.player-card-header__login-type {
+  @apply text-gray-300 text-right
+}

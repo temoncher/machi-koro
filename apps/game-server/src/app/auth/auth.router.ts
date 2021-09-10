@@ -1,17 +1,28 @@
+import { registerGuestRequestBodySchema } from '@machikoro/game-server-contracts';
 import * as express from 'express';
-import * as asyncHandler from 'express-async-handler';
-import { RedisClient } from 'redis';
 
-import { authController } from './auth.controller';
-import { authRequestBodySchema } from './authRequestBody.schema';
-import { authValidationMiddleware } from './authValidation.middleware';
+import { authMiddleware } from '../shared/auth.middleware';
+import { bodyParserMiddleware } from '../shared/body-parser.middleware';
+import { asyncHandler } from '../utils/asyncHandler';
 
-export const initializeAuthRouter = (redisClientUsers: RedisClient): express.Router => {
+import { authMeRequestHandler } from './authMeRequest.handler';
+import { registerGuestRequestHandler, RegisterGuestRequestHandlerDependencies } from './registerGuestRequest.handler';
+
+export type AuthRouterDependencies = RegisterGuestRequestHandlerDependencies;
+export const initializeAuthRouter = (dependencies: AuthRouterDependencies): express.Router => {
   const authRouter = express.Router();
 
-  return authRouter.post(
-    '/auth',
-    authValidationMiddleware(authRequestBodySchema),
-    asyncHandler(authController(redisClientUsers)),
-  );
+  authRouter
+    .post(
+      '/register',
+      bodyParserMiddleware(registerGuestRequestBodySchema),
+      asyncHandler(registerGuestRequestHandler(dependencies)),
+    )
+    .get(
+      '/me',
+      authMiddleware(dependencies),
+      asyncHandler(authMeRequestHandler()),
+    );
+
+  return authRouter;
 };
