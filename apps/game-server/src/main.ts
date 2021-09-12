@@ -7,6 +7,7 @@ import * as redis from 'redis';
 
 import {
   initializeApiRouter,
+  LobbyRepository,
   RedisDbInstance,
   promisifyRedisClient,
   initSocketServer,
@@ -28,6 +29,11 @@ const main = (): void => {
     port: 6379,
     db: RedisDbInstance.LOBBIES,
   });
+  const redisClientGames = redis.createClient({
+    host: 'localhost',
+    port: 6379,
+    db: RedisDbInstance.GAMES,
+  });
 
   redisClientUsers.on('error', (error) => {
     // eslint-disable-next-line no-console
@@ -36,6 +42,8 @@ const main = (): void => {
 
   const promisifiedUsersClient = promisifyRedisClient(redisClientUsers);
   const promisifiedLobbiesClient = promisifyRedisClient(redisClientLobbies);
+  const promisifiedGamesClient = promisifyRedisClient(redisClientGames);
+  const lobbyRepository = LobbyRepository.init(promisifiedLobbiesClient);
 
   app.use(express.json());
 
@@ -56,6 +64,8 @@ const main = (): void => {
   app.use('/api', initializeApiRouter({
     redisClientUsers: promisifiedUsersClient,
     redisClientLobbies: promisifiedLobbiesClient,
+    redisClientGames: promisifiedGamesClient,
+    getLobby: lobbyRepository.getLobby,
   }));
 
   server.listen(PORT, () => {

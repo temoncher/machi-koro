@@ -20,7 +20,7 @@ type SetLobbyParams = {
 
 export type LobbyAction = SetLobbyParams;
 
-export const setLobbyParams = (lobbyParams: LobbyState): LobbyAction => ({
+export const setLobbyParams = (lobbyParams: LobbyState): SetLobbyParams => ({
   type: LobbyActionTypes.SET_LOBBY_PARAMS,
   payload: lobbyParams,
 });
@@ -32,12 +32,7 @@ export const createLobbyThunk = (lobbyData: CreateLobbyRequestBody) => async (
 ): Promise<void> => {
   dispatch(setIsLoading(true));
 
-  const mockUserData = {
-    lobbyId: '',
-  };
-
-  const createLobbyResponse = await rootApi.lobbyApi.sendCreateLobbyRequest(lobbyData)
-    .catch(() => mockUserData);
+  const createLobbyResponse = await rootApi.lobbyApi.sendCreateLobbyRequest(lobbyData);
 
   const lobbyParams: LobbyState = {
     lobbyId: createLobbyResponse.lobbyId,
