@@ -1,10 +1,10 @@
 import { Lobby, LobbyState, User } from '@machikoro/game-server-contracts';
 import { ZodError } from 'zod';
 
-import { AuthMiddlewareLocals } from '../shared/auth.middleware';
-import { AppSocket } from '../types/websocket';
+import { AuthMiddlewareLocals } from '../shared';
+import { AppSocket } from '../types';
 
-const validateLobby = (lobby: Lobby | undefined) => {
+const validateLobby = (lobby: Lobby | undefined): Lobby | undefined => {
   if (!lobby || lobby.users.length > 3) {
     return undefined;
   }

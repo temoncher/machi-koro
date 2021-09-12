@@ -1,11 +1,10 @@
-import { getAuthorizationHeader } from '../utils/getAuthorizationHeader';
-
-import { LoginApi } from './login.api';
+import { AppHeaders } from '../types';
+import { getAuthorizationHeader } from '../utils';
 
 export type LoginState = {
   username: string;
   userId: string;
-  headers: LoginApi.HeadersType;
+  headers: AppHeaders;
 };
 
 export const initialLoginState: LoginState = {

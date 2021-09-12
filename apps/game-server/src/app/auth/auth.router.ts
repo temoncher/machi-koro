@@ -1,9 +1,8 @@
 import { registerGuestRequestBodySchema } from '@machikoro/game-server-contracts';
 import * as express from 'express';
 
-import { authMiddleware } from '../shared/auth.middleware';
-import { bodyParserMiddleware } from '../shared/body-parser.middleware';
-import { asyncHandler } from '../utils/asyncHandler';
+import { authMiddleware, bodyParserMiddleware } from '../shared';
+import { asyncHandler } from '../utils';
 
 import { authMeRequestHandler } from './authMeRequest.handler';
 import { registerGuestRequestHandler, RegisterGuestRequestHandlerDependencies } from './registerGuestRequest.handler';

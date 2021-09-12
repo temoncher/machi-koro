@@ -2,9 +2,9 @@ import { CreateLobbyResponse, ServerError } from '@machikoro/game-server-contrac
 import { RequestHandler } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AuthMiddlewareLocals } from '../shared/auth.middleware';
-import { HTTPStatusCode } from '../types/HTTPStatusCode.enum';
-import { PromisifiedRedisClient } from '../utils/promisifyRedisClient';
+import { AuthMiddlewareLocals } from '../shared';
+import { HTTPStatusCode } from '../types';
+import { PromisifiedRedisClient } from '../utils';
 
 type Lobby = {
   lobbyId: string;

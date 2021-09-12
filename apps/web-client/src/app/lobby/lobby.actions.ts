@@ -1,12 +1,12 @@
+import { CreateLobbyRequestBody } from '@machikoro/game-server-contracts';
 import { push } from 'connected-react-router';
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
 
-import { setIsLoading } from '../loading/loading.actions';
-import { RootApi } from '../root.api';
+import { setIsLoading } from '../loading';
+import { RootApiType } from '../root.api.type';
 import { RootState } from '../root.state';
 
-import { LobbyApi } from './lobby.api';
 import { LobbyState } from './lobby.state';
 
 export enum LobbyActionTypes {
@@ -25,10 +25,10 @@ export const setLobbyParams = (lobbyParams: LobbyState): LobbyAction => ({
   payload: lobbyParams,
 });
 
-export const createLobbyThunk = (lobbyData: LobbyApi.CreateLobbyRequestBody) => async (
+export const createLobbyThunk = (lobbyData: CreateLobbyRequestBody) => async (
   dispatch: ThunkDispatch<unknown, unknown, Action>,
   getState: () => RootState,
-  rootApi: RootApi.RootApi,
+  rootApi: RootApiType.RootApi,
 ): Promise<void> => {
   dispatch(setIsLoading(true));
 

@@ -4,9 +4,8 @@ import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
 import { ZodError } from 'zod';
 
-import { HTTPStatusCode } from '../types/HTTPStatusCode.enum';
-import { AppSocket } from '../types/websocket';
-import { PromisifiedRedisClient } from '../utils/promisifyRedisClient';
+import { HTTPStatusCode, AppSocket } from '../types';
+import { PromisifiedRedisClient } from '../utils';
 
 import { parseUserWithTokenWithoutId } from './user.model';
 

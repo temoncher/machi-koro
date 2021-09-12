@@ -1,7 +1,7 @@
-import { GAME_RU_TRANSLATIONS } from './game/game-ru.translations';
-import { HOME_RU_TRANSLATIONS } from './home/home-ru.translations';
-import { LOBBY_RU_TRANSLATIONS } from './lobby/lobby-ru.translations';
-import { LOGIN_RU_TRANSLATIONS } from './login/login-ru.translations';
+import { GAME_RU_TRANSLATIONS } from './game';
+import { HOME_RU_TRANSLATIONS } from './home';
+import { LOBBY_RU_TRANSLATIONS } from './lobby';
+import { LOGIN_RU_TRANSLATIONS } from './login';
 import { ROOT_EN_TRANSLATIONS } from './root-en.translations';
 
 export const ROOT_RU_TRANSLATIONS: typeof ROOT_EN_TRANSLATIONS = {

@@ -1,16 +1,10 @@
-import { LobbyApi } from './lobby/lobby.api';
-import { LoginApi } from './login/login.api';
+import { LobbyApi } from './lobby';
+import { LoginApi } from './login';
+import { RootApiType } from './root.api.type';
 
 export namespace RootApi {
 
-  type Dependencies = LoginApi.Dependencies;
-
-  export type RootApi = {
-    loginApi: LoginApi.Api;
-    lobbyApi: LobbyApi.Api;
-  };
-
-  export const init = (deps: Dependencies): RootApi => ({
+  export const init = (deps: RootApiType.Dependencies): RootApiType.RootApi => ({
     loginApi: LoginApi.init(deps),
     lobbyApi: LobbyApi.init(deps),
   });

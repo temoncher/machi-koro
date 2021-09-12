@@ -1,7 +1,7 @@
 import { User } from '@machikoro/game-server-contracts';
 import { ZodError } from 'zod';
 
-import { PromisifiedRedisClient } from '../utils/promisifyRedisClient';
+import { PromisifiedRedisClient } from '../utils';
 
 import { parseUserWithTokenWithoutId } from './user.model';
 

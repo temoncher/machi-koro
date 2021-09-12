@@ -1,8 +1,8 @@
 import { AuthMeResponse, ServerError } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
 
-import { AuthMiddlewareLocals } from '../shared/auth.middleware';
-import { HTTPStatusCode } from '../types/HTTPStatusCode.enum';
+import { AuthMiddlewareLocals } from '../shared';
+import { HTTPStatusCode } from '../types';
 
 type AuthMeRequestHandler = RequestHandler<
 Record<string, string>,

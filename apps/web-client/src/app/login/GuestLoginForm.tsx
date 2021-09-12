@@ -7,7 +7,7 @@ import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { LoginApi } from './login.api';
+import { LoginApiType } from './login.api.type';
 import { useLoginActions } from './useLoginActions';
 import './GuestLoginForm.css';
 
@@ -46,7 +46,7 @@ export const GuestLoginForm: React.FC = () => {
   }, [t]);
 
   const login = ({ username }: GuestFormInputs) => {
-    const loginRequestBody: LoginApi.AuthRequestBody = {
+    const loginRequestBody: LoginApiType.AuthRequestBody = {
       username,
       type: 'guest',
     };

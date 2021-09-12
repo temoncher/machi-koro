@@ -4,9 +4,9 @@ import * as jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EXPIRE_JWT_TIME_1D, EXPIRE_TIME_1D } from '../constants';
-import { UserWithTokenWithoutId } from '../shared/user.model';
-import { HTTPStatusCode } from '../types/HTTPStatusCode.enum';
-import { PromisifiedRedisClient } from '../utils/promisifyRedisClient';
+import { UserWithTokenWithoutId } from '../shared';
+import { HTTPStatusCode } from '../types';
+import { PromisifiedRedisClient } from '../utils';
 
 type RegisterGuestRequestHandler = RequestHandler<
 Record<string, string>,

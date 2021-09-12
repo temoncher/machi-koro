@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import './PlayersView.css';
 import React, { memo } from 'react';
 
-import { Player } from '../types/types';
+import { Player } from '../types';
 
 import { PlayerView } from './PlayerView';
 

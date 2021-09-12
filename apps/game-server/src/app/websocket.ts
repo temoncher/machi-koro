@@ -6,11 +6,9 @@ import {
 } from '@machikoro/game-server-contracts';
 import * as SocketIO from 'socket.io';
 
-import { LobbyRepository } from './lobbies/lobbies.repository';
-import { handleLobbyEvents } from './lobbies/lobbies.websocket';
-import { AuthMiddlewareLocals, authSocketMiddleware } from './shared/auth.middleware';
-import { getUsers } from './shared/user.repository';
-import { AppSocket, WebsocketHandlersDependencies } from './types/websocket';
+import { LobbyRepository, handleLobbyEvents } from './lobbies';
+import { AuthMiddlewareLocals, authSocketMiddleware, getUsers } from './shared';
+import { AppSocket, WebsocketHandlersDependencies } from './types';
 
 type OnDisconnectingDependencies = {
   removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;

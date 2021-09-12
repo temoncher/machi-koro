@@ -4,8 +4,11 @@ import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
-  CommonEstablishment, DiceCombination, Player, Status,
-} from '../types/types';
+  CommonEstablishment,
+  DiceCombination,
+  Player,
+  Status,
+} from '../types';
 
 import { DicePairView } from './DicePairView';
 import { EstablishmentsShopView } from './EstablishmentsShopView';

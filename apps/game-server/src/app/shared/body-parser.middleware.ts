@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { HTTPStatusCode } from '../types/HTTPStatusCode.enum';
-import { convertIssueToErrorInfo } from '../utils/zod.utils';
+import { HTTPStatusCode } from '../types';
+import { convertIssueToErrorInfo } from '../utils';
 
 export const bodyParserMiddleware = <S>(schema: z.ZodType<S>) => (req: Request, res: Response, next: NextFunction): void => {
   const parsingResult = schema.safeParse(req.body);

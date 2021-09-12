@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import React, { memo, useMemo } from 'react';
 
-import { Landmark, CommonEstablishment } from '../types/types';
-import { URLUtils } from '../utils/url.utils';
+import { Landmark, CommonEstablishment } from '../types';
+import { URLUtils } from '../utils';
 
 import './CardView.css';
 

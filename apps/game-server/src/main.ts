@@ -5,10 +5,12 @@ import * as cors from 'cors';
 import * as express from 'express';
 import * as redis from 'redis';
 
-import { initializeApiRouter } from './app/api.router';
-import { RedisDbInstance } from './app/types/RedisDbInstance.enum';
-import { promisifyRedisClient } from './app/utils/promisifyRedisClient';
-import { initSocketServer } from './app/websocket';
+import {
+  initializeApiRouter,
+  RedisDbInstance,
+  promisifyRedisClient,
+  initSocketServer,
+} from './app';
 
 const main = (): void => {
   const PORT = process.env.port || 3333;

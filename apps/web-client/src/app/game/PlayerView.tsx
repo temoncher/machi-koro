@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import './PlayerView.css';
 import React, { memo, useMemo } from 'react';
 
-import { Player, Status } from '../types/types';
+import { Player, Status } from '../types';
 
 import { CommonEstablishmentView, LandmarkView } from './CardView';
 

@@ -5,7 +5,7 @@ import {
 } from '@machikoro/game-server-contracts';
 import * as SocketIOClient from 'socket.io-client';
 
-import { getAuthorizationHeader } from './utils/getAuthorizationHeader';
+import { getAuthorizationHeader } from './utils';
 
 let socket: SocketIOClient.Socket<ServerSentEventsMap, ClientSentEventsMap> | undefined;
 

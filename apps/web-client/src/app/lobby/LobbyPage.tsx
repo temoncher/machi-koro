@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useTypedSelector } from '../hooks/useTypedSelector';
+import { useTypedSelector } from '../hooks';
 import { initializeSocket, joinLobby, leaveLobby } from '../socket';
 
 import { PlayerCard, Player } from './PlayerCard';
