@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import './DicePairView.css';
 import React, { memo } from 'react';
 
-import { DiceCombination } from '../types/types';
+import { DiceCombination } from '../types';
 
 import { DiceView } from './DiceView';
 

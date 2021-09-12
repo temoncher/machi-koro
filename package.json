@@ -30,7 +30,9 @@
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "depcruise:web-client": "cd apps/web-client && \"../../node_modules/.bin/depcruise\" --ts-config tsconfig.app.json --ts-pre-compilation-deps --exclude \"../../node_modules\" --output-type dot src/main.tsx | dot -T svg > ../../web-client.graph.svg",
+    "depcruise:game-server": "cd apps/game-server && \"../../node_modules/.bin/depcruise\" --ts-config tsconfig.app.json --ts-pre-compilation-deps --exclude \"../../node_modules\" --output-type dot src/main.ts | dot -T svg > ../../game-server.graph.svg"
   },
   "private": true,
   "dependencies": {
@@ -43,9 +45,11 @@
     "connected-react-router": "^6.9.1",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
+    "dependency-cruiser": "^10.2.0",
     "document-register-element": "1.13.1",
     "express": "4.17.1",
     "express-async-handler": "^1.1.4",
+    "graphviz": "0.0.9",
     "history": "^4.10.1",
     "i18next": "^20.3.5",
     "i18next-browser-languagedetector": "^6.1.2",

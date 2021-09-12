@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useTypedSelector } from '../hooks/useTypedSelector';
-import { useLobbyActions } from '../lobby/useLobbyActions';
+import { useTypedSelector } from '../hooks';
+import { useLobbyActions } from '../lobby';
 
 import './HomePage.css';
 

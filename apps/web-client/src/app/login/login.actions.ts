@@ -1,12 +1,12 @@
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
 
-import { setIsLoading } from '../loading/loading.actions';
-import { RootApi } from '../root.api';
+import { setIsLoading } from '../loading';
+import { RootApiType } from '../root.api.type';
 import { RootState } from '../root.state';
-import { getAuthorizationHeader } from '../utils/getAuthorizationHeader';
+import { getAuthorizationHeader } from '../utils';
 
-import { LoginApi } from './login.api';
+import { LoginApiType } from './login.api.type';
 import { LoginState } from './login.state';
 
 export enum LoginActionTypes {
@@ -28,7 +28,7 @@ export const setLoginParams = (loginParams: LoginState): LoginAction => ({
 export const getUserData = () => async (
   dispatch: ThunkDispatch<unknown, unknown, Action>,
   getState: () => RootState,
-  rootApi: RootApi.RootApi,
+  rootApi: RootApiType.RootApi,
 ): Promise<void> => {
   dispatch(setIsLoading(true));
 
@@ -58,10 +58,10 @@ export const getUserData = () => async (
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const registerGuest = (userData: LoginApi.AuthRequestBody) => async (
+export const registerGuest = (userData: LoginApiType.AuthRequestBody) => async (
   dispatch: ThunkDispatch<unknown, unknown, Action>,
   getState: () => RootState,
-  rootApi: RootApi.RootApi,
+  rootApi: RootApiType.RootApi,
 ): Promise<void> => {
   dispatch(setIsLoading(true));
 

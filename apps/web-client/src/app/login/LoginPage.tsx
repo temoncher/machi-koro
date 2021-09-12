@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
 
-import { useTypedSelector } from '../hooks/useTypedSelector';
+import { useTypedSelector } from '../hooks';
 
 import { GuestLoginForm } from './GuestLoginForm';
 

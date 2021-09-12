@@ -1,6 +1,6 @@
 import { Lobby } from '@machikoro/game-server-contracts';
 
-import { PromisifiedRedisClient } from '../utils/promisifyRedisClient';
+import { PromisifiedRedisClient } from '../utils';
 
 export namespace LobbyRepository {
 

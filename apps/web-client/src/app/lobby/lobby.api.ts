@@ -1,23 +1,12 @@
-import { LoginApi } from '../login/login.api';
+import { CreateLobbyResponse } from '@machikoro/game-server-contracts';
+
+import { LobbyApiType } from './lobby.api.type';
 
 export namespace LobbyApi {
-  type SendCreateLobbyRequest = (lobbyRequestBody: CreateLobbyRequestBody) => Promise<CreateLobbyResponse>;
-
-  export type Api = {
-    sendCreateLobbyRequest: SendCreateLobbyRequest;
-  };
-
-  export type CreateLobbyRequestBody = {
-    hostId: string;
-  };
-
-  export type CreateLobbyResponse = {
-    lobbyId: string;
-  };
 
   export const initializeSendCreateLobbyRequest = (
-    { getHeaders, httpClient }: LoginApi.Dependencies,
-  ): SendCreateLobbyRequest => async (lobbyRequestBody) => {
+    { getHeaders, httpClient }: LobbyApiType.SendCreateLobbyRequestDependencies,
+  ): LobbyApiType.SendCreateLobbyRequest => async (lobbyRequestBody) => {
     const commonHeaders = getHeaders();
 
     const response = await httpClient.post('lobbies', lobbyRequestBody, {
@@ -27,7 +16,7 @@ export namespace LobbyApi {
     return response.data as CreateLobbyResponse;
   };
 
-  export const init = (deps: LoginApi.Dependencies): Api => ({
+  export const init = (deps: LobbyApiType.Dependencies): LobbyApiType.Api => ({
     sendCreateLobbyRequest: initializeSendCreateLobbyRequest(deps),
   });
 }

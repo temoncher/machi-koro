@@ -1,7 +1,7 @@
 import * as express from 'express';
 
-import { AuthMiddlewareDependencies, authMiddleware } from '../shared/auth.middleware';
-import { asyncHandler } from '../utils/asyncHandler';
+import { AuthMiddlewareDependencies, authMiddleware } from '../shared';
+import { asyncHandler } from '../utils';
 
 import { createLobbyRequestHandler, CreateLobbyRequestHandlerDependencies } from './createLobbyRequest.handler';
 

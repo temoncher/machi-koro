@@ -2,7 +2,7 @@ import './EstablishmentsShopView.css';
 import clsx from 'clsx';
 import React, { memo } from 'react';
 
-import { CommonEstablishment } from '../types/types';
+import { CommonEstablishment } from '../types';
 
 import { CommonEstablishmentView } from './CardView';
 

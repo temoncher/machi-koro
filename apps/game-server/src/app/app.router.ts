@@ -1,7 +1,7 @@
 import * as express from 'express';
 
-import { AuthRouterDependencies, initializeAuthRouter } from './auth/auth.router';
-import { initializeLobbiesRouter, LobbiesRouterDependencies } from './lobbies/lobbies.router';
+import { AuthRouterDependencies, initializeAuthRouter } from './auth';
+import { initializeLobbiesRouter, LobbiesRouterDependencies } from './lobbies';
 
 export type ApiDependencies = AuthRouterDependencies & LobbiesRouterDependencies;
 

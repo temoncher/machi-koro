@@ -6,9 +6,7 @@ import * as ReactDOM from 'react-dom';
 import { initReactI18next } from 'react-i18next';
 import { Provider } from 'react-redux';
 
-import { App } from './app/App';
-import { initializeI18n } from './app/i18n';
-import { initStore } from './app/store';
+import { App, initializeI18n, initStore } from './app';
 import './styles.css';
 
 const main = () => {

@@ -12,7 +12,7 @@ import { LOCAL_URL } from './constants';
 import { RootApi } from './root.api';
 import { rootReducer } from './root.reducer';
 import { RootState } from './root.state';
-import { initHttpClient } from './utils/http-client';
+import { initHttpClient } from './utils';
 
 declare global {
   interface Window {

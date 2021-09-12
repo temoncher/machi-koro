@@ -1,7 +1,7 @@
-import { GAME_EN_TRANSLATIONS } from './game/game-en.translations';
-import { HOME_EN_TRANSLATIONS } from './home/home-en.translations';
-import { LOBBY_EN_TRANSLATIONS } from './lobby/lobby-en.translations';
-import { LOGIN_EN_TRANSLATIONS } from './login/login-en.translations';
+import { GAME_EN_TRANSLATIONS } from './game';
+import { HOME_EN_TRANSLATIONS } from './home';
+import { LOBBY_EN_TRANSLATIONS } from './lobby';
+import { LOGIN_EN_TRANSLATIONS } from './login';
 
 export const ROOT_EN_TRANSLATIONS = {
   gameName: 'Machi Koro',
