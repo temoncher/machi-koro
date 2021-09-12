@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useGameActions } from '../game/useGameActions';
 import { useTypedSelector } from '../hooks';
 import { initializeSocket, joinLobby, leaveLobby } from '../socket';
 
@@ -56,7 +57,15 @@ export const LobbyPage: React.FC<LobbyProps> = ({ currentUserId }: LobbyProps) =
     return getLobbyId(pathname);
   });
 
-  const createGame = (): void => { };
+  const { createGameThunk } = useGameActions();
+  const createGame = (): void => {
+    if (lobbyId) {
+      createGameThunk({ lobbyId });
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('LobbyId is missing');
+    }
+  };
 
   useEffect(() => {
     initializeSocket();

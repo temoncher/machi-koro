@@ -1,16 +1,13 @@
-import { Lobby, LobbyState, User } from '@machikoro/game-server-contracts';
+import {
+  Lobby,
+  LobbyState,
+  User,
+  validateLobby,
+} from '@machikoro/game-server-contracts';
 import { ZodError } from 'zod';
 
 import { AuthMiddlewareLocals } from '../shared';
 import { AppSocket } from '../types';
-
-const validateLobby = (lobby: Lobby | undefined): Lobby | undefined => {
-  if (!lobby || lobby.users.length > 3) {
-    return undefined;
-  }
-
-  return lobby;
-};
 
 type LeaveLobbyDependencies = {
   removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;
