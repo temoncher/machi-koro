@@ -12,6 +12,9 @@ export const loginReducer = (state: LoginState = initialLoginState, action: Logi
         headers: action.payload.headers,
       };
     }
+    case LoginActionTypes.SET_AUTH_ERROR: {
+      return { ...state, authError: action.payload };
+    }
 
     default:
       return state;

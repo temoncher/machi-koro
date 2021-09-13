@@ -5,6 +5,7 @@ export type LoginState = {
   username: string;
   userId: string;
   headers: AppHeaders;
+  authError: string | undefined;
 };
 
 export const initialLoginState: LoginState = {
@@ -14,4 +15,5 @@ export const initialLoginState: LoginState = {
     Authorization: getAuthorizationHeader() ?? '',
     'Content-Type': 'application/json',
   },
+  authError: undefined,
 };

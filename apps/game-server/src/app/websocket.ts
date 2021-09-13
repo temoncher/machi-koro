@@ -6,16 +6,19 @@ import {
 } from '@machikoro/game-server-contracts';
 import * as SocketIO from 'socket.io';
 
-import { LobbyRepository, handleLobbyEvents } from './lobbies';
-import { AuthMiddlewareLocals, authSocketMiddleware, getUsers } from './shared';
-import { AppSocket, WebsocketHandlersDependencies } from './types';
+import { handleLobbyEvents, HandleLobbyEventsDependencies } from './lobbies';
+import {
+  AuthMiddlewareLocals,
+  authSocketMiddleware,
+  AuthSocketMiddlewareDependencies,
+} from './shared';
+import { AppSocket } from './types';
 
 type OnDisconnectingDependencies = {
   removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;
-  socket: AppSocket;
 };
 
-const onDisconnecting = async ({ removeUserFromLobby, socket }: OnDisconnectingDependencies): Promise<void> => {
+const onDisconnecting = ({ removeUserFromLobby }: OnDisconnectingDependencies) => async (socket: AppSocket): Promise<void> => {
   // authSocketMiddleware checked and put currentUser object in socket.data
   const { currentUser: { userId, username, type } } = socket.data as AuthMiddlewareLocals;
 
@@ -28,33 +31,24 @@ const onDisconnecting = async ({ removeUserFromLobby, socket }: OnDisconnectingD
   lobbies.forEach((lobbyId) => socket.in(lobbyId).emit('LOBBY_USER_LEAVE', { userId, username, type }));
 };
 
+type OnConnectionDependencies = HandleLobbyEventsDependencies & OnDisconnectingDependencies;
 const onConnection = (
-  websocketHandlersDependencies: WebsocketHandlersDependencies,
+  onConnectionDependencies: OnConnectionDependencies,
 ) => (
   socket: AppSocket,
 ): void => {
-  const lobbyRepository = LobbyRepository.init(websocketHandlersDependencies.redisClientLobbies);
+  handleLobbyEvents(onConnectionDependencies)(socket);
 
-  handleLobbyEvents(
-    {
-      removeUserFromLobby: lobbyRepository.removeUserFromLobby,
-      addUserToLobby: lobbyRepository.addUserToLobby,
-      getLobby: lobbyRepository.getLobby,
-      getUsers: getUsers(websocketHandlersDependencies.redisClientUsers),
-      socket,
-    },
-  );
   socket.on('disconnecting', () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    onDisconnecting({
-      removeUserFromLobby: lobbyRepository.removeUserFromLobby,
-      socket,
-    });
+    onDisconnecting(onConnectionDependencies)(socket);
   });
 };
 
+export type SocketServerDependencies = AuthSocketMiddlewareDependencies & OnConnectionDependencies;
+
 export const initSocketServer = (
-  websocketHandlersDependencies: WebsocketHandlersDependencies,
+  socketServerDependencies: SocketServerDependencies,
   server: http.Server,
 ): SocketIO.Server<ClientSentEventsMap, ServerSentEventsMap, ServerSentEventsMap> => {
   const io = new SocketIO.Server(server, {
@@ -71,8 +65,8 @@ export const initSocketServer = (
   });
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  io.use(authSocketMiddleware(websocketHandlersDependencies.redisClientUsers));
-  io.on('connection', onConnection(websocketHandlersDependencies));
+  io.use(authSocketMiddleware(socketServerDependencies));
+  io.on('connection', onConnection(socketServerDependencies));
 
   return io;
 };

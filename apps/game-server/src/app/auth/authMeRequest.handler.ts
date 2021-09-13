@@ -17,8 +17,8 @@ export const authMeRequestHandler = (): AuthMeRequestHandler => async (
   res,
   next,
 ) => {
-  const { userId, username } = res.locals.currentUser;
-  const authMeResponse: AuthMeResponse = { username, userId };
+  const { userId, username, type } = res.locals.currentUser;
+  const authMeResponse: AuthMeResponse = { username, userId, type };
 
   res.status(HTTPStatusCode.OK).send(authMeResponse);
   next();
