@@ -4,16 +4,12 @@ import {
   Game,
   Lobby,
   ServerError,
-  UsersStatusesMap,
-  UserStatus,
   validateLobby,
 } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 
 import { AuthMiddlewareLocals } from '../shared';
 import { HTTPStatusCode } from '../types';
-import { PromisifiedRedisClient } from '../utils';
 
 type CreateGameRequestHandler = RequestHandler<
 Record<string, string>,
@@ -24,12 +20,12 @@ AuthMiddlewareLocals
 >;
 
 export type CreateGameRequestHandlerDependencies = {
-  redisClientGames: PromisifiedRedisClient;
+  createGame: (currentUserId: string, users: string[]) => Promise<Game>;
   getLobby: (lobbyId: string) => Promise<Lobby | undefined>;
 };
 
 export const createGameRequestHandler = (
-  { redisClientGames, getLobby }: CreateGameRequestHandlerDependencies,
+  { createGame, getLobby }: CreateGameRequestHandlerDependencies,
 ): CreateGameRequestHandler => async (req, res, next) => {
   try {
     const currentUserId = res.locals.currentUser.userId;
@@ -44,23 +40,7 @@ export const createGameRequestHandler = (
       return;
     }
 
-    const usersStatusesMap: UsersStatusesMap = Object.fromEntries(lobbyOrError.users.map((userId) => [userId, UserStatus.DISCONNECTED]));
-    const game: Game = {
-      gameId: uuidv4(),
-      hostId: currentUserId,
-      users: lobbyOrError.users,
-      usersStatuses: usersStatusesMap,
-    };
-
-    const usersHash = Object.entries(game.users).flat();
-
-    const usersStatuses = Object.entries(usersStatusesMap).flat();
-
-    await Promise.all([
-      redisClientGames.set(`${game.gameId}:hostId`, game.hostId),
-      redisClientGames.rpush(`${game.gameId}:users`, ...usersHash),
-      redisClientGames.hset([`${game.gameId}:usersStatuses`, ...usersStatuses]),
-    ]);
+    const game = await createGame(currentUserId, lobbyOrError.users);
 
     const gamesResponse: CreateGameResponse = {
       gameId: game.gameId,

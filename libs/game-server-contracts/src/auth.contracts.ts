@@ -1,10 +1,12 @@
-export type AuthMeResponse = {
-  username: string;
-  userId: string;
-};
+import { z } from 'zod';
 
-export type AuthResponse = {
-  username: string;
-  id: string;
-  token: string;
-};
+import { UserWithToken } from './user-with-token.model';
+import { userSchema, User } from './user.model';
+
+export type AuthMeResponse = User;
+
+export type RegisterGuestResponse = UserWithToken;
+
+export const registerGuestRequestBodySchema = userSchema.omit({ userId: true });
+
+export type RegisterGuestRequestBody = z.infer<typeof registerGuestRequestBodySchema>;

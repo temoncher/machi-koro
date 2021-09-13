@@ -30,9 +30,9 @@ export const createRequireLogin = (store: Store<RootState, RootAction>, dispatch
   // eslint-disable-next-line @typescript-eslint/await-thenable
   await dispatch(getUserData());
 
-  const { username } = store.getState().loginReducer;
+  const { authError } = store.getState().loginReducer;
 
-  if (username === '') {
+  if (authError !== undefined) {
     next.redirect('/login');
   } else {
     next();

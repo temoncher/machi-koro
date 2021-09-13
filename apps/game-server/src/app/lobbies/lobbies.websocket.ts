@@ -11,14 +11,8 @@ import { AppSocket } from '../types';
 
 type LeaveLobbyDependencies = {
   removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;
-  socket: AppSocket;
 };
-const leaveLobby = ({
-  removeUserFromLobby,
-  socket,
-}: LeaveLobbyDependencies) => async (
-  lobbyId: string,
-) => {
+const leaveLobby = ({ removeUserFromLobby }: LeaveLobbyDependencies) => (socket: AppSocket) => async (lobbyId: string) => {
   try {
     // authSocketMiddleware checked and put currentUser object in socket.data
     const { currentUser: { userId, username, type } } = socket.data as AuthMiddlewareLocals;
@@ -47,17 +41,13 @@ type JoinLobbyDependencies = {
   addUserToLobby: (userToDeleteId: string, lobbyId: string) => Promise<unknown>;
   getLobby: (lobbyId: string) => Promise<Lobby | undefined>;
   getUsers: (users: string[]) => Promise<(User | ZodError)[]>;
-  socket: AppSocket;
 };
 
 const joinLobby = ({
   addUserToLobby,
   getLobby,
   getUsers,
-  socket,
-}: JoinLobbyDependencies) => async (
-  lobbyId: string,
-) => {
+}: JoinLobbyDependencies) => (socket: AppSocket) => async (lobbyId: string) => {
   try {
     const lobby = await getLobby(lobbyId);
 
@@ -116,25 +106,11 @@ const joinLobby = ({
   }
 };
 
-type HandleLobbyEventsDependencies = {
-  removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;
-  addUserToLobby: (currentUserId: string, lobbyId: string) => Promise<unknown>;
-  getLobby: (lobbyId: string) => Promise<Lobby | undefined>;
-  getUsers: (users: string[]) => Promise<(User | ZodError)[]>;
-  socket: AppSocket;
-};
+export type HandleLobbyEventsDependencies = JoinLobbyDependencies & LeaveLobbyDependencies;
 
-export const handleLobbyEvents = (handleLobbyEventsDependencies: HandleLobbyEventsDependencies): void => {
+export const handleLobbyEvents = (handleLobbyEventsDependencies: HandleLobbyEventsDependencies) => (socket: AppSocket): void => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  handleLobbyEventsDependencies.socket.on('joinLobby', joinLobby({
-    addUserToLobby: handleLobbyEventsDependencies.addUserToLobby,
-    getLobby: handleLobbyEventsDependencies.getLobby,
-    getUsers: handleLobbyEventsDependencies.getUsers,
-    socket: handleLobbyEventsDependencies.socket,
-  }));
+  socket.on('joinLobby', joinLobby(handleLobbyEventsDependencies)(socket));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  handleLobbyEventsDependencies.socket.on('leaveLobby', leaveLobby({
-    removeUserFromLobby: handleLobbyEventsDependencies.removeUserFromLobby,
-    socket: handleLobbyEventsDependencies.socket,
-  }));
+  socket.on('leaveLobby', leaveLobby(handleLobbyEventsDependencies)(socket));
 };

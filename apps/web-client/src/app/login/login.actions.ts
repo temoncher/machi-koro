@@ -1,3 +1,4 @@
+import { RegisterGuestRequestBody } from '@machikoro/game-server-contracts';
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
 
@@ -6,23 +7,36 @@ import { RootApiType } from '../root.api.type';
 import { RootState } from '../root.state';
 import { getAuthorizationHeader } from '../utils';
 
-import { LoginApiType } from './login.api.type';
 import { LoginState } from './login.state';
 
 export enum LoginActionTypes {
   SET_LOGIN_PARAMS = 'APP/SET_LOGIN_PARAMS',
+  SET_AUTH_ERROR = 'APP/SET_AUTH_ERROR',
 }
+
+type SetLoginParamsPayload = Pick<LoginState, 'username' | 'userId' | 'headers'>;
 
 type SetLoginParams = {
   type: LoginActionTypes.SET_LOGIN_PARAMS;
-  payload: LoginState;
+  payload: SetLoginParamsPayload;
 };
 
-export type LoginAction = SetLoginParams;
+type SetAuthError = {
+  type: LoginActionTypes.SET_AUTH_ERROR;
+  payload: string;
 
-export const setLoginParams = (loginParams: LoginState): LoginAction => ({
+};
+
+export type LoginAction = SetLoginParams | SetAuthError;
+
+export const setLoginParams = (loginParams: SetLoginParamsPayload): LoginAction => ({
   type: LoginActionTypes.SET_LOGIN_PARAMS,
   payload: loginParams,
+});
+
+export const setAuthError = (authError: string): LoginAction => ({
+  type: LoginActionTypes.SET_AUTH_ERROR,
+  payload: authError,
 });
 
 export const getUserData = () => async (
@@ -30,53 +44,49 @@ export const getUserData = () => async (
   getState: () => RootState,
   rootApi: RootApiType.RootApi,
 ): Promise<void> => {
-  dispatch(setIsLoading(true));
+  try {
+    dispatch(setIsLoading(true));
 
-  const mockUserData = {
-    username: '',
-    id: '',
-  };
+    const userData = await rootApi.loginApi.sendAuthMeRequest();
 
-  const userData = await rootApi.loginApi.fetchUserData()
-    .catch(() => mockUserData);
+    const loginParams: SetLoginParamsPayload = {
+      username: userData.username,
+      userId: userData.userId,
+      headers: {
+        Authorization: getAuthorizationHeader() ?? '',
+        'Content-Type': 'application/json',
+      },
+    };
 
-  if (userData.username === '') {
+    dispatch(setLoginParams(loginParams));
+  } catch (error: unknown) {
     localStorage.removeItem('token');
+
+    if (error instanceof Error) {
+      dispatch(setAuthError(error.message));
+
+      return;
+    }
+
+    throw error;
+  } finally {
+    dispatch(setIsLoading(false));
   }
-
-  const loginParams: LoginState = {
-    username: userData.username,
-    userId: userData.id,
-    headers: {
-      Authorization: getAuthorizationHeader() ?? '',
-      'Content-Type': 'application/json',
-    },
-  };
-
-  dispatch(setLoginParams(loginParams));
-  dispatch(setIsLoading(false));
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const registerGuest = (userData: LoginApiType.AuthRequestBody) => async (
+export const registerGuest = (userData: RegisterGuestRequestBody) => async (
   dispatch: ThunkDispatch<unknown, unknown, Action>,
   getState: () => RootState,
   rootApi: RootApiType.RootApi,
 ): Promise<void> => {
   dispatch(setIsLoading(true));
 
-  const mockUserData = {
-    username: '',
-    id: '',
-    token: '',
-  };
+  const registerUserDataResponse = await rootApi.loginApi.sendRegisterGuestRequest(userData);
 
-  const registerUserDataResponse = await rootApi.loginApi.fetchRegisterGuest(userData)
-    .catch(() => mockUserData);
-
-  const loginParams: LoginState = {
+  const loginParams: SetLoginParamsPayload = {
     username: registerUserDataResponse.username,
-    userId: registerUserDataResponse.id,
+    userId: registerUserDataResponse.userId,
     headers:
     {
       Authorization: `Bearer ${registerUserDataResponse.token || ''}`,

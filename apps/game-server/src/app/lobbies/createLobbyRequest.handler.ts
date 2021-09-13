@@ -1,16 +1,8 @@
-import { CreateLobbyResponse, ServerError } from '@machikoro/game-server-contracts';
+import { CreateLobbyResponse, Lobby, ServerError } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 
 import { AuthMiddlewareLocals } from '../shared';
 import { HTTPStatusCode } from '../types';
-import { PromisifiedRedisClient } from '../utils';
-
-type Lobby = {
-  lobbyId: string;
-  hostId: string;
-  users: string[];
-};
 
 type CreateLobbyRequestHandler = RequestHandler<
 Record<string, string>,
@@ -21,23 +13,23 @@ AuthMiddlewareLocals
 >;
 
 export type CreateLobbyRequestHandlerDependencies = {
-  redisClientLobbies: PromisifiedRedisClient;
+  createLobby: (hostId: string) => Promise<Lobby & { lobbyId: string } | undefined>;
 };
 export const createLobbyRequestHandler = (
-  { redisClientLobbies }: CreateLobbyRequestHandlerDependencies,
+  { createLobby }: CreateLobbyRequestHandlerDependencies,
 ): CreateLobbyRequestHandler => async (req, res, next) => {
   try {
     const currentUserId = res.locals.currentUser.userId;
 
-    const lobby: Lobby = {
-      lobbyId: uuidv4(),
-      hostId: currentUserId,
-      users: [],
-    };
+    const lobby = await createLobby(currentUserId);
 
-    await Promise.all([
-      redisClientLobbies.set(`${lobby.lobbyId}:hostId`, lobby.hostId),
-    ]);
+    if (!lobby) {
+      res
+        .status(HTTPStatusCode.INTERNAL_ERROR)
+        .send({ message: 'Failed to create lobby' });
+
+      return;
+    }
 
     const createLobbyResponse: CreateLobbyResponse = {
       lobbyId: lobby.lobbyId,

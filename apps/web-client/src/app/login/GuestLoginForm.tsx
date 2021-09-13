@@ -1,5 +1,6 @@
 import {
   FIRST_CHAR_USERNAME_REGEXP,
+  RegisterGuestRequestBody,
   USERNAME_REGEXP,
 } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
@@ -7,7 +8,6 @@ import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { LoginApiType } from './login.api.type';
 import { useLoginActions } from './useLoginActions';
 import './GuestLoginForm.css';
 
@@ -46,7 +46,7 @@ export const GuestLoginForm: React.FC = () => {
   }, [t]);
 
   const login = ({ username }: GuestFormInputs) => {
-    const loginRequestBody: LoginApiType.AuthRequestBody = {
+    const loginRequestBody: RegisterGuestRequestBody = {
       username,
       type: 'guest',
     };

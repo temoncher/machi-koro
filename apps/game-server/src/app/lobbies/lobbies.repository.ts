@@ -1,30 +1,33 @@
 import { Lobby } from '@machikoro/game-server-contracts';
+import { v4 as uuidv4 } from 'uuid';
 
 import { PromisifiedRedisClient } from '../utils';
 
-export namespace LobbyRepository {
+export namespace LobbiesRepository {
 
   type RemoveUserFromLobby = (userToDeleteId: string, lobbyId: string) => Promise<number>;
   type AddUserToLobby = (currentUserId: string, lobbyId: string,) => Promise<unknown>;
   type GetLobby = (lobbyId: string) => Promise<Lobby | undefined>;
+  type CreateLobby = (hostId: string) => Promise<Lobby & { lobbyId: string } | undefined>;
 
-  export type LobbyRepository = {
+  type LobbiesRepository = {
     removeUserFromLobby: RemoveUserFromLobby;
     addUserToLobby: AddUserToLobby;
     getLobby: GetLobby;
+    createLobby: CreateLobby;
   };
 
-  export const initializeRemoveUserFromLobby = (redisClientLobbies: PromisifiedRedisClient): RemoveUserFromLobby => async (
+  const initializeRemoveUserFromLobby = (redisClientLobbies: PromisifiedRedisClient): RemoveUserFromLobby => async (
     userToDeleteId: string,
     lobbyId: string,
   ): Promise<number> => redisClientLobbies.lrem(`${lobbyId}:users`, 1, userToDeleteId);
 
-  export const initializeAddUserToLobby = (redisClientLobbies: PromisifiedRedisClient) => async (
+  const initializeAddUserToLobby = (redisClientLobbies: PromisifiedRedisClient) => async (
     currentUserId: string,
     lobbyId: string,
   ): Promise<unknown> => redisClientLobbies.rpush(`${lobbyId}:users`, currentUserId);
 
-  export const initializeGetLobby = (
+  const initializeGetLobby = (
     redisClientLobbies: PromisifiedRedisClient,
   ) => async (
     lobbyId: string,
@@ -40,9 +43,24 @@ export namespace LobbyRepository {
     return { hostId, users };
   };
 
-  export const init = (redisClientLobbies: PromisifiedRedisClient): LobbyRepository => ({
+  const initializeCreateLobby = (
+    redisClientLobbies: PromisifiedRedisClient,
+  ): CreateLobby => async (hostId) => {
+    const lobby: Lobby & { lobbyId: string } = {
+      lobbyId: uuidv4(),
+      hostId,
+      users: [],
+    };
+
+    await redisClientLobbies.set(`${lobby.lobbyId}:hostId`, lobby.hostId);
+
+    return lobby;
+  };
+
+  export const init = (redisClientLobbies: PromisifiedRedisClient): LobbiesRepository => ({
     removeUserFromLobby: initializeRemoveUserFromLobby(redisClientLobbies),
     addUserToLobby: initializeAddUserToLobby(redisClientLobbies),
     getLobby: initializeGetLobby(redisClientLobbies),
+    createLobby: initializeCreateLobby(redisClientLobbies),
   });
 }

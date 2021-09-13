@@ -1,43 +1,34 @@
-import { AuthResponse, ServerError, RegisterGuestRequestBody } from '@machikoro/game-server-contracts';
+import {
+  RegisterGuestResponse,
+  ServerError,
+  RegisterGuestRequestBody,
+  User,
+  UserWithToken,
+} from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
-import * as jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
+import { ZodError } from 'zod';
 
-import { EXPIRE_JWT_TIME_1D, EXPIRE_TIME_1D } from '../constants';
-import { UserWithTokenWithoutId } from '../shared';
 import { HTTPStatusCode } from '../types';
-import { PromisifiedRedisClient } from '../utils';
 
 type RegisterGuestRequestHandler = RequestHandler<
 Record<string, string>,
-AuthResponse | ServerError,
+RegisterGuestResponse | ServerError,
 RegisterGuestRequestBody
 >;
 
-export type RegisterGuestRequestHandlerDependencies = { redisClientUsers: PromisifiedRedisClient };
+export type RegisterGuestRequestHandlerDependencies = {
+  getUser: (userId: string) => Promise<User | ZodError>;
+  createUser: ({ username, type }: Pick<User, 'username' | 'type'>) => Promise<UserWithToken>;
+};
 export const registerGuestRequestHandler = (
-  { redisClientUsers }: RegisterGuestRequestHandlerDependencies,
+  { createUser }: RegisterGuestRequestHandlerDependencies,
 ): RegisterGuestRequestHandler => async (req, res, next) => {
   try {
     const { type, username } = req.body;
 
-    const id = uuidv4();
-    const token = jwt.sign({ id }, 'secret_key', {
-      expiresIn: EXPIRE_JWT_TIME_1D,
-    });
-    const user: UserWithTokenWithoutId = { username, token, type };
-    const userHash = Object.entries(user).flat();
+    const user = await createUser({ username, type });
 
-    await redisClientUsers.hset([id, ...userHash]);
-    await redisClientUsers.expire(id, EXPIRE_TIME_1D);
-
-    const authResponse: AuthResponse = {
-      username,
-      id,
-      token,
-    };
-
-    res.status(HTTPStatusCode.CREATED).send(authResponse);
+    res.status(HTTPStatusCode.CREATED).send(user);
   } catch (error: unknown) {
     res
       .status(HTTPStatusCode.INTERNAL_ERROR)

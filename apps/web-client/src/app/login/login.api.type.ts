@@ -1,32 +1,28 @@
-import { LoginResponse, RegisterRequestBody } from '@machikoro/game-server-contracts';
+import { AuthMeResponse, RegisterGuestRequestBody, RegisterGuestResponse } from '@machikoro/game-server-contracts';
 import { AxiosInstance } from 'axios';
 
 import { AppHeaders } from '../types';
 
 export namespace LoginApiType {
 
-  export type FetchLogin = (loginRequestBody: RegisterRequestBody) => Promise<LoginResponse>;
-  export type FetchUserData = () => Promise<LoginResponse>;
+  export type SendRegisterGuestRequest = (loginRequestBody: RegisterGuestRequestBody) => Promise<RegisterGuestResponse>;
+  export type SendAuthMeRequest = () => Promise<AuthMeResponse>;
 
   export type Api = {
-    fetchRegisterGuest: FetchLogin;
-    fetchUserData: FetchUserData;
+    sendRegisterGuestRequest: SendRegisterGuestRequest;
+    sendAuthMeRequest: SendAuthMeRequest;
   };
 
-  export type FetchUserDataDependencies = {
+  export type SendAuthMeRequestDependencies = {
     getHeaders: () => AppHeaders;
     httpClient: AxiosInstance;
   };
 
-  export type FetchRegisterGuestDependencies = {
+  export type SendRegisterGuestRequestDependencies = {
     getHeaders: () => AppHeaders;
     httpClient: AxiosInstance;
   };
 
-  export type Dependencies = FetchRegisterGuestDependencies & FetchUserDataDependencies;
+  export type Dependencies = SendRegisterGuestRequestDependencies & SendAuthMeRequestDependencies;
 
-  export type AuthRequestBody = {
-    username: string;
-    type: 'guest';
-  };
 }

@@ -5,12 +5,9 @@ import { ExtendedError } from 'socket.io/dist/namespace';
 import { ZodError } from 'zod';
 
 import { HTTPStatusCode, AppSocket } from '../types';
-import { PromisifiedRedisClient } from '../utils';
-
-import { parseUserWithTokenWithoutId } from './user.model';
 
 export type AuthMiddlewareDependencies = {
-  redisClientUsers: PromisifiedRedisClient;
+  getUser: (userId: string) => Promise<User | ZodError>;
 };
 
 export type AuthMiddlewareLocals = {
@@ -47,7 +44,7 @@ export const validateToken = (authorization: string | undefined): string | undef
 };
 
 export const authMiddleware = (
-  { redisClientUsers }: AuthMiddlewareDependencies,
+  { getUser }: AuthMiddlewareDependencies,
 ): AuthMiddleware => async (req, res, next) => {
   try {
     const { authorization } = req.headers;
@@ -62,9 +59,7 @@ export const authMiddleware = (
       return;
     }
 
-    const currentUser = await redisClientUsers.hgetall(currentUserId);
-
-    const userOrError = parseUserWithTokenWithoutId(currentUser);
+    const userOrError = await getUser(currentUserId);
 
     if (userOrError instanceof ZodError) {
       res
@@ -89,8 +84,11 @@ export const authMiddleware = (
   }
 };
 
+export type AuthSocketMiddlewareDependencies = {
+  getUser: (userId: string) => Promise<User | ZodError>;
+};
 export const authSocketMiddleware = (
-  redisClientUsers: PromisifiedRedisClient,
+  { getUser }: AuthSocketMiddlewareDependencies,
 ) => async (
   socket: AppSocket,
   next: (error?: ExtendedError) => void,
@@ -105,9 +103,7 @@ export const authSocketMiddleware = (
       return;
     }
 
-    const currentUser = await redisClientUsers.hgetall(currentUserId);
-
-    const userOrError = parseUserWithTokenWithoutId(currentUser);
+    const userOrError = await getUser(currentUserId);
 
     if (userOrError instanceof ZodError) {
       // TODO: emit error

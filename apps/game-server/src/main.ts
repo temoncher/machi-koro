@@ -6,12 +6,16 @@ import * as express from 'express';
 import * as redis from 'redis';
 
 import {
-  initializeApiRouter,
-  LobbyRepository,
+  initializeAppRouter,
+  LobbiesRepository,
   RedisDbInstance,
   promisifyRedisClient,
   initSocketServer,
+  AppRouterDependencies,
+  SocketServerDependencies,
 } from './app';
+import { GameRepository } from './app/games/games.repository';
+import { UsersRepository } from './app/shared';
 
 const main = (): void => {
   const PORT = process.env.port || 3333;
@@ -43,7 +47,9 @@ const main = (): void => {
   const promisifiedUsersClient = promisifyRedisClient(redisClientUsers);
   const promisifiedLobbiesClient = promisifyRedisClient(redisClientLobbies);
   const promisifiedGamesClient = promisifyRedisClient(redisClientGames);
-  const lobbyRepository = LobbyRepository.init(promisifiedLobbiesClient);
+  const lobbiesRepository = LobbiesRepository.init(promisifiedLobbiesClient);
+  const usersRepository = UsersRepository.init(promisifiedUsersClient);
+  const gamesRepository = GameRepository.init(promisifiedGamesClient);
 
   app.use(express.json());
 
@@ -61,12 +67,15 @@ const main = (): void => {
   }));
   app.use('/static', staticFiles);
 
-  app.use('/api', initializeApiRouter({
-    redisClientUsers: promisifiedUsersClient,
-    redisClientLobbies: promisifiedLobbiesClient,
-    redisClientGames: promisifiedGamesClient,
-    getLobby: lobbyRepository.getLobby,
-  }));
+  const appRouterDependencies: AppRouterDependencies = {
+    getUser: usersRepository.getUser,
+    createUser: usersRepository.createUser,
+    createLobby: lobbiesRepository.createLobby,
+    getLobby: lobbiesRepository.getLobby,
+    createGame: gamesRepository.createGame,
+  };
+
+  app.use('/api', initializeAppRouter(appRouterDependencies));
 
   server.listen(PORT, () => {
     // eslint-disable-next-line no-console
@@ -76,10 +85,15 @@ const main = (): void => {
   // eslint-disable-next-line no-console
   server.on('error', console.error);
 
-  initSocketServer({
-    redisClientUsers: promisifiedUsersClient,
-    redisClientLobbies: promisifiedLobbiesClient,
-  }, server);
+  const socketServerDependencies: SocketServerDependencies = {
+    removeUserFromLobby: lobbiesRepository.removeUserFromLobby,
+    addUserToLobby: lobbiesRepository.addUserToLobby,
+    getLobby: lobbiesRepository.getLobby,
+    getUsers: usersRepository.getUsers,
+    getUser: usersRepository.getUser,
+  };
+
+  initSocketServer(socketServerDependencies, server);
 };
 
 main();
