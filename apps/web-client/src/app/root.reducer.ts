@@ -2,6 +2,7 @@ import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
 import { Reducer, combineReducers } from 'redux';
 
+import { gameReducer } from './game';
 import { loadingReducer } from './loading';
 import { lobbyReducer } from './lobby';
 import { loginReducer } from './login';
@@ -11,5 +12,6 @@ export const rootReducer = (history: History<unknown>): Reducer<RootState> => co
   loginReducer,
   loadingReducer,
   lobbyReducer,
+  gameReducer,
   router: connectRouter(history),
 });

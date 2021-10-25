@@ -36,7 +36,7 @@ export const initializeSocket = (): void => {
     // eslint-disable-next-line no-console
     console.log('Something went terribly wrong');
   });
-  socket.on('JOINED_ERROR', () => {
+  socket.on('JOIN_ERROR', () => {
     // eslint-disable-next-line no-console
     console.log('Error connect new user');
   });
@@ -46,7 +46,7 @@ export const initializeSocket = (): void => {
     // eslint-disable-next-line no-console
     console.log(`Connect new user ${user.username}`, user);
   });
-  socket.on('LOBBY_USER_LEAVE', (user: User) => {
+  socket.on('LOBBY_USER_LEFT', (user: User) => {
     // eslint-disable-next-line no-console
     console.log(`Disconnect user ${user.username}`, user);
   });
@@ -58,9 +58,33 @@ export const initializeSocket = (): void => {
     // eslint-disable-next-line no-console
     console.log('Lobby state', lobbyState);
   });
-  socket.on('LOBBY_LEAVE', () => {
+  // Game
+  socket.on('GAME_STATE_UPDATED', (gameState) => {
     // eslint-disable-next-line no-console
-    console.log('You have left the lobby');
+    console.log('Game state', gameState);
+  });
+  socket.on('GAME_USER_JOINED', (userId) => {
+    // eslint-disable-next-line no-console
+    console.log(`Connect new user, id = ${userId}`);
+  });
+  socket.on('GAME_USER_LEFT', (userId) => {
+    // eslint-disable-next-line no-console
+    console.log(`Disconnect user ${userId}`);
+  });
+  socket.on('GAME_ERROR_ACCESS', () => {
+    // eslint-disable-next-line no-console
+    console.log('Access denied');
+  });
+
+  // Machine
+  socket.on('GAME_STARTED', (stateMachine) => {
+    // eslint-disable-next-line no-console
+    console.log(stateMachine);
+  });
+
+  socket.on('DICE_ROLLED', (resultRollDice) => {
+    // eslint-disable-next-line no-console
+    console.log(`Result roll dice ${resultRollDice}`);
   });
 };
 
@@ -70,4 +94,20 @@ export const joinLobby = (lobbyId: string): void => {
 
 export const leaveLobby = (lobbyId: string): void => {
   socket?.emit('leaveLobby', lobbyId);
+};
+
+export const joinGame = (gameId: string): void => {
+  socket?.emit('joinGame', gameId);
+};
+
+export const leaveGame = (gameId: string): void => {
+  socket?.emit('leaveGame', gameId);
+};
+
+export const startGame = (gameId: string): void => {
+  socket?.emit('startGame', gameId);
+};
+
+export const rollDice = (userId: string): void => {
+  socket?.emit('rollDice', userId);
 };

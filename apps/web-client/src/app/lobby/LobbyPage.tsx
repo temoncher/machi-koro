@@ -4,14 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useGameActions } from '../game/useGameActions';
 import { useTypedSelector } from '../hooks';
 import { initializeSocket, joinLobby, leaveLobby } from '../socket';
+import { UrlUtils } from '../utils';
 
 import { PlayerCard, Player } from './PlayerCard';
 
 import './LobbyPage.css';
-
-type LobbyProps = {
-  currentUserId: string;
-};
 
 const mockPlayers: Player[] = [
   {
@@ -40,21 +37,14 @@ const mockPlayers: Player[] = [
   },
 ];
 
-const getLobbyId = (pathname: string): string | undefined => {
-  const currentUrl = pathname.split('/');
-  const numberOfSubstringWithLobbyId = currentUrl.length - 1;
-  const lobbyId = currentUrl[numberOfSubstringWithLobbyId];
-
-  return lobbyId;
-};
-
-export const LobbyPage: React.FC<LobbyProps> = ({ currentUserId }: LobbyProps) => {
+export const LobbyPage: React.FC = () => {
   const { isJoinLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
+  const { userId } = useTypedSelector((state) => state.loginReducer);
   const { t } = useTranslation();
   const lobbyId = useTypedSelector((state) => {
     const { pathname } = state.router.location;
 
-    return getLobbyId(pathname);
+    return UrlUtils.getLastSegment(pathname);
   });
 
   const { createGameThunk } = useGameActions();
@@ -96,7 +86,7 @@ export const LobbyPage: React.FC<LobbyProps> = ({ currentUserId }: LobbyProps) =
         <div className="lobby-players-list__container">
           {
             mockPlayers.map((player) => (
-              <PlayerCard player={player} isHighlighted={player.id === currentUserId} key={player.id} />
+              <PlayerCard player={player} isHighlighted={player.id === userId} key={player.id} />
             ))
           }
         </div>

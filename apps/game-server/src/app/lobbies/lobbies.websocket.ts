@@ -28,10 +28,10 @@ const leaveLobby = ({ removeUserFromLobby }: LeaveLobbyDependencies) => (socket:
       lobbyId,
     );
 
-    socket.in(lobbyId).emit('LOBBY_USER_LEAVE', user);
+    socket.in(lobbyId).emit('LOBBY_USER_LEFT', user);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     socket.leave(lobbyId);
-    socket.emit('LOBBY_LEAVE');
+    socket.emit('LOBBY_USER_LEFT', user);
   } catch (error: unknown) {
     socket.emit('SERVER_ERROR');
   }
@@ -102,7 +102,7 @@ const joinLobby = ({
     socket.in(lobbyId).emit('LOBBY_USER_JOINED', user);
     socket.emit('LOBBY_STATE_UPDATED', newLobbyState);
   } catch (error: unknown) {
-    socket.emit('JOINED_ERROR');
+    socket.emit('JOIN_ERROR');
   }
 };
 
