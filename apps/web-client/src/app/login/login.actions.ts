@@ -1,4 +1,5 @@
 import { RegisterGuestRequestBody } from '@machikoro/game-server-contracts';
+import { push } from 'connected-react-router';
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
 
@@ -23,7 +24,7 @@ type SetLoginParams = {
 
 type SetAuthError = {
   type: LoginActionTypes.SET_AUTH_ERROR;
-  payload: string;
+  payload: string | undefined;
 
 };
 
@@ -34,7 +35,7 @@ export const setLoginParams = (loginParams: SetLoginParamsPayload): LoginAction 
   payload: loginParams,
 });
 
-export const setAuthError = (authError: string): LoginAction => ({
+export const setAuthError = (authError: string | undefined): LoginAction => ({
   type: LoginActionTypes.SET_AUTH_ERROR,
   payload: authError,
 });
@@ -97,7 +98,9 @@ export const registerGuest = (userData: RegisterGuestRequestBody) => async (
   localStorage.setItem('token', registerUserDataResponse.token || '');
 
   dispatch(setLoginParams(loginParams));
+  dispatch(setAuthError(undefined));
   dispatch(setIsLoading(false));
+  dispatch(push('/'));
 };
 
 export const loginActions = {

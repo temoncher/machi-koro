@@ -32,7 +32,7 @@ export namespace GameRepository {
     userToDisconnectId: string,
     gameId: string,
   ): Promise<'OK'> => redisClientGames.hmset([
-    `${gameId}:usersStatuses`,
+    `${gameId}:usersStatusesMap`,
     userToDisconnectId,
     UserStatus.DISCONNECTED,
   ]);
@@ -41,7 +41,7 @@ export namespace GameRepository {
     userToConnectId: string,
     gameId: string,
   ): Promise<'OK'> => redisClientGames.hmset([
-    `${gameId}:usersStatuses`,
+    `${gameId}:usersStatusesMap`,
     userToConnectId,
     UserStatus.CONNECTED,
   ]);
@@ -54,24 +54,25 @@ export namespace GameRepository {
     const [
       hostId,
       users,
-      usersStatuses,
+      userStatusesMap,
     ] = await Promise.all([
       redisClientGames.get(`${gameId}:hostId`),
       redisClientGames.lrange(`${gameId}:users`, 0, -1),
-      redisClientGames.hgetall(`${gameId}:usersStatuses`),
+      redisClientGames.hgetall(`${gameId}:usersStatusesMap`),
     ]);
 
-    if (!hostId || !users || !usersStatuses) {
+    if (!hostId || !users || !userStatusesMap) {
+      // TODO: emit error
       return undefined;
     }
 
-    const usersStatusesMap = usersStatuses as UsersStatusesMap;
+    const usersStatusesMap = userStatusesMap as UsersStatusesMap;
 
     return {
       gameId,
       hostId,
       users,
-      usersStatuses: usersStatusesMap,
+      usersStatusesMap,
     };
   };
 
@@ -81,17 +82,15 @@ export namespace GameRepository {
       gameId: uuidv4(),
       hostId: currentUserId,
       users,
-      usersStatuses: usersStatusesMap,
+      usersStatusesMap,
     };
 
-    const usersHash = Object.entries(game.users).flat();
-
-    const usersStatuses = Object.entries(usersStatusesMap).flat();
+    const usersStatusesMapHash = Object.entries(usersStatusesMap).flat();
 
     await Promise.all([
       redisClientGames.set(`${game.gameId}:hostId`, game.hostId),
-      redisClientGames.rpush(`${game.gameId}:users`, ...usersHash),
-      redisClientGames.hset([`${game.gameId}:usersStatuses`, ...usersStatuses]),
+      redisClientGames.rpush(`${game.gameId}:users`, ...game.users),
+      redisClientGames.hset([`${game.gameId}:usersStatusesMap`, ...usersStatusesMapHash]),
     ]);
 
     return game;

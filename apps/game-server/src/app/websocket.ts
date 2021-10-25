@@ -2,10 +2,12 @@ import * as http from 'http';
 
 import {
   ClientSentEventsMap,
+  Game,
   ServerSentEventsMap,
 } from '@machikoro/game-server-contracts';
 import * as SocketIO from 'socket.io';
 
+import { handleGameEvents, HandleGameEventsDependencies } from './games/games.websocket';
 import { handleLobbyEvents, HandleLobbyEventsDependencies } from './lobbies';
 import {
   AuthMiddlewareLocals,
@@ -16,28 +18,40 @@ import { AppSocket } from './types';
 
 type OnDisconnectingDependencies = {
   removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;
+  disconnectUserFromGame: (userToConnectId: string, gameId: string,) => Promise<'OK'>;
+  getGame: (gameId: string) => Promise<Game | undefined>;
 };
 
-const onDisconnecting = ({ removeUserFromLobby }: OnDisconnectingDependencies) => async (socket: AppSocket): Promise<void> => {
+const onDisconnecting = (
+  { removeUserFromLobby, disconnectUserFromGame, getGame }: OnDisconnectingDependencies,
+) => async (socket: AppSocket): Promise<void> => {
   // authSocketMiddleware checked and put currentUser object in socket.data
   const { currentUser: { userId, username, type } } = socket.data as AuthMiddlewareLocals;
 
-  const lobbies = [...socket.rooms];
+  const rooms = [...socket.rooms];
 
-  const lobbiesRequests = lobbies.map(async (lobbyId) => removeUserFromLobby(userId, lobbyId));
+  const lobbiesRequests = rooms.map(async (roomId) => {
+    const game = await getGame(roomId);
+
+    const actionToPerform = game ? disconnectUserFromGame : removeUserFromLobby;
+
+    await actionToPerform(userId, roomId);
+  });
 
   await Promise.all(lobbiesRequests);
 
-  lobbies.forEach((lobbyId) => socket.in(lobbyId).emit('LOBBY_USER_LEAVE', { userId, username, type }));
+  rooms.forEach((roomId) => socket.in(roomId).emit('LOBBY_USER_LEFT', { userId, username, type }));
 };
 
-type OnConnectionDependencies = HandleLobbyEventsDependencies & OnDisconnectingDependencies;
+type OnConnectionDependencies = HandleLobbyEventsDependencies & HandleGameEventsDependencies & OnDisconnectingDependencies;
 const onConnection = (
   onConnectionDependencies: OnConnectionDependencies,
 ) => (
   socket: AppSocket,
 ): void => {
   handleLobbyEvents(onConnectionDependencies)(socket);
+
+  handleGameEvents(onConnectionDependencies)(socket);
 
   socket.on('disconnecting', () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

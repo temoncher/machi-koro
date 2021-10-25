@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { memo, useMemo } from 'react';
 
 import { Landmark, CommonEstablishment } from '../types';
-import { URLUtils } from '../utils';
+import { UrlUtils } from '../utils';
 
 import './CardView.css';
 
@@ -63,12 +63,12 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
   const cardColor = useMemo(() => cardTypeToColorMap[type], [type]);
 
   const { backgroundImage, backgroundClass, textClass } = useMemo(() => ({
-    backgroundImage: `url(${URLUtils.getBackgroundImageCard(cardColor)}`,
+    backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}`,
     backgroundClass: `card-view--${cardColor}`,
     textClass: `card-view__name--${cardColor}`,
   }), [cardColor]);
 
-  const underConstructionIcon = useMemo((): string => URLUtils.getStaticImageURL('under-construction'), []);
+  const underConstructionIcon = useMemo((): string => UrlUtils.getStaticImage('under-construction'), []);
 
   const scale = useMemo((): number => (size ? cardSizeToScaleMap[size] : cardSizeToScaleMap.base), [size]);
 

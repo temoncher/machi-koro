@@ -14,7 +14,7 @@ import {
   AppRouterDependencies,
   SocketServerDependencies,
 } from './app';
-import { GameRepository } from './app/games/games.repository';
+import { GameRepository } from './app/games';
 import { UsersRepository } from './app/shared';
 
 const main = (): void => {
@@ -91,6 +91,9 @@ const main = (): void => {
     getLobby: lobbiesRepository.getLobby,
     getUsers: usersRepository.getUsers,
     getUser: usersRepository.getUser,
+    getGame: gamesRepository.getGame,
+    connectUserToGame: gamesRepository.connectUserToGame,
+    disconnectUserFromGame: gamesRepository.disconnectUserFromGame,
   };
 
   initSocketServer(socketServerDependencies, server);

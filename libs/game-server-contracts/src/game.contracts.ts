@@ -13,7 +13,7 @@ export type Game = {
   gameId: string;
   hostId: string;
   users: string[];
-  usersStatuses: UsersStatusesMap;
+  usersStatusesMap: UsersStatusesMap;
 };
 
 export type CreateGameResponse = {

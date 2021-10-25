@@ -2,7 +2,7 @@
 import { createMachine, assign } from 'xstate';
 
 type Card = {
-  type: string;
+  type: 'Landmark' | 'Wheat' | 'Livestock' | 'Box' | 'Cup' | 'Gear' | 'Enterprise' | 'Apple' | 'Establishment';
   name: string;
   cost: number;
   activation: number[];
@@ -24,82 +24,137 @@ type GameContext = {
 
 const allGameCards: Record<string, Card> = {
   trainStation: {
-    type: 'landmark',
+    type: 'Landmark',
     name: 'Train Station',
     cost: 4,
     activation: [],
     quantity: 0,
   },
   shoppingMall: {
-    type: 'landmark',
+    type: 'Landmark',
     name: 'Shopping Mall',
     cost: 10,
     activation: [],
     quantity: 0,
   },
   amusementPark: {
-    type: 'landmark',
+    type: 'Landmark',
     name: 'Amusement Park',
     cost: 16,
     activation: [],
     quantity: 0,
   },
   radioTower: {
-    type: 'landmark',
+    type: 'Landmark',
     name: 'Radio tower',
     cost: 22,
     activation: [],
     quantity: 0,
   },
   wheatField: {
-    type: 'Primary Industry',
+    type: 'Wheat',
     name: 'Wheat field',
     cost: 1,
-    activation: [1],
     quantity: 6,
+    activation: [1],
   },
-  ranch: {
-    type: 'Primary Industry',
-    name: 'Ranch',
+  livestockFarm: {
+    type: 'Livestock',
+    name: 'Livestock Farm',
     cost: 1,
     quantity: 6,
     activation: [2],
   },
-  forest: {
-    type: 'Primary Industry',
-    name: 'Forest',
-    cost: 3,
-    quantity: 6,
-    activation: [5],
-  },
-  mine: {
-    type: 'Primary Industry',
-    name: 'Mine',
-    cost: 6,
-    quantity: 6,
-    activation: [9],
-  },
-  appleOrchard: {
-    type: 'Primary Industry',
-    name: 'Apple Orchard',
-    cost: 3,
-    quantity: 6,
-    activation: [10],
-  },
-  bakery:
-  {
-    type: 'Secondary Industry',
+  bakery: {
+    type: 'Box',
     name: 'Bakery',
     cost: 1,
     quantity: 6,
     activation: [2, 3],
   },
+  Cafe: {
+    type: 'Cup',
+    name: 'Cafe',
+    cost: 2,
+    quantity: 6,
+    activation: [2, 3],
+  },
   convenienceStore: {
-    type: 'Secondary Industry',
+    type: 'Box',
     name: 'Convenience Store',
     cost: 2,
     quantity: 6,
     activation: [4],
+  },
+  forest: {
+    type: 'Gear',
+    name: 'Forest',
+    cost: 3,
+    quantity: 6,
+    activation: [5],
+  },
+  stadium: {
+    type: 'Establishment',
+    name: 'Stadium',
+    cost: 6,
+    quantity: 5,
+    activation: [6],
+  },
+  TVStation: {
+    type: 'Establishment',
+    name: 'TV Station',
+    cost: 7,
+    quantity: 5,
+    activation: [6],
+  },
+  businessComplex: {
+    type: 'Establishment',
+    name: 'Business Complex',
+    cost: 8,
+    quantity: 5,
+    activation: [6],
+  },
+  cheeseFactory: {
+    type: 'Enterprise',
+    name: 'Cheese Factory',
+    cost: 5,
+    quantity: 6,
+    activation: [7],
+  },
+  furnitureFactory: {
+    type: 'Enterprise',
+    name: 'Furniture Factory',
+    cost: 3,
+    quantity: 6,
+    activation: [8],
+  },
+  mine: {
+    type: 'Gear',
+    name: 'Mine',
+    cost: 6,
+    quantity: 6,
+    activation: [9],
+  },
+  restaurant: {
+    type: 'Cup',
+    name: 'Restaurant',
+    cost: 3,
+    quantity: 6,
+    activation: [9, 10],
+  },
+  appleOrchard: {
+    type: 'Wheat',
+    name: 'Apple Orchard',
+    cost: 3,
+    quantity: 6,
+    activation: [10],
+  },
+  produceMarket: {
+    type: 'Apple',
+    name: 'Produce Market',
+    cost: 2,
+    quantity: 6,
+    activation: [11, 12],
   },
 };
 
@@ -152,7 +207,7 @@ const hasWinner = (context: GameContext) => {
   const currentPlayerCards = context.playersCards[context.currentPlayerId];
 
   if (currentPlayerCards) {
-    const userListLandmark = currentPlayerCards.filter((card) => card.type === 'landmark');
+    const userListLandmark = currentPlayerCards.filter((card) => card.type === 'Landmark');
 
     return userListLandmark.length === 4;
   }
