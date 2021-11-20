@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { createMachine, assign } from 'xstate';
+
+import { RecordUtils } from '../utils';
 
 type Card = {
   type: 'Landmark' | 'Wheat' | 'Livestock' | 'Box' | 'Cup' | 'Gear' | 'Enterprise' | 'Apple' | 'Establishment';
@@ -11,7 +12,6 @@ type Card = {
 
 type Player = {
   userId: string;
-  coins: number;
 };
 
 type GameContext = {
@@ -19,7 +19,9 @@ type GameContext = {
   currentPlayerId: string;
   players: Player[];
   playersCards: Record<string, Card[]>;
+  coins: Record<string, number>;
   rollDiceResult: number;
+  winnerId: string;
 };
 
 const allGameCards: Record<string, Card> = {
@@ -171,54 +173,77 @@ type SimpleGameMachineMessage =
   | RollDiceMessage
   | StartGame;
 
-const canRollDice = (context: GameContext, message: SimpleGameMachineMessage) => {
-  if (message.type === 'ROLL_DICE') {
-    return context.currentPlayerId === message.userId;
-  }
+const canRollDice = (
+  context: GameContext,
+  message: SimpleGameMachineMessage,
+) => message.type === 'ROLL_DICE' && context.currentPlayerId === message.userId;
 
-  return false;
-};
+const rollDice = assign<GameContext, SimpleGameMachineMessage>({
+  rollDiceResult: (context, message) => {
+    if (message.type === 'ROLL_DICE') {
+      return Math.floor((Math.random() * 6) + 1);
+    }
 
-const rollDice = assign((context: GameContext, message: SimpleGameMachineMessage) => {
-  if (message.type === 'ROLL_DICE') {
-    return { rollDiceResult: Math.floor((Math.random() * 6) + 1) };
-  }
-
-  return { rollDiceResult: context.rollDiceResult };
+    return context.rollDiceResult;
+  },
 });
 
-const chooseNextPlayer = assign((context: GameContext, message: SimpleGameMachineMessage) => {
-  if (message.type === 'START_GAME') {
+const applyCardEffects = assign<GameContext, SimpleGameMachineMessage>({
+  coins: (context, message) => {
+    if (message.type === 'ROLL_DICE') {
+      return RecordUtils.modifyAt(
+        context.currentPlayerId,
+        (coins) => coins + context.rollDiceResult,
+        context.coins,
+      );
+    }
+
+    return context.coins;
+  },
+});
+
+const chooseNextPlayer = assign<GameContext, SimpleGameMachineMessage>({
+  currentPlayerId: (context) => {
     const currentPlayerIndex = context.players.findIndex((player) => player.userId === context.currentPlayerId);
 
     if (currentPlayerIndex === context.players.length - 1) {
-      return { currentPlayerId: context.players[0]?.userId as string };
+      const firstPlayer = context.players[0];
+
+      if (!firstPlayer) {
+        return context.currentPlayerId;
+      }
+
+      return firstPlayer.userId;
     }
 
-    const nextPlayerIndex = currentPlayerIndex + 1;
+    const nextPlayer = context.players[currentPlayerIndex + 1];
 
-    return { currentPlayerId: context.players[nextPlayerIndex]?.userId as string };
-  }
+    if (!nextPlayer) {
+      return context.currentPlayerId;
+    }
 
-  return { currentPlayerId: context.currentPlayerId };
+    return nextPlayer.userId;
+  },
 });
 
 const hasWinner = (context: GameContext) => {
-  const currentPlayerCards = context.playersCards[context.currentPlayerId];
+  const currentPlayerCoins = context.coins[context.currentPlayerId];
 
-  if (currentPlayerCards) {
-    const userListLandmark = currentPlayerCards.filter((card) => card.type === 'Landmark');
-
-    return userListLandmark.length === 4;
-  }
-
-  return false;
+  return !!currentPlayerCoins && currentPlayerCoins >= 52;
 };
 
-const initializePlayers = assign((context: GameContext, message: SimpleGameMachineMessage) => {
+const hasNoWinner = (context: GameContext) => {
+  const currentPlayerCoins = context.coins[context.currentPlayerId];
+
+  return !!currentPlayerCoins && currentPlayerCoins < 52;
+};
+
+const endGame = assign<GameContext, SimpleGameMachineMessage>({ winnerId: (context) => context.currentPlayerId });
+
+const initializePlayers = assign<GameContext, SimpleGameMachineMessage>((context, message) => {
   if (message.type === 'START_GAME') {
     return {
-      players: message.usersIds.map((userId) => ({ userId, coins: 3 })),
+      players: message.usersIds.map((userId) => ({ userId })),
       gameCards: allGameCards,
       currentPlayerId: message.usersIds[0],
     };
@@ -227,7 +252,7 @@ const initializePlayers = assign((context: GameContext, message: SimpleGameMachi
   return { players: context.players };
 });
 
-const addStarterKit = assign((context: GameContext, message: SimpleGameMachineMessage) => {
+const addStarterKit = assign<GameContext, SimpleGameMachineMessage>((context, message) => {
   if (message.type === 'START_GAME') {
     const { wheatField, bakery } = context.gameCards;
 
@@ -236,11 +261,12 @@ const addStarterKit = assign((context: GameContext, message: SimpleGameMachineMe
 
       return {
         playersCards: Object.fromEntries(context.players.map((player) => [player.userId, initialCards])),
+        coins: Object.fromEntries(context.players.map((player) => [player.userId, 3])),
       };
     }
   }
 
-  return { playersCards: context.playersCards };
+  return { playersCards: context.playersCards, coins: context.coins };
 });
 
 export const gameMachine = createMachine<GameContext, SimpleGameMachineMessage >(
@@ -252,11 +278,14 @@ export const gameMachine = createMachine<GameContext, SimpleGameMachineMessage >
       currentPlayerId: '',
       players: [],
       playersCards: {},
+      coins: {},
       rollDiceResult: 0,
+      winnerId: '',
     },
     states: {
       initializing: {
         on: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           START_GAME: {
             actions: [
               'initializePlayers', 'addStarterKit',
@@ -267,18 +296,38 @@ export const gameMachine = createMachine<GameContext, SimpleGameMachineMessage >
       },
       waitingToRollDice: {
         on: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           ROLL_DICE: [
             {
               cond: 'canRollDice',
               actions: [
-                'rollDice',
-                'applyCardEffects',
-                'chooseNextPlayer',
+                'rollDice', 'applyCardEffects',
               ],
-              target: 'waitingToRollDice',
+              target: 'checkingWinningConditions',
             },
           ],
         },
+      },
+      closingGame: {
+        type: 'final',
+      },
+      checkingWinningConditions: {
+        always: [
+          {
+            cond: 'hasWinner',
+            actions: [
+              'endGame',
+            ],
+            target: 'closingGame',
+          },
+          {
+            cond: 'hasNoWinner',
+            actions: [
+              'chooseNextPlayer',
+            ],
+            target: 'waitingToRollDice',
+          },
+        ],
       },
     },
   },
@@ -286,12 +335,15 @@ export const gameMachine = createMachine<GameContext, SimpleGameMachineMessage >
     guards: {
       canRollDice,
       hasWinner,
+      hasNoWinner,
     },
     actions: {
       initializePlayers,
       addStarterKit,
       rollDice,
+      applyCardEffects,
       chooseNextPlayer,
+      endGame,
     },
   },
 );
