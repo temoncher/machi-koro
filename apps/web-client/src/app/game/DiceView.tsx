@@ -30,7 +30,7 @@ export const DiceView: React.FC<DiceViewProps> = memo(({
     <div className={clsx('dice', diceClass, className)}>
       {rolledDice && Array(rolledDice).fill(0)
         // eslint-disable-next-line react/no-array-index-key
-        .map((rolledDiceItem, index) => <div className="dice__dot" key={index} />)}
+        .map((rolledDiceItem, index) => <div key={index} className="dice__dot" />)}
 
     </div>
   );

@@ -30,7 +30,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, isHighlighted }:
     >
       <div className="player-card-header">
         <div className="player-card-header__img">
-          <img src={profilePlaceholderImage} alt="user avatar" />
+          <img alt="user avatar" src={profilePlaceholderImage} />
         </div>
         <div className="player-card-header__name">
           {player.name}

@@ -20,8 +20,8 @@ export const LoginPage: React.FC = () => {
       default:
         return (
           <button
-            type="button"
             className="login-button"
+            type="button"
             onClick={() => { setLoginPageState(LoginPageState.GUEST_FORM); }}
           >
             {t('login.tryAsGuestButtonText')}

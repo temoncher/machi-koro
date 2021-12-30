@@ -1,27 +1,34 @@
+import { Establishment, Landmark } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
 import React, { memo, useMemo } from 'react';
 
-import { Landmark, CommonEstablishment } from '../types';
 import { UrlUtils } from '../utils';
 
 import './CardView.css';
 
 type CardSize = 'base' | 'lg' | 'sm' | 'xs';
 
-type CardInfo = Landmark | CommonEstablishment;
+type CardInfo = Landmark | Establishment;
 
 type CardViewProps = {
   className?: string;
   cardInfo: CardInfo;
   size?: CardSize;
+  quantity?: number;
+  underConstruction?: boolean;
+  onClick?: () => void;
 };
 
 type LandmarkViewProps = Omit<CardViewProps, 'cardInfo'> & {
   cardInfo: Landmark;
+  underConstruction: boolean;
+  onClick?: () => void;
 };
 
-type CommonEstablishmentViewProps = Omit<CardViewProps, 'cardInfo'> & {
-  cardInfo: CommonEstablishment;
+type EstablishmentViewProps = Omit<CardViewProps, 'cardInfo'> & {
+  cardInfo: Establishment;
+  quantity: number;
+  onClick?: () => void;
 };
 
 const cardSizeToScaleMap = {
@@ -39,41 +46,63 @@ const cardTypeToColorMap = {
   landmark: 'yellow',
 } as const;
 
-const getCommonProps = (cardInfo: CardInfo) => ({
-  ...cardInfo,
-  activationDice: 'activationDice' in cardInfo ? cardInfo.activationDice : undefined,
-  count: 'count' in cardInfo ? cardInfo.count : undefined,
-  underConstruction: 'underConstruction' in cardInfo ? cardInfo.underConstruction : undefined,
-});
+const getCommonProps = (cardInfo: CardInfo) => (
+  cardInfo.domain === 'landmark' ? {
+    ...cardInfo,
+    tag: undefined,
+    activation: undefined,
+    quantity: undefined,
+    establishmentId: undefined,
+  }
+    : {
+      ...cardInfo,
+      underConstruction: undefined,
+      landmarkId: undefined,
+    });
 
-const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: CardViewProps) => {
+const CardView: React.FC<CardViewProps> = memo(({
+  className,
+  cardInfo,
+  size,
+  underConstruction,
+  quantity,
+  onClick,
+}: CardViewProps) => {
   const {
-    type,
-    count,
-    activationDice,
+    activation,
     name,
     tagSrc,
-    establishmentImageSrc,
-    buildCost,
+    imageSrc,
+    cost,
     descriptionText,
-    underConstruction,
+    domain,
   } = getCommonProps(cardInfo);
 
-  const activationDiceRange = useMemo((): string => (activationDice ? activationDice.join('-') : ''), [activationDice]);
-  const cardColor = useMemo(() => cardTypeToColorMap[type], [type]);
+  const activationDiceRange = useMemo((): string => (activation ? activation.join('-') : ''), [activation]);
+  const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
 
-  const { backgroundImage, backgroundClass, textClass } = useMemo(() => ({
-    backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}`,
-    backgroundClass: `card-view--${cardColor}`,
-    textClass: `card-view__name--${cardColor}`,
-  }), [cardColor]);
+  const { backgroundImage, backgroundClass, textClass } = useMemo(
+    () => ({
+      backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}`,
+      backgroundClass: `card-view--${cardColor}`,
+      textClass: `card-view__name--${cardColor}`,
+    }),
+    [cardColor],
+  );
 
   const underConstructionIcon = useMemo((): string => UrlUtils.getStaticImage('under-construction'), []);
 
   const scale = useMemo((): number => (size ? cardSizeToScaleMap[size] : cardSizeToScaleMap.base), [size]);
 
   return (
-    <div className={clsx('card-view-wrapper', className)} style={{ ['--card-scale' as string]: scale }}>
+    <div
+      className={clsx('card-view-wrapper', className)}
+      role="button"
+      style={{ ['--card-scale' as string]: scale }}
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={onClick}
+    >
       <article
         className={clsx({
           /* eslint-disable @typescript-eslint/naming-convention */
@@ -87,20 +116,19 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
         style={{ backgroundImage }}
       >
 
-        {type !== 'landmark' && (
+        {domain !== 'landmark' && (
           <p className="card-view__sum-dice">
             {activationDiceRange}
           </p>
         )}
 
-        {count && (
+        {quantity && (
         <p className="card-view__count">
-          {count}
+          {quantity}
         </p>
         )}
 
         <h2
-          style={{ ['--bg-image' as string]: `url('${tagSrc}')` }}
           className={clsx({
           /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -110,22 +138,23 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
 
           /* eslint-enable @typescript-eslint/naming-convention */
           })}
+          style={{ ['--bg-image' as string]: `url('${tagSrc}')` }}
         >
           { name }
         </h2>
 
         <div className="card-view__card-image-container">
           <img
-            className="card-view__card-image"
-            src={establishmentImageSrc}
             alt="card"
+            className="card-view__card-image"
+            src={imageSrc}
           />
         </div>
 
         <p
           className="card-view__effect"
         >
-          {buildCost && (
+          {cost && (
             <>
               <span className={clsx({
                 /* eslint-disable @typescript-eslint/naming-convention */
@@ -133,11 +162,11 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
                 'card-view__cost-container': true,
                 'card-view__cost-container--left': true,
 
-                /* eslint-disable @typescript-eslint/naming-convention */
+                /* eslint-enable @typescript-eslint/naming-convention */
               })}
               >
                 <span className="card-view__cost-background">
-                  <span className="card-view__cost">{buildCost}</span>
+                  <span className="card-view__cost">{cost}</span>
                 </span>
               </span>
 
@@ -147,7 +176,7 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
                 'card-view__cost-container': true,
                 'card-view__cost-container--right': true,
 
-                /* eslint-disable @typescript-eslint/naming-convention */
+                /* eslint-enable @typescript-eslint/naming-convention */
               })}
               >
                 <span className="card-view__cost-background" />
@@ -161,9 +190,9 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
 
       {underConstruction && (
       <img
+        alt="card"
         className="card-view-wrapper__under-construction-icon"
         src={underConstructionIcon}
-        alt="card"
       />
       )}
     </div>
@@ -173,21 +202,25 @@ const CardView: React.FC<CardViewProps> = memo(({ className, cardInfo, size }: C
 export const LandmarkView: React.FC<LandmarkViewProps> = (landmarkViewProps: LandmarkViewProps) => (
   <CardView
   /*  eslint-disable react/destructuring-assignment */
-    className={landmarkViewProps.className}
     cardInfo={landmarkViewProps.cardInfo}
+    className={landmarkViewProps.className}
     size={landmarkViewProps.size}
+    underConstruction={landmarkViewProps.underConstruction}
+    onClick={landmarkViewProps.onClick}
   /*  eslint-enable react/destructuring-assignment */
   />
 );
 
 export const CommonEstablishmentView:
-React.FC<CommonEstablishmentViewProps> = (commonEstablishmentViewProps:
-CommonEstablishmentViewProps) => (
+React.FC<EstablishmentViewProps> = (commonEstablishmentViewProps:
+EstablishmentViewProps) => (
   <CardView
   /*  eslint-disable react/destructuring-assignment */
-    className={commonEstablishmentViewProps.className}
     cardInfo={commonEstablishmentViewProps.cardInfo}
+    className={commonEstablishmentViewProps.className}
+    quantity={commonEstablishmentViewProps.quantity}
     size={commonEstablishmentViewProps.size}
-    /*  eslint-enable react/destructuring-assignment */
+    onClick={commonEstablishmentViewProps.onClick}
+  /*  eslint-enable react/destructuring-assignment */
   />
 );

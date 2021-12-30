@@ -76,8 +76,11 @@ export namespace GameRepository {
     };
   };
 
-  const initializeCreateGame = (redisClientGames: PromisifiedRedisClient): CreateGame => async (currentUserId: string, users: string[]) => {
+  const initializeCreateGame = (
+    redisClientGames: PromisifiedRedisClient,
+  ): CreateGame => async (currentUserId: string, users: string[]) => {
     const usersStatusesMap: UsersStatusesMap = Object.fromEntries(users.map((userId) => [userId, UserStatus.DISCONNECTED]));
+
     const game: Game = {
       gameId: uuidv4(),
       hostId: currentUserId,
@@ -89,7 +92,7 @@ export namespace GameRepository {
 
     await Promise.all([
       redisClientGames.set(`${game.gameId}:hostId`, game.hostId),
-      redisClientGames.rpush(`${game.gameId}:users`, ...game.users),
+      redisClientGames.rpush(`${game.gameId}:users`, ...users),
       redisClientGames.hset([`${game.gameId}:usersStatusesMap`, ...usersStatusesMapHash]),
     ]);
 

@@ -63,14 +63,14 @@ export const GuestLoginForm: React.FC = () => {
         <label htmlFor="username">
           {t('login.guestFormLableUsername')}
           <input
-            id="username"
-            maxLength={30}
             className={clsx({
               // eslint-disable-next-line @typescript-eslint/naming-convention
               'guest-form__input': true,
               // eslint-disable-next-line @typescript-eslint/naming-convention
               'guest-form__input_error': errors.username,
             })}
+            id="username"
+            maxLength={30}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...register('username', {
               validate: validateUsername,
@@ -81,9 +81,9 @@ export const GuestLoginForm: React.FC = () => {
           {errors.username && errors.username.message}
         </p>
         <button
-          type="submit"
           className="guest-form__button"
           disabled={!!errors.username || !isDirty}
+          type="submit"
         >
           {t('login.guestFormButton')}
         </button>

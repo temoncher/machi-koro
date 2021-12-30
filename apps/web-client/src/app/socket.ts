@@ -1,7 +1,11 @@
 import {
   ClientSentEventsMap,
+  EstablishmentId,
+  GameId,
+  LandmarkId,
   ServerSentEventsMap,
   User,
+  UserId,
 } from '@machikoro/game-server-contracts';
 import * as SocketIOClient from 'socket.io-client';
 
@@ -86,6 +90,26 @@ export const initializeSocket = (): void => {
     // eslint-disable-next-line no-console
     console.log(`Result roll dice ${resultRollDice}`);
   });
+
+  socket.on('BUILD_ESTABLISHMENT', (stateMachine) => {
+    // eslint-disable-next-line no-console
+    console.log(stateMachine);
+  });
+
+  socket.on('BUILD_LANDMARK', (stateMachine) => {
+    // eslint-disable-next-line no-console
+    console.log(stateMachine);
+  });
+
+  socket.on('PASS', (stateMachine) => {
+    // eslint-disable-next-line no-console
+    console.log(stateMachine);
+  });
+
+  socket.on('GAME_ERROR', (message) => {
+    // eslint-disable-next-line no-console
+    console.log(message);
+  });
 };
 
 export const joinLobby = (lobbyId: string): void => {
@@ -96,18 +120,30 @@ export const leaveLobby = (lobbyId: string): void => {
   socket?.emit('leaveLobby', lobbyId);
 };
 
-export const joinGame = (gameId: string): void => {
+export const joinGame = (gameId: GameId): void => {
   socket?.emit('joinGame', gameId);
 };
 
-export const leaveGame = (gameId: string): void => {
+export const leaveGame = (gameId: GameId): void => {
   socket?.emit('leaveGame', gameId);
 };
 
-export const startGame = (gameId: string): void => {
+export const startGame = (gameId: GameId): void => {
   socket?.emit('startGame', gameId);
 };
 
-export const rollDice = (userId: string): void => {
+export const rollDice = (userId: UserId): void => {
   socket?.emit('rollDice', userId);
+};
+
+export const buildEstablishment = (userId: UserId) => (establishmentId: EstablishmentId): void => {
+  socket?.emit('buildEstablishment', userId, establishmentId);
+};
+
+export const buildLandmark = (userId: UserId) => (landmarkId: LandmarkId): void => {
+  socket?.emit('buildLandmark', userId, landmarkId);
+};
+
+export const pass = (userId: UserId): void => {
+  socket?.emit('pass', userId);
 };

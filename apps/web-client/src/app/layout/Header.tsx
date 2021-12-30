@@ -45,11 +45,11 @@ export const Header: React.FC<HeaderProps> = ({ className }: HeaderProps) => {
                 </span>
               </Listbox.Button>
               <Transition
-                show={open}
                 as={Fragment}
                 leave="transition ease-in duration-100"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
+                show={open}
               >
                 <Listbox.Options
                   static
@@ -57,9 +57,9 @@ export const Header: React.FC<HeaderProps> = ({ className }: HeaderProps) => {
                 >
                   {Object.entries(languageCodeToRepresentationMap).map(([languageCode, languageRepresentation]) => (
                     <Listbox.Option
+                      key={languageCode}
                       className="select-langs__option"
                       value={languageCode}
-                      key={languageCode}
                     >
                       <div className="flex items-center">
                         <span>{languageRepresentation}</span>

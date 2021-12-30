@@ -23,7 +23,10 @@ export const convertIssueToErrorInfo = (issue: ZodIssue): ErrorInfo => {
       const lastKey = `'${ArrayUtils.lastItem(issue.path) as string}'`;
       const requiredValues = `'${issue.options.join("' or '")}'`;
 
-      return { code: issue.code, message: `${lastKey} required and must be only ${requiredValues}` };
+      return {
+        code: issue.code,
+        message: `${lastKey} required and must be only ${requiredValues}`,
+      };
     }
     default:
       return { code: issue.code, message: issue.message };

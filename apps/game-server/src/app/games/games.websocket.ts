@@ -1,13 +1,15 @@
 import {
   Game,
+  GameState,
+  User,
   UserStatus,
 } from '@machikoro/game-server-contracts';
 import { interpret } from 'xstate';
+import { ZodError } from 'zod';
 
+import { gameMachine } from '../game-machine';
 import { AuthMiddlewareLocals } from '../shared';
 import { AppSocket } from '../types';
-
-import { gameMachine } from './simpleGame.machine';
 
 const machine = interpret(gameMachine);
 
@@ -34,20 +36,56 @@ const startGame = ({
   socket.emit('GAME_STARTED', state.context);
 };
 
-const rollDice = (socket: AppSocket) => (userId: string): void => {
+const rollDice = (socket: AppSocket) => (userId: string) => {
   const state = machine.send('ROLL_DICE', { userId });
 
-  socket.emit('DICE_ROLLED', state.context.rollDiceResult);
+  if (state.changed) {
+    return socket.emit('DICE_ROLLED', state.context.rollDiceResult);
+  }
+
+  return socket.emit('GAME_ERROR', `Error at event ${state.event.type}.`);
+};
+
+const buildEstablishment = (socket: AppSocket) => (userId: string, establishmentToBuild: string) => {
+  const state = machine.send('BUILD_ESTABLISHMENT', { userId, establishmentToBuild });
+
+  if (state.changed) {
+    return socket.emit('BUILD_ESTABLISHMENT', state.context);
+  }
+
+  return socket.emit('GAME_ERROR', `Error at event ${state.event.type}.`);
+};
+
+const buildLandmark = (socket: AppSocket) => (userId: string, landmarkToBuild: string) => {
+  const state = machine.send('BUILD_LANDMARK', { userId, landmarkToBuild });
+
+  if (state.changed) {
+    return socket.emit('BUILD_LANDMARK', state.context);
+  }
+
+  return socket.emit('GAME_ERROR', `Error at event ${state.event.type}.`);
+};
+
+const pass = (socket: AppSocket) => (userId: string) => {
+  const state = machine.send('PASS', { userId });
+
+  if (state.changed) {
+    return socket.emit('PASS', state.context);
+  }
+
+  return socket.emit('GAME_ERROR', `Error at event ${state.event.type}.`);
 };
 
 type JoinGameDependencies = {
   connectUserToGame: (userToConnectId: string, gameId: string,) => Promise<'OK'>;
   getGame: (gameId: string) => Promise<Game | undefined>;
+  getUsers: (users: string[]) => Promise<(User | ZodError)[]>;
 };
 
 const joinGame = ({
   connectUserToGame,
   getGame,
+  getUsers,
 }: JoinGameDependencies) => (socket: AppSocket) => async (
   gameId: string,
 ): Promise<void> => {
@@ -72,10 +110,21 @@ const joinGame = ({
     await connectUserToGame(userId, gameId);
     game.usersStatusesMap[userId] = UserStatus.CONNECTED;
 
-    const newGameState: Game = {
+    const possibleUsers = await getUsers(game.users);
+    const hasErrors = possibleUsers.some((possibleUser) => possibleUser instanceof ZodError);
+
+    if (hasErrors) {
+      // TODO: emit error
+      return;
+    }
+
+    // This type cast is safe, because we already checked that possibleUsers has no errors inside of it
+    const users = possibleUsers as User[];
+
+    const newGameState: GameState = {
       gameId,
       hostId: game.hostId,
-      users: game.users,
+      users,
       usersStatusesMap: {
         ...game.usersStatusesMap,
         [userId]: UserStatus.CONNECTED,
@@ -127,4 +176,10 @@ export const handleGameEvents = (handleGameEventsDependencies: HandleGameEventsD
   socket.on('startGame', startGame(handleGameEventsDependencies)(socket));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   socket.on('rollDice', rollDice(socket));
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  socket.on('buildEstablishment', buildEstablishment(socket));
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  socket.on('buildLandmark', buildLandmark(socket));
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  socket.on('pass', pass(socket));
 };
