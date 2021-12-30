@@ -1,31 +1,69 @@
-import clsx from 'clsx';
 import './PlayerView.css';
-import React, { memo, useMemo } from 'react';
 
-import { Player, Status } from '../types';
+import {
+  Establishment,
+  EstablishmentId,
+  Landmark,
+  LandmarkId,
+  User,
+  UserStatus,
+} from '@machikoro/game-server-contracts';
+import clsx from 'clsx';
+import React, { memo, useMemo } from 'react';
 
 import { CommonEstablishmentView, LandmarkView } from './CardView';
 
 type PlayerViewProps = {
   className?: string;
-  player: Player;
+  player: User;
+  coins: number;
+  gameLandmarks: Record<string, Landmark>;
+  status: UserStatus;
+  establishments: Record<EstablishmentId, number>;
+  gameEstablishments: Record<EstablishmentId, Establishment>;
+  landmarks: Record<LandmarkId, boolean>;
+  onLandmarkClick: (landmarkId: string) => void;
 };
 
-export const PlayerView: React.FC<PlayerViewProps> = memo(({
-  className, player,
-}: PlayerViewProps) => {
-  const {
-    username,
-    status,
-    cards,
-    coins,
-    landmarks,
-  } = player;
+export const PlayerView: React.FC<PlayerViewProps> = memo((playerViewProps: PlayerViewProps) => {
+  const { username } = playerViewProps.player;
 
-  const playerStatusClass = useMemo(() => (status === Status.ACTIVE ? 'player-view__status--green' : 'player-view__status--red'), [status]);
+  const playerStatusClass = useMemo(
+    () => (playerViewProps.status === UserStatus.CONNECTED ? 'player-view__status--green' : 'player-view__status--red'),
+    [playerViewProps.status],
+  );
+
+  const onLandmarkCardClick = (landmarkId?: string) => {
+    if (!landmarkId) {
+      return;
+    }
+
+    playerViewProps.onLandmarkClick(landmarkId);
+  };
+
+  const renderCard = (establishmentId: string, count: number, cardIndex: number): JSX.Element | null => {
+    const currentEstablishments = playerViewProps.gameEstablishments[establishmentId];
+
+    return currentEstablishments ? (
+      <div className="player-view__card-container" style={{ ['--number' as string]: cardIndex }}>
+        <CommonEstablishmentView
+          key={establishmentId}
+          cardInfo={currentEstablishments}
+          quantity={count}
+        />
+        <CommonEstablishmentView
+          key={establishmentId}
+          cardInfo={currentEstablishments}
+          className="player-view__show-card"
+          quantity={count}
+          size="lg"
+        />
+      </div>
+    ) : null;
+  };
 
   return (
-    <div className={clsx('player-view', className)}>
+    <div className={clsx('player-view', playerViewProps.className)}>
       <div className="player-view__info">
         <div className="player-view__headline">
           <div className="player-view__status-container">
@@ -33,36 +71,30 @@ export const PlayerView: React.FC<PlayerViewProps> = memo(({
           </div>
           <span className="player-view__coins-container">
             <span className="player-view__coins-background">
-              <span className="player-view__coins">{coins}</span>
+              <span className="player-view__coins">{playerViewProps.coins}</span>
             </span>
           </span>
         </div>
         <p className="player-view__username">{username}</p>
       </div>
       <div className="player-view__landmarks">
-        {landmarks.map((playerLandmark) => (
+        {Object.entries(playerViewProps.gameLandmarks).map(([,landmark]) => (
           <LandmarkView
-            cardInfo={playerLandmark}
+            cardInfo={landmark}
             size="xs"
+            underConstruction={!!playerViewProps.landmarks[landmark.landmarkId]}
+            onClick={() => { onLandmarkCardClick(landmark.landmarkId); }}
           />
         ))}
 
       </div>
-      <div className="player-view__cards" style={{ ['--cards-number' as string]: cards.length - 1 }}>
-        { cards.map((card, cardIndex) => (
-          <div className="player-view__card-container" style={{ ['--number' as string]: cardIndex }}>
-            <CommonEstablishmentView
-              cardInfo={card}
-              key={card.name}
-            />
-            <CommonEstablishmentView
-              className="player-view__show-card"
-              cardInfo={card}
-              size="lg"
-              key={card.name}
-            />
-          </div>
-        ))}
+      <div
+        className="player-view__cards"
+        style={{ ['--cards-number' as string]: Object.values(playerViewProps.establishments).length - 1 }}
+      >
+        { Object.entries(playerViewProps.establishments).map(
+          ([establishmentId, count], cardIndex) => renderCard(establishmentId, count, cardIndex),
+        )}
       </div>
     </div>
   );

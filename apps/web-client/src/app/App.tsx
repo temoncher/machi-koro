@@ -72,16 +72,16 @@ export const App: React.FC = () => {
       <Header />
       <GuardProvider loading={Loading}>
         <Switch>
-          <GuardedRoute guards={[createRequireUnauthorized(store, dispatch)]} path="/login" exact>
+          <GuardedRoute exact guards={[createRequireUnauthorized(store, dispatch)]} path="/login">
             <LoginPage />
           </GuardedRoute>
-          <GuardedRoute guards={[createRequireAuthorized(store, dispatch)]} path="/" exact>
+          <GuardedRoute exact guards={[createRequireAuthorized(store, dispatch)]} path="/">
             <HomePage />
           </GuardedRoute>
-          <GuardedRoute guards={[createRequireAuthorized(store, dispatch)]} path="/lobbies/:lobbyId" exact>
+          <GuardedRoute exact guards={[createRequireAuthorized(store, dispatch)]} path="/lobbies/:lobbyId">
             <LobbyPage />
           </GuardedRoute>
-          <GuardedRoute guards={[createRequireAuthorized(store, dispatch)]} path="/games/:gameId" exact>
+          <GuardedRoute exact guards={[createRequireAuthorized(store, dispatch)]} path="/games/:gameId">
             <GamePage className="app__game-page" />
           </GuardedRoute>
         </Switch>

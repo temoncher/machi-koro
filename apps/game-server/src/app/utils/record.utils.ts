@@ -10,4 +10,11 @@ export namespace RecordUtils {
 
       return [recordKey, value];
     }));
+
+  export const mapWithIndex = <T, V>(
+    map: (index: string, value: T) => V,
+    record: Record<string, T>,
+  ): Record<string, V> => Object.fromEntries(Object.entries(record).map(
+      ([key, value]) => [key, map(key, value)],
+    ));
 }

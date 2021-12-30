@@ -36,4 +36,5 @@ export const userSchema = z.object({
   type: userTypeSchema,
   userId: userIdShema,
 });
+
 export type User = z.infer<typeof userSchema>;

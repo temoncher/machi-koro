@@ -19,7 +19,7 @@ export const HomePage: React.FC = () => {
       <p className="p-4 text-center">
         {t('home.welcomeText')}
       </p>
-      <button type="button" className="new-lobby-button" onClick={createLobbyRequest}>{t('home.createNewLobbyButtonText')}</button>
+      <button className="new-lobby-button" type="button" onClick={createLobbyRequest}>{t('home.createNewLobbyButtonText')}</button>
     </div>
   );
 };

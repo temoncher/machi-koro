@@ -39,7 +39,11 @@
       "rules": {
         "react/react-in-jsx-scope": 0,
         "react/require-default-props": 0,
-
+        "react/jsx-sort-props": ["error", {
+          "shorthandFirst": true,
+          "callbacksLast": true,
+          "reservedFirst": true
+        }],
         "import/order": [
           1,
           {
