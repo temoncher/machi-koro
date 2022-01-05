@@ -39,5 +39,8 @@ testem.log
 Thumbs.db
 
 # Reporters
-junit.xml 
+junit.xml
 *graph.svg
+
+# Cypress
+.cypress_cache

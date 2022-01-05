@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:alpine
+    restart: always
+    command: redis-server
+    volumes:
+      - redis-data:/var/lib/redis
+    ports:
+      - 6379:6379
+
+  whole-app:
+    container_name: whole-app-development
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.dev
+    ports:
+      - 4200:4200
+      - 3333:3333
+    environment:
+      - CYPRESS_CACHE_FOLDER=.cypress_cache
+      - DEVCONTAINER=true
+    init: true
+    volumes:
+      # Use a named volume for the source code
+      - ../:/workspace
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+volumes:
+  redis-data:

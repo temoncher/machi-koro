@@ -19,22 +19,31 @@ import { UsersRepository } from './app/shared';
 
 const main = (): void => {
   const PORT = process.env.port || 3333;
+  const hosts = process.env.DEVCONTAINER
+    ? {
+      REDIS: 'redis',
+      MAIN: '127.0.0.1',
+    }
+    : {
+      REDIS: 'localhost',
+      MAIN: 'localhost',
+    };
 
   const app = express();
   const server = http.createServer(app);
 
   const redisClientUsers = redis.createClient({
-    host: 'localhost',
+    host: hosts.REDIS,
     port: 6379,
     db: RedisDbInstance.GUESTS,
   });
   const redisClientLobbies = redis.createClient({
-    host: 'localhost',
+    host: hosts.REDIS,
     port: 6379,
     db: RedisDbInstance.LOBBIES,
   });
   const redisClientGames = redis.createClient({
-    host: 'localhost',
+    host: hosts.REDIS,
     port: 6379,
     db: RedisDbInstance.GAMES,
   });
@@ -44,19 +53,16 @@ const main = (): void => {
     console.error(error);
   });
 
-  const promisifiedUsersClient = promisifyRedisClient(redisClientUsers);
-  const promisifiedLobbiesClient = promisifyRedisClient(redisClientLobbies);
-  const promisifiedGamesClient = promisifyRedisClient(redisClientGames);
-  const lobbiesRepository = LobbiesRepository.init(promisifiedLobbiesClient);
-  const usersRepository = UsersRepository.init(promisifiedUsersClient);
-  const gamesRepository = GameRepository.init(promisifiedGamesClient);
+  const lobbiesRepository = LobbiesRepository.init(promisifyRedisClient(redisClientLobbies));
+  const usersRepository = UsersRepository.init(promisifyRedisClient(redisClientUsers));
+  const gamesRepository = GameRepository.init(promisifyRedisClient(redisClientGames));
 
   app.use(express.json());
 
   const staticFiles = express.static(path.join(__dirname, 'assets', 'static'));
 
   app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: `http://${hosts.MAIN}:4200`,
     credentials: true,
     methods: [
       'GET',
@@ -79,7 +85,7 @@ const main = (): void => {
 
   server.listen(PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`Listening at http://localhost:${PORT}/game`);
+    console.log(`Listening at http://${hosts.MAIN}:${PORT}/`);
   });
 
   // eslint-disable-next-line no-console
@@ -96,7 +102,18 @@ const main = (): void => {
     disconnectUserFromGame: gamesRepository.disconnectUserFromGame,
   };
 
-  initSocketServer(socketServerDependencies, server);
+  initSocketServer({
+    cors: {
+      origin: `http://${hosts.MAIN}:4200`,
+      credentials: true,
+      methods: [
+        'GET',
+        'PUT',
+        'POST',
+        'OPTIONS',
+      ],
+    },
+  }, socketServerDependencies, server);
 };
 
 main();

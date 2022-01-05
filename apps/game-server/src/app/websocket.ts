@@ -62,21 +62,11 @@ const onConnection = (
 export type SocketServerDependencies = AuthSocketMiddlewareDependencies & OnConnectionDependencies;
 
 export const initSocketServer = (
+  options: Partial<SocketIO.ServerOptions>,
   socketServerDependencies: SocketServerDependencies,
   server: http.Server,
 ): SocketIO.Server<ClientSentEventsMap, ServerSentEventsMap, ServerSentEventsMap> => {
-  const io = new SocketIO.Server(server, {
-    cors: {
-      origin: 'http://localhost:4200',
-      credentials: true,
-      methods: [
-        'GET',
-        'PUT',
-        'POST',
-        'OPTIONS',
-      ],
-    },
-  });
+  const io = new SocketIO.Server(server, options);
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   io.use(authSocketMiddleware(socketServerDependencies));

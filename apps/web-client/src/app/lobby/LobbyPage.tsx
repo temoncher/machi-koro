@@ -84,11 +84,9 @@ export const LobbyPage: React.FC = () => {
           {t('lobby.playersSectionTitle')}
         </div>
         <div className="lobby-players-list__container">
-          {
-            mockPlayers.map((player) => (
-              <PlayerCard key={player.id} isHighlighted={player.id === userId} player={player} />
-            ))
-          }
+          {mockPlayers.map((player) => (
+            <PlayerCard key={player.id} isHighlighted={player.id === userId} player={player} />
+          ))}
         </div>
       </section>
       <section className="lobby-buttons-container">
@@ -99,17 +97,15 @@ export const LobbyPage: React.FC = () => {
         >
           {t('lobby.startNewGameButtonText')}
         </button>
-        {isJoinLobbyLoading ? (
-          <>
-            <button
-              className="lobby-buttons-container__button"
-              type="submit"
-              onClick={() => { requestToLeaveLobby(); }}
-            >
-              {t('lobby.leaveLobbyButtonText')}
-            </button>
-          </>
-        ) : <></>}
+        {isJoinLobbyLoading && (
+          <button
+            className="lobby-buttons-container__button"
+            type="submit"
+            onClick={() => { requestToLeaveLobby(); }}
+          >
+            {t('lobby.leaveLobbyButtonText')}
+          </button>
+        )}
       </section>
     </div>
   );
