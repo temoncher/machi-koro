@@ -15,9 +15,9 @@ cache:
 lint:
   stage: lint
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - yarn install --frozen-lockfile --cache-folder .npm
   script:
-    - npm run lint-ci
+    - yarn lint-ci
   artifacts:
     reports:
       codequality: gl-codequality.json
@@ -26,6 +26,6 @@ lint:
 test:
   stage: test
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - yarn install --frozen-lockfile --cache-folder .npm
   script:
-    - npm run test-ci
+    - yarn test-ci

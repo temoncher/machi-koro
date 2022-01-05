@@ -10,6 +10,7 @@
     "lint-all": "nx run-many --all --target=lint",
     "lint-ci": "nx run-many --all --target=lint --format gitlab .",
     "start": "nx serve",
+    "startdev": "nx serve --host=127.0.0.1",
     "build": "nx build",
     "test": "nx test",
     "lint": "nx workspace-lint && nx lint",
