@@ -1,8 +1,4 @@
-import {
-  FIRST_CHAR_USERNAME_REGEXP,
-  RegisterGuestRequestBody,
-  USERNAME_REGEXP,
-} from '@machikoro/game-server-contracts';
+import { FIRST_CHAR_USERNAME_REGEXP, USERNAME_REGEXP } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
@@ -26,7 +22,7 @@ export const GuestLoginForm: React.FC = () => {
     defaultValues: { username: '' },
   });
 
-  const { registerGuest } = useLoginActions();
+  const { registerGuestCommand } = useLoginActions();
   const { t } = useTranslation();
 
   const validateUsername = useCallback((name: string) => {
@@ -46,19 +42,12 @@ export const GuestLoginForm: React.FC = () => {
   }, [t]);
 
   const login = ({ username }: GuestFormInputs) => {
-    const loginRequestBody: RegisterGuestRequestBody = {
-      username,
-      type: 'guest',
-    };
-
-    registerGuest(loginRequestBody);
+    registerGuestCommand(username);
   };
 
   return (
     <div className="guest-form">
-      <h2 className="guest-form__title">
-        {t('login.guestFormTitle')}
-      </h2>
+      <h2 className="guest-form__title">{t('login.guestFormTitle')}</h2>
       <form onSubmit={handleSubmit(login)}>
         <label htmlFor="username">
           {t('login.guestFormLableUsername')}

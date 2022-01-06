@@ -28,15 +28,12 @@ type PlayersViewProps = {
 
 export const PlayersView: React.FC<PlayersViewProps> = memo((playersViewProps: PlayersViewProps) => {
   const defaultLandmarks = useMemo(
-    () => Object.fromEntries(
-      Object.entries(playersViewProps.gameLandmarks).map(([landmarkId]) => [landmarkId, false]),
-    ),
+    () => Object.fromEntries(Object.keys(playersViewProps.gameLandmarks).map((landmarkId) => [landmarkId, false])),
     [playersViewProps.gameLandmarks],
   );
 
   return (
     <div className={clsx('players', playersViewProps.className)}>
-
       {playersViewProps.players.map((player) => (
         <PlayerView
           key={player.userId}

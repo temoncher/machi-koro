@@ -12,7 +12,7 @@ export type EstablishmentId = string;
 
 export type LandmarkDomain = 'landmark';
 
-export const tagToUrlMap: Record<CommonEstablishmentType | 'landmark', string> = {
+export const tagToUrlMap: Record<CommonEstablishmentType | LandmarkDomain, string> = {
   wheat: 'http://localhost:3333/static/icons/wheat.png',
   livestock: 'http://localhost:3333/static/icons/cow.png',
   box: 'http://localhost:3333/static/icons/shop.png',
@@ -61,7 +61,7 @@ export type UsersStatusesMap = Record<UserId, UserStatus >;
 
 export type Game = {
   gameId: GameId;
-  hostId: string;
+  hostId: UserId;
   users: UserId[];
   usersStatusesMap: UsersStatusesMap;
 };
@@ -80,7 +80,7 @@ export type GameContext = {
 };
 
 export type ApplyEffects = (
-  establishmentId: string,
+  establishmentId: EstablishmentId,
   income: number,
   activetedEstablishmentType?: CommonEstablishmentType
 ) => (context: GameContext) => GameContext;
@@ -269,8 +269,6 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     tag: 'cup',
     name: 'Restaurant',
     cost: 3,
-    // applyEffect: updateCoinsForAllPlayersAtTheExpenseOfActivePlayer('restaurant', 2),
-    // quantity: 6,
     activation: [9, 10],
     tagSrc: tagToUrlMap.cup,
     imageSrc: 'http://localhost:3333/static/establishment-images/restaurant.png',
@@ -282,8 +280,6 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     tag: 'wheat',
     name: 'Apple Orchard',
     cost: 3,
-    // applyEffect: updateCoinsForAllPlayersWith('appleOrchard', 3),
-    // quantity: 6,
     activation: [10],
     tagSrc: tagToUrlMap.wheat,
     imageSrc: 'http://localhost:3333/static/establishment-images/apple-orchard.png',
@@ -295,8 +291,6 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     tag: 'apple',
     name: 'Produce Market',
     cost: 2,
-    // applyEffect: updateCoinsForActivePlayerWithIndustryEstablishment('produceMarket', 2, 'wheat'),
-    // quantity: 6,
     activation: [11, 12],
     tagSrc: tagToUrlMap.apple,
     imageSrc: 'http://localhost:3333/static/establishment-images/convenience-store.png',

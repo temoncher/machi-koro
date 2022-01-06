@@ -1,19 +1,16 @@
-export enum LoadingActionTypes {
-  SET_IS_LOADING = 'APP/SET_IS_LOADING',
+import { action, payload } from 'ts-action';
+
+enum LoadingActionType {
+  SET_IS_LOADING_DOCUMENT = '[Document] APP/Loading/SET_IS_LOADING',
 }
 
-interface SetIsLoading {
-  type: LoadingActionTypes.SET_IS_LOADING;
-  payload: boolean;
-}
+export const setIsLoadingDocument = action(
+  LoadingActionType.SET_IS_LOADING_DOCUMENT,
+  payload<boolean>(),
+);
 
-export type LoadingAction = SetIsLoading;
-
-export const setIsLoading = (isLoading: boolean): LoadingAction => ({
-  type: LoadingActionTypes.SET_IS_LOADING,
-  payload: isLoading,
-});
+export type LoadingAction = ReturnType<typeof setIsLoadingDocument>;
 
 export const loadingActions = {
-  setIsLoading,
+  setIsLoadingDocument,
 };

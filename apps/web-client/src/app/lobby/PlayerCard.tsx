@@ -23,18 +23,17 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, isHighlighted }:
   const { t } = useTranslation();
 
   return (
-    <div className={clsx({
-      'player-card__container': true,
-      'player-card__container--highlighted': isHighlighted,
-    })}
+    <div
+      className={clsx({
+        'player-card__container': true,
+        'player-card__container--highlighted': isHighlighted,
+      })}
     >
       <div className="player-card-header">
         <div className="player-card-header__img">
           <img alt="user avatar" src={profilePlaceholderImage} />
         </div>
-        <div className="player-card-header__name">
-          {player.name}
-        </div>
+        <div className="player-card-header__name">{player.name}</div>
       </div>
       <div className="player-card-header__login-type">
         {t('lobby.guestCardSubtitleText')}

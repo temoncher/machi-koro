@@ -1,48 +1,111 @@
 .dice {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    border-width: 4px;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  border-width: 4px;
 
-    @apply bg-white border-gray-300 border-solid overflow-hidden shadow-lg relative;
+  @apply bg-white border-gray-300 border-solid overflow-hidden shadow-lg relative;
 }
 
 .dice--disable {
-    opacity: .7;
+  opacity: 0.7;
 }
 
 .dice__dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
 
-    @apply bg-black block absolute;
+  @apply bg-black block absolute;
 }
 
-.dice--one .dice__dot:nth-child(1) { top: 50%; left: 50%; }
+.dice--one .dice__dot:nth-child(1) {
+  top: 50%;
+  left: 50%;
+}
 
-.dice--two .dice__dot:nth-child(1) { top: 25%; left: 25%; }
-.dice--two .dice__dot:nth-child(2) { top: 75%; left: 75%; }
+.dice--two .dice__dot:nth-child(1) {
+  top: 25%;
+  left: 25%;
+}
+.dice--two .dice__dot:nth-child(2) {
+  top: 75%;
+  left: 75%;
+}
 
-.dice--three .dice__dot:nth-child(1) { top: 25%; left: 25%; }
-.dice--three .dice__dot:nth-child(2) { top: 75%; left: 75%; }
-.dice--three .dice__dot:nth-child(3) { top: 50%; left: 50%; }
+.dice--three .dice__dot:nth-child(1) {
+  top: 25%;
+  left: 25%;
+}
+.dice--three .dice__dot:nth-child(2) {
+  top: 75%;
+  left: 75%;
+}
+.dice--three .dice__dot:nth-child(3) {
+  top: 50%;
+  left: 50%;
+}
 
-.dice--four .dice__dot:nth-child(1) { top: 25%; left: 25%; }
-.dice--four .dice__dot:nth-child(2) { top: 25%; left: 75%; }
-.dice--four .dice__dot:nth-child(3) { top: 75%; left: 25%; }
-.dice--four .dice__dot:nth-child(4) { top: 75%; left: 75%; }
+.dice--four .dice__dot:nth-child(1) {
+  top: 25%;
+  left: 25%;
+}
+.dice--four .dice__dot:nth-child(2) {
+  top: 25%;
+  left: 75%;
+}
+.dice--four .dice__dot:nth-child(3) {
+  top: 75%;
+  left: 25%;
+}
+.dice--four .dice__dot:nth-child(4) {
+  top: 75%;
+  left: 75%;
+}
 
-.dice--five .dice__dot:nth-child(1) { top: 25%; left: 25%; }
-.dice--five .dice__dot:nth-child(2) { top: 25%; left: 75%; }
-.dice--five .dice__dot:nth-child(3) { top: 75%; left: 25%; }
-.dice--five .dice__dot:nth-child(4) { top: 75%; left: 75%; }
-.dice--five .dice__dot:nth-child(5) { top: 50%; left: 50%; }
+.dice--five .dice__dot:nth-child(1) {
+  top: 25%;
+  left: 25%;
+}
+.dice--five .dice__dot:nth-child(2) {
+  top: 25%;
+  left: 75%;
+}
+.dice--five .dice__dot:nth-child(3) {
+  top: 75%;
+  left: 25%;
+}
+.dice--five .dice__dot:nth-child(4) {
+  top: 75%;
+  left: 75%;
+}
+.dice--five .dice__dot:nth-child(5) {
+  top: 50%;
+  left: 50%;
+}
 
-.dice--six .dice__dot:nth-child(1) { top: 25%; left: 25%; }
-.dice--six .dice__dot:nth-child(2) { top: 25%; left: 75%; }
-.dice--six .dice__dot:nth-child(3) { top: 75%; left: 25%; }
-.dice--six .dice__dot:nth-child(4) { top: 75%; left: 75%; }
-.dice--six .dice__dot:nth-child(5) { top: 50%; left: 25%; }
-.dice--six .dice__dot:nth-child(6) { top: 50%; left: 75%; }
+.dice--six .dice__dot:nth-child(1) {
+  top: 25%;
+  left: 25%;
+}
+.dice--six .dice__dot:nth-child(2) {
+  top: 25%;
+  left: 75%;
+}
+.dice--six .dice__dot:nth-child(3) {
+  top: 75%;
+  left: 25%;
+}
+.dice--six .dice__dot:nth-child(4) {
+  top: 75%;
+  left: 75%;
+}
+.dice--six .dice__dot:nth-child(5) {
+  top: 50%;
+  left: 25%;
+}
+.dice--six .dice__dot:nth-child(6) {
+  top: 50%;
+  left: 75%;
+}

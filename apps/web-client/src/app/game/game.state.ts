@@ -1,7 +1,5 @@
 export type GameState = {
-  gameId: string;
+
 };
 
-export const initialGameState: GameState = {
-  gameId: '',
-};
+export const initialGameState: GameState = {};

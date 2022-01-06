@@ -1,5 +1,8 @@
 import i18n, {
-  TFunction, ThirdPartyModule, LanguageDetectorModule, Newable,
+  TFunction,
+  ThirdPartyModule,
+  LanguageDetectorModule,
+  Newable,
 } from 'i18next';
 
 import { ROOT_EN_TRANSLATIONS } from './root-en.translations';

@@ -4,10 +4,7 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
-      "extends": [
-        "plugin:import/react",
-        "airbnb/hooks"
-      ],
+      "extends": ["plugin:import/react", "airbnb/hooks"],
       "parserOptions": {
         "project": "apps/web-client/tsconfig.app.json"
       },

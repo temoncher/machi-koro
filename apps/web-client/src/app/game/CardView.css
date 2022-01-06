@@ -1,92 +1,92 @@
 .card-view-wrapper {
-    @apply relative flex items-center justify-center;
+  @apply relative flex items-center justify-center;
 }
 
 .card-view {
-    max-width: calc(196px * var(--card-scale));
-    min-width: calc(196px * var(--card-scale));
-    min-height: calc(300px * var(--card-scale));
-    max-height: calc(300px * var(--card-scale));
+  max-width: calc(196px * var(--card-scale));
+  min-width: calc(196px * var(--card-scale));
+  min-height: calc(300px * var(--card-scale));
+  max-height: calc(300px * var(--card-scale));
 
-    border-radius: calc(8px * var(--card-scale));
-    @apply flex flex-col items-center relative shadow-lg bg-gray-500 bg-cover;
+  border-radius: calc(8px * var(--card-scale));
+  @apply flex flex-col items-center relative shadow-lg bg-gray-500 bg-cover;
 }
 
 .card-view--faded {
-    @apply filter grayscale
+  @apply filter grayscale;
 }
 
 .card-view--purple {
-    @apply bg-brand-purple-light;
+  @apply bg-brand-purple-light;
 }
 
 .card-view--red {
-    @apply bg-brand-red-light;
+  @apply bg-brand-red-light;
 }
 
 .card-view--blue {
-    @apply bg-brand-blue-light;
+  @apply bg-brand-blue-light;
 }
 
 .card-view--green {
-    @apply bg-brand-green-light;
+  @apply bg-brand-green-light;
 }
 
 .card-view--yellow {
-    @apply bg-brand-yellow-light;
+  @apply bg-brand-yellow-light;
 }
 
 .card-view__sum-dice {
-    min-height: calc(36px * var(--card-scale));
+  min-height: calc(36px * var(--card-scale));
 
-    font-size: calc(30px * var(--card-scale));
-    line-height: calc(36px * var(--card-scale));
-    @apply text-center text-white font-lithos flex-initial z-10;
+  font-size: calc(30px * var(--card-scale));
+  line-height: calc(36px * var(--card-scale));
+  @apply text-center text-white font-lithos flex-initial z-10;
 }
 
 .card-view__count {
-    min-height: calc(36px * var(--card-scale));
+  min-height: calc(36px * var(--card-scale));
 
-    font-size: calc(24px * var(--card-scale));
-    line-height: calc(30px * var(--card-scale));
+  font-size: calc(24px * var(--card-scale));
+  line-height: calc(30px * var(--card-scale));
 
-    top: calc(4px * var(--card-scale));
-    left: calc(4px * var(--card-scale));
-    @apply absolute text-center text-white font-sans flex-initial z-10;
+  top: calc(4px * var(--card-scale));
+  left: calc(4px * var(--card-scale));
+  @apply absolute text-center text-white font-sans flex-initial z-10;
 }
 
 .card-view__name {
-    min-height: calc(32px * var(--card-scale));
-    max-height: calc(32px * var(--card-scale));
+  min-height: calc(32px * var(--card-scale));
+  max-height: calc(32px * var(--card-scale));
 
-    font-size: calc(16px * var(--card-scale));
-    line-height: calc(24px * var(--card-scale));
-    margin-top: calc(12px * var(--card-scale));
-    @apply text-center font-lithos font-extrabold text-gray-800 flex-initial max-w-11/12 relative z-10 inline-block;
+  font-size: calc(16px * var(--card-scale));
+  line-height: calc(24px * var(--card-scale));
+  margin-top: calc(12px * var(--card-scale));
+  @apply text-center font-lithos font-extrabold text-gray-800 flex-initial max-w-11/12 relative z-10 inline-block;
 }
 
 .card-view__name--purple {
-    @apply text-brand-purple-dark;
+  @apply text-brand-purple-dark;
 }
 
 .card-view__name--red {
-    @apply text-brand-red-dark;
+  @apply text-brand-red-dark;
 }
 
 .card-view__name--blue {
-    @apply text-brand-blue-dark;
+  @apply text-brand-blue-dark;
 }
 
 .card-view__name--green {
-    @apply text-brand-green-dark;
+  @apply text-brand-green-dark;
 }
 
 .card-view__name--yellow {
-    @apply text-brand-yellow-dark;
+  @apply text-brand-yellow-dark;
 }
 
 .card-view__name--disabled {
-    @apply filter grayscale;
+  @apply filter grayscale;
 }
 
 .card-view__name::before {
@@ -95,66 +95,67 @@
   margin-right: calc(4px * var(--card-scale));
   height: calc(24px * var(--card-scale));
   width: calc(24px * var(--card-scale));
-  content: "";
+  content: '';
   background-size: 100%;
   background-image: var(--bg-image);
 }
 .card-view__card-image-container {
-    min-height: calc(92px * var(--card-scale));
+  min-height: calc(92px * var(--card-scale));
 
-    margin-bottom: calc(16px * var(--card-scale));
-    @apply flex-auto flex items-end justify-center relative;
+  margin-bottom: calc(16px * var(--card-scale));
+  @apply flex-auto flex items-end justify-center relative;
 }
 
 .card-view__card-image {
-    max-height: calc(180px * var(--card-scale));
-    @apply max-w-3/4 object-contain;
+  max-height: calc(180px * var(--card-scale));
+  @apply max-w-3/4 object-contain;
 }
 
 .card-view__effect {
-    flex: 0 0  calc(76px * var(--card-scale));
-    height: calc(76px * var(--card-scale));
+  flex: 0 0 calc(76px * var(--card-scale));
+  height: calc(76px * var(--card-scale));
 
-    font-size: calc(10px * var(--card-scale));
-    line-height: calc(12px * var(--card-scale));
-    padding:  calc(4px * var(--card-scale))  calc(8px * var(--card-scale)) calc(4px * var(--card-scale)) calc(8px * var(--card-scale));
-    @apply text-center text-white font-sans z-10;
+  font-size: calc(10px * var(--card-scale));
+  line-height: calc(12px * var(--card-scale));
+  padding: calc(4px * var(--card-scale)) calc(8px * var(--card-scale))
+    calc(4px * var(--card-scale)) calc(8px * var(--card-scale));
+  @apply text-center text-white font-sans z-10;
 }
 
 .card-view__cost-container {
-    height: 100%;
-    shape-outside: inset(calc(100% - ( 32px * var(--card-scale))) 0 0); 
-    margin-right: calc(8px * var(--card-scale)); 
-    @apply flex items-end;
+  height: 100%;
+  shape-outside: inset(calc(100% - (32px * var(--card-scale))) 0 0);
+  margin-right: calc(8px * var(--card-scale));
+  @apply flex items-end;
 }
 
-.card-view__cost-container--left { 
-    @apply float-left;
+.card-view__cost-container--left {
+  @apply float-left;
 }
 
-.card-view__cost-container--right { 
-    @apply float-right;
+.card-view__cost-container--right {
+  @apply float-right;
 }
 
 .card-view__cost-background {
-    height: calc(32px * var(--card-scale));
-    width: calc(32px * var(--card-scale));
+  height: calc(32px * var(--card-scale));
+  width: calc(32px * var(--card-scale));
 
-    border-width: calc(4px * var(--card-scale));
-    @apply bg-soft-yellow border-vivid-orange rounded-full bg-cover flex items-center justify-center;
+  border-width: calc(4px * var(--card-scale));
+  @apply bg-soft-yellow border-vivid-orange rounded-full bg-cover flex items-center justify-center;
 }
 
 .card-view__cost-container--right .card-view__cost-background {
-    @apply bg-transparent border-transparent;
+  @apply bg-transparent border-transparent;
 }
 
 .card-view__cost {
-    font-size: calc(16px * var(--card-scale));
-    line-height: calc(24px * var(--card-scale));
-    @apply text-black align-middle font-lithos font-bold;
+  font-size: calc(16px * var(--card-scale));
+  line-height: calc(24px * var(--card-scale));
+  @apply text-black align-middle font-lithos font-bold;
 }
 
 .card-view-wrapper__under-construction-icon {
-    height: calc(120px * var(--card-scale));
-    @apply max-w-3/4 object-contain absolute z-20;
+  height: calc(120px * var(--card-scale));
+  @apply max-w-3/4 object-contain absolute z-20;
 }

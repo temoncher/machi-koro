@@ -19,9 +19,14 @@ export const DicePairView: React.FC<DicePairViewProps> = memo(({
 
   return (
     <div className={clsx('dice-container', className)}>
-
-      <DiceView className="dice-container__dice-view" rolledDice={firstDice} />
-      <DiceView className="dice-container__dice-view" rolledDice={secondDice} />
+      <DiceView
+        className="dice-container__dice-view"
+        rolledDice={firstDice}
+      />
+      <DiceView
+        className="dice-container__dice-view"
+        rolledDice={secondDice}
+      />
     </div>
   );
 });

@@ -38,7 +38,6 @@ const mockPlayers: Player[] = [
 ];
 
 export const LobbyPage: React.FC = () => {
-  const { isJoinLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
   const { userId } = useTypedSelector((state) => state.loginReducer);
   const { t } = useTranslation();
   const lobbyId = useTypedSelector((state) => {
@@ -47,10 +46,10 @@ export const LobbyPage: React.FC = () => {
     return UrlUtils.getLastSegment(pathname);
   });
 
-  const { createGameThunk } = useGameActions();
+  const { createGameCommand } = useGameActions();
   const createGame = (): void => {
     if (lobbyId) {
-      createGameThunk({ lobbyId });
+      createGameCommand({ lobbyId });
     } else {
       // eslint-disable-next-line no-console
       console.error('LobbyId is missing');
@@ -85,7 +84,11 @@ export const LobbyPage: React.FC = () => {
         </div>
         <div className="lobby-players-list__container">
           {mockPlayers.map((player) => (
-            <PlayerCard key={player.id} isHighlighted={player.id === userId} player={player} />
+            <PlayerCard
+              key={player.id}
+              isHighlighted={player.id === userId}
+              player={player}
+            />
           ))}
         </div>
       </section>
@@ -97,15 +100,13 @@ export const LobbyPage: React.FC = () => {
         >
           {t('lobby.startNewGameButtonText')}
         </button>
-        {isJoinLobbyLoading && (
-          <button
-            className="lobby-buttons-container__button"
-            type="submit"
-            onClick={() => { requestToLeaveLobby(); }}
-          >
-            {t('lobby.leaveLobbyButtonText')}
-          </button>
-        )}
+        <button
+          className="lobby-buttons-container__button"
+          type="submit"
+          onClick={requestToLeaveLobby}
+        >
+          {t('lobby.leaveLobbyButtonText')}
+        </button>
       </section>
     </div>
   );

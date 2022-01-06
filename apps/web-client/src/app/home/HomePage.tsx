@@ -7,19 +7,27 @@ import { useLobbyActions } from '../lobby';
 import './HomePage.css';
 
 export const HomePage: React.FC = () => {
-  const { createLobbyThunk } = useLobbyActions();
+  const { createLobbyCommand } = useLobbyActions();
   const { username, userId } = useTypedSelector((state) => state.loginReducer);
+  const { isCreateLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
   const { t } = useTranslation();
 
-  const createLobbyRequest = () => { createLobbyThunk({ hostId: userId }); };
+  const createLobbyRequest = () => {
+    createLobbyCommand({ hostId: userId });
+  };
 
   return (
     <div className="home-container">
       <h2 className="text-2xl">{t('home.greeting', { username })}</h2>
-      <p className="p-4 text-center">
-        {t('home.welcomeText')}
-      </p>
-      <button className="new-lobby-button" type="button" onClick={createLobbyRequest}>{t('home.createNewLobbyButtonText')}</button>
+      <p className="p-4 text-center">{t('home.welcomeText')}</p>
+      <button
+        className="new-lobby-button"
+        disabled={isCreateLobbyLoading}
+        type="button"
+        onClick={createLobbyRequest}
+      >
+        {t('home.createNewLobbyButtonText')}
+      </button>
     </div>
   );
 };

@@ -102,7 +102,7 @@ const main = (): void => {
     disconnectUserFromGame: gamesRepository.disconnectUserFromGame,
   };
 
-  initSocketServer({
+  const socketServerConfig = {
     cors: {
       origin: `http://${hosts.MAIN}:4200`,
       credentials: true,
@@ -113,7 +113,9 @@ const main = (): void => {
         'OPTIONS',
       ],
     },
-  }, socketServerDependencies, server);
+  };
+
+  initSocketServer(socketServerConfig, socketServerDependencies, server);
 };
 
 main();

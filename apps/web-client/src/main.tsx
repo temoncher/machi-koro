@@ -7,6 +7,9 @@ import { initReactI18next } from 'react-i18next';
 import { Provider } from 'react-redux';
 
 import { App, initializeI18n, initStore } from './app';
+import { LOCAL_URL } from './app/constants';
+import { getAuthorizationHeader, initHttpClient } from './app/utils';
+
 import './styles.css';
 
 const main = () => {
@@ -14,10 +17,12 @@ const main = () => {
   initializeI18n(LanguageDetector, initReactI18next);
 
   const history = createBrowserHistory();
+  const httpClient = initHttpClient(`${LOCAL_URL}/api`, getAuthorizationHeader);
+  const store = initStore({ history, httpClient });
 
   ReactDOM.render(
     <StrictMode>
-      <Provider store={initStore(history)}>
+      <Provider store={store}>
         <ConnectedRouter history={history}>
           <App />
         </ConnectedRouter>

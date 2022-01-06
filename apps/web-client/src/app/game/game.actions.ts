@@ -1,46 +1,32 @@
-import { CreateGameRequestBody } from '@machikoro/game-server-contracts';
-import { push } from 'connected-react-router';
-import { Action } from 'redux';
-import { ThunkDispatch } from 'redux-thunk';
+import { CreateGameRequestBody, CreateGameResponse } from '@machikoro/game-server-contracts';
+import { action, payload } from 'ts-action';
 
-import { setIsLoading } from '../loading';
-import { RootApiType } from '../root.api.type';
-import { RootState } from '../root.state';
-
-import { GameState } from './game.state';
-
-export enum GameActionTypes {
-  SET_GAME_ID = 'APP/SET_GAME_ID',
+enum GameActionType {
+  CREATE_GAME_COMMAND = '[COMMAND] APP/GAME/CREATE_GAME',
+  CREATE_GAME_RESOLVED = '[EVENT] APP/GAME/CREATE_GAME/RESOLVED',
+  CREATE_GAME_REJECTED = '[EVENT] APP/GAME/CREATE_GAME/REJECTED',
 }
 
-type SetGameId = {
-  type: GameActionTypes.SET_GAME_ID;
-  payload: GameState['gameId'];
-};
+export const createGameCommand = action(
+  GameActionType.CREATE_GAME_COMMAND,
+  payload<CreateGameRequestBody>(),
+);
 
-export type GameAction = SetGameId;
+export const createGameResolvedEvent = action(
+  GameActionType.CREATE_GAME_RESOLVED,
+  payload<CreateGameResponse>(),
+);
 
-export const setGameId = (gameId: GameState['gameId']): SetGameId => ({
-  type: GameActionTypes.SET_GAME_ID,
-  payload: gameId,
-});
+export const createGameRejectedEvent = action(
+  GameActionType.CREATE_GAME_REJECTED,
+  payload<string>(),
+);
 
-export const createGameThunk = (createGameRequestBody: CreateGameRequestBody) => async (
-  dispatch: ThunkDispatch<unknown, unknown, Action>,
-  getState: () => RootState,
-  rootApi: RootApiType.RootApi,
-): Promise<void> => {
-  dispatch(setIsLoading(true));
-
-  const createGameResponse = await rootApi.gameApi.sendCreateGameRequest(createGameRequestBody);
-
-  dispatch(setGameId(createGameResponse.gameId));
-  dispatch(setIsLoading(false));
-
-  dispatch(push(`/games/${createGameResponse.gameId}`));
-};
+export type GameAction =
+  | ReturnType<typeof createGameCommand>
+  | ReturnType<typeof createGameResolvedEvent>
+  | ReturnType<typeof createGameRejectedEvent>;
 
 export const gameActions = {
-  setGameId,
-  createGameThunk,
+  createGameCommand,
 };

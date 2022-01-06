@@ -1,0 +1,5 @@
+export enum LoginStatus {
+  PENDING = 'PENDING',
+  AUTHORIZED = 'AUTHORIZED',
+  NOT_AUTHORIZED = 'NOT_AUTHORIZED',
+}

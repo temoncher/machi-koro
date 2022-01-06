@@ -1,38 +1,69 @@
+import { AxiosInstance } from 'axios';
 import { routerMiddleware } from 'connected-react-router';
 import { History } from 'history';
 import {
   createStore,
   compose,
   applyMiddleware,
-  Middleware,
 } from 'redux';
-import thunk from 'redux-thunk';
+import { createEpicMiddleware } from 'redux-observable';
 
-import { LOCAL_URL } from './constants';
+import { RootAction } from './root.actions';
 import { RootApi } from './root.api';
+import { rootEpic, RootEpicDependencies } from './root.epic';
 import { rootReducer } from './root.reducer';
 import { RootState } from './root.state';
-import { initHttpClient } from './utils';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
   }
 }
 
-const thunkWrapper: Middleware<unknown, RootState> = (storeApi) => {
-  const getHeaders = () => storeApi.getState().loginReducer.headers;
-  const httpClient = initHttpClient(`${LOCAL_URL}/api`);
-
-  const rootApi = RootApi.init({ getHeaders, httpClient });
-
-  return thunk.withExtraArgument(rootApi)(storeApi);
-};
-
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-export const initStore = (history: History<unknown>) => createStore(
-  rootReducer(history),
-  composeEnhancers(applyMiddleware(routerMiddleware(history), thunkWrapper)),
-);
+type InitStoreDependencies = {
+  history: History<unknown>;
+  httpClient: AxiosInstance;
+};
+
+export const initStore = (deps: InitStoreDependencies) => {
+  const epicMiddleware = createEpicMiddleware<RootAction, RootAction, RootState, unknown>();
+  const rootApi = RootApi.init({ httpClient: deps.httpClient });
+
+  const store = createStore(
+    rootReducer(deps.history),
+    composeEnhancers(
+      applyMiddleware(
+        // `routerMiddleware` has not porperly set up types, therefore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        routerMiddleware(deps.history),
+        epicMiddleware,
+      ),
+    ),
+  );
+
+  const rootEpicDependencies: RootEpicDependencies = {
+    authorize: rootApi.loginApi.sendAuthMeRequest,
+    registerGuest: rootApi.loginApi.sendRegisterGuestRequest,
+    createLobby: rootApi.lobbyApi.sendCreateLobbyRequest,
+    createGame: rootApi.gameApi.sendCreateGameRequest,
+    cleanUpAuthToken: () => {
+      localStorage.removeItem('token');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
+      deps.httpClient.defaults.headers.Authorization = '';
+    },
+    setAuthToken: (token: string) => {
+      localStorage.setItem('token', token);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
+      deps.httpClient.defaults.headers.Authorization = `Bearer ${token}`;
+    },
+  };
+
+  epicMiddleware.run(rootEpic(rootEpicDependencies));
+
+  return store;
+};

@@ -18,14 +18,16 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = mem
       {Object.entries(establishmentsShopViewProps.shop).map(([establishmentId, quantity]) => {
         const establishment = establishmentsShopViewProps.establishments[establishmentId];
 
-        return establishment && (
-        <CommonEstablishmentView
-          key={establishment.name}
-          cardInfo={establishment}
-          quantity={quantity}
-          size="lg"
-          onClick={() => { establishmentsShopViewProps.onEstablishmentClick(establishmentId); }}
-        />
+        if (!establishment) return null;
+
+        return (
+          <CommonEstablishmentView
+            key={establishment.name}
+            cardInfo={establishment}
+            quantity={quantity}
+            size="lg"
+            onClick={() => { establishmentsShopViewProps.onEstablishmentClick(establishmentId); }}
+          />
         );
       })}
     </div>
