@@ -1,19 +1,13 @@
-import { AppHeaders } from '../types';
-import { getAuthorizationHeader } from '../utils';
+import { LoginStatus } from '../types';
 
 export type LoginState = {
   username: string;
   userId: string;
-  headers: AppHeaders;
-  authError: string | undefined;
+  status: LoginStatus;
 };
 
 export const initialLoginState: LoginState = {
   username: '',
   userId: '',
-  headers: {
-    Authorization: getAuthorizationHeader() ?? '',
-    'Content-Type': 'application/json',
-  },
-  authError: undefined,
+  status: LoginStatus.PENDING,
 };

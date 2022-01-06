@@ -4,7 +4,6 @@ import {
   GameId,
   LandmarkId,
   ServerSentEventsMap,
-  User,
   UserId,
 } from '@machikoro/game-server-contracts';
 import * as SocketIOClient from 'socket.io-client';
@@ -46,11 +45,11 @@ export const initializeSocket = (): void => {
   });
 
   // Lobby
-  socket.on('LOBBY_USER_JOINED', (user: User) => {
+  socket.on('LOBBY_USER_JOINED', (user) => {
     // eslint-disable-next-line no-console
     console.log(`Connect new user ${user.username}`, user);
   });
-  socket.on('LOBBY_USER_LEFT', (user: User) => {
+  socket.on('LOBBY_USER_LEFT', (user) => {
     // eslint-disable-next-line no-console
     console.log(`Disconnect user ${user.username}`, user);
   });

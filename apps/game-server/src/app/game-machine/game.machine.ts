@@ -12,35 +12,35 @@ import { RecordUtils } from '../utils';
 
 import { establishmentsEffectsMap } from './establishments';
 
- type RollDiceMessage = {
-   type: 'ROLL_DICE';
-   userId: string;
- };
-  type StartGame = {
-    type: 'START_GAME';
-    usersIds: string[];
-  };
-  type Pass = {
-    type: 'PASS';
-    userId: string;
-  };
-  type BuildEstablishment = {
-    type: 'BUILD_ESTABLISHMENT';
-    userId: string;
-    establishmentToBuild: string;
-  };
-  type BuildLandmark = {
-    type: 'BUILD_LANDMARK';
-    userId: string;
-    landmarkToBuild: string;
-  };
+type RollDiceMessage = {
+  type: 'ROLL_DICE';
+  userId: string;
+};
+type StartGame = {
+  type: 'START_GAME';
+  usersIds: string[];
+};
+type Pass = {
+  type: 'PASS';
+  userId: string;
+};
+type BuildEstablishment = {
+  type: 'BUILD_ESTABLISHMENT';
+  userId: string;
+  establishmentToBuild: string;
+};
+type BuildLandmark = {
+  type: 'BUILD_LANDMARK';
+  userId: string;
+  landmarkToBuild: string;
+};
 
-  type GameMachineMessage =
-    | RollDiceMessage
-    | StartGame
-    | Pass
-    | BuildEstablishment
-    | BuildLandmark;
+type GameMachineMessage =
+  | RollDiceMessage
+  | StartGame
+  | Pass
+  | BuildEstablishment
+  | BuildLandmark;
 
 const canRollDice = (
   context: GameContext,

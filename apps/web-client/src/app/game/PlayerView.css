@@ -1,85 +1,85 @@
 .player-view {
-    min-width: 192px;
-    max-width: 192px;
-    @apply bg-tertiary flex flex-col p-2 rounded-lg;
+  min-width: 192px;
+  max-width: 192px;
+  @apply bg-tertiary flex flex-col p-2 rounded-lg;
 }
 
 .player-view::-webkit-scrollbar {
-    width: 0;
+  width: 0;
 }
 
 .player-view__headline {
-    @apply flex justify-between items-center;
+  @apply flex justify-between items-center;
 }
 
 .player-view__status-container {
-    height: 32px;
-    width: 32px;
+  height: 32px;
+  width: 32px;
 
-    @apply flex justify-center items-center;
+  @apply flex justify-center items-center;
 }
 
 .player-view__status {
-    height: 10px;
-    width: 10px;
-    @apply rounded-full;
+  height: 10px;
+  width: 10px;
+  @apply rounded-full;
 }
 
 .player-view__status--red {
-    @apply bg-brand-red;
+  @apply bg-brand-red;
 }
 
 .player-view__status--green {
-    @apply bg-brand-green;
+  @apply bg-brand-green;
 }
 
 .player-view__coins-container {
-    height: 100%;
-    margin-right: 8px; 
-    @apply flex items-end;
+  height: 100%;
+  margin-right: 8px;
+  @apply flex items-end;
 }
 
 .player-view__coins-background {
-    height: 32px;
-    width: 32px;
+  height: 32px;
+  width: 32px;
 
-    border-width: 4px;
-    @apply bg-nutmeg border-terracotta rounded-full bg-cover flex items-center justify-center;
+  border-width: 4px;
+  @apply bg-nutmeg border-terracotta rounded-full bg-cover flex items-center justify-center;
 }
 
 .player-view__coins {
-    font-size: 16px;
-    line-height: 24px;
-    @apply text-white align-middle font-lithos font-bold;
+  font-size: 16px;
+  line-height: 24px;
+  @apply text-white align-middle font-lithos font-bold;
 }
 
 .player-view__username {
-    @apply font-lithos font-extrabold overflow-ellipsis whitespace-nowrap overflow-hidden;
+  @apply font-lithos font-extrabold overflow-ellipsis whitespace-nowrap overflow-hidden;
 }
 
 .player-view__landmarks {
-    @apply grid grid-cols-2 gap-y-4 mt-4;
+  @apply grid grid-cols-2 gap-y-4 mt-4;
 }
 
 .player-view__cards {
-    height: 100%;
-    min-height:  calc(180px + 20px * var(--cards-number));
-    @apply relative flex justify-center mt-4;
+  height: 100%;
+  min-height: calc(180px + 20px * var(--cards-number));
+  @apply relative flex justify-center mt-4;
 }
 
 .player-view__card-container {
-    top: calc(20px * var(--number));
-    z-index: 20;
-    @apply absolute;
+  top: calc(20px * var(--number));
+  z-index: 20;
+  @apply absolute;
 }
 
 .player-view__show-card {
-    bottom: 0;
-    right: 110%;
-    display: none;
-    @apply absolute;
+  bottom: 0;
+  right: 110%;
+  display: none;
+  @apply absolute;
 }
 
 .player-view__card-container:hover .player-view__show-card {
-    display: block;
+  display: block;
 }

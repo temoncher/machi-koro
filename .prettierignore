@@ -2,3 +2,6 @@
 
 /dist
 /coverage
+/node_modules
+.cypress_cache
+.npm

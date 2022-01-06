@@ -10,7 +10,7 @@
       "rules": {}
     },
     {
-      "files": ["*.spec.ts"],
+      "files": ["*.spec.ts", "*.test.ts"],
       "parserOptions": {
         "project": "apps/game-server/tsconfig.spec.json"
       },

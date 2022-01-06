@@ -1,9 +1,7 @@
 export type LobbyState = {
-  lobbyId: string;
-  isJoinLobbyLoading: boolean;
+  isCreateLobbyLoading: boolean;
 };
 
 export const initialLobbyState: LobbyState = {
-  lobbyId: '',
-  isJoinLobbyLoading: false,
+  isCreateLobbyLoading: false,
 };

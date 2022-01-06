@@ -96,6 +96,7 @@ export const authSocketMiddleware = (
   try {
     const { token } = socket.handshake.auth;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const currentUserId = validateToken(token);
 
     if (!currentUserId) {

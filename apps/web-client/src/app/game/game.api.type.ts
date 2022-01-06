@@ -1,7 +1,8 @@
-import { CreateGameRequestBody, CreateGameResponse } from '@machikoro/game-server-contracts';
+import {
+  CreateGameRequestBody,
+  CreateGameResponse,
+} from '@machikoro/game-server-contracts';
 import { AxiosInstance } from 'axios';
-
-import { AppHeaders } from '../types';
 
 export namespace GameApiType {
   export type SendCreateGameRequest = (GameRequestBody: CreateGameRequestBody) => Promise<CreateGameResponse>;
@@ -11,7 +12,6 @@ export namespace GameApiType {
   };
 
   export type SendCreateGameRequestDependencies = {
-    getHeaders: () => AppHeaders;
     httpClient: AxiosInstance;
   };
 

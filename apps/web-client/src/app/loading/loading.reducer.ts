@@ -1,17 +1,12 @@
-import { LoadingAction, LoadingActionTypes } from './loading.actions';
-import { initialLoadingState, LoadingState } from './loading.state';
+import { on, reducer } from 'ts-action';
 
-// eslint-disable-next-line @typescript-eslint/default-param-last
-export const loadingReducer = (state: LoadingState = initialLoadingState, action: LoadingAction): LoadingState => {
-  switch (action.type) {
-    case LoadingActionTypes.SET_IS_LOADING: {
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
-    }
+import { setIsLoadingDocument } from './loading.actions';
+import { initialLoadingState } from './loading.state';
 
-    default:
-      return state;
-  }
-};
+export const loadingReducer = reducer(
+  initialLoadingState,
+  on(setIsLoadingDocument, (state, action) => ({
+    ...state,
+    isLoading: action.payload,
+  })),
+);

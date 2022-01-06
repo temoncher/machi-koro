@@ -1,51 +1,39 @@
-import { CreateLobbyRequestBody } from '@machikoro/game-server-contracts';
-import { push } from 'connected-react-router';
-import { Action } from 'redux';
-import { ThunkDispatch } from 'redux-thunk';
+import { CreateLobbyRequestBody, CreateLobbyResponse } from '@machikoro/game-server-contracts';
+import { action, payload } from 'ts-action';
 
-import { setIsLoading } from '../loading';
-import { RootApiType } from '../root.api.type';
-import { RootState } from '../root.state';
-
-import { LobbyState } from './lobby.state';
-
-export enum LobbyActionTypes {
-  SET_LOBBY_PARAMS = 'APP/SET_LOBBY_PARAMS',
+enum LobbyActionType {
+  SET_IS_CREATE_LOBBY_LOADING_DOCUMENT = '[DOCUMENT] APP/LOBBY/SET_IS_CREATE_LOBBY_LOADING',
+  CREATE_LOBBY_COMMAND = '[COMMAND] APP/LOBBY/CREATE_LOBBY',
+  CREATE_LOBBY_RESOLVED_EVENT = '[EVENT] APP/LOBBY/CREATE_LOBBY/RESOLVED',
+  CREATE_LOBBY_REJECTED_EVENT = '[EVENT] APP/LOBBY/CREATE_LOBBY/REJECTED',
 }
 
-type SetLobbyParams = {
-  type: LobbyActionTypes.SET_LOBBY_PARAMS;
-  payload: LobbyState;
-};
+export const setIsCreateLobbyLoadingDocument = action(
+  LobbyActionType.SET_IS_CREATE_LOBBY_LOADING_DOCUMENT,
+  payload<boolean>(),
+);
 
-export type LobbyAction = SetLobbyParams;
+export const createLobbyCommand = action(
+  LobbyActionType.CREATE_LOBBY_COMMAND,
+  payload<CreateLobbyRequestBody>(),
+);
 
-export const setLobbyParams = (lobbyParams: LobbyState): SetLobbyParams => ({
-  type: LobbyActionTypes.SET_LOBBY_PARAMS,
-  payload: lobbyParams,
-});
+export const createLobbyResolvedEvent = action(
+  LobbyActionType.CREATE_LOBBY_RESOLVED_EVENT,
+  payload<CreateLobbyResponse>(),
+);
 
-export const createLobbyThunk = (lobbyData: CreateLobbyRequestBody) => async (
-  dispatch: ThunkDispatch<unknown, unknown, Action>,
-  getState: () => RootState,
-  rootApi: RootApiType.RootApi,
-): Promise<void> => {
-  dispatch(setIsLoading(true));
+export const createLobbyRejectedEvent = action(
+  LobbyActionType.CREATE_LOBBY_REJECTED_EVENT,
+  payload<string>(),
+);
 
-  const createLobbyResponse = await rootApi.lobbyApi.sendCreateLobbyRequest(lobbyData);
-
-  const lobbyParams: LobbyState = {
-    lobbyId: createLobbyResponse.lobbyId,
-    isJoinLobbyLoading: true,
-  };
-
-  dispatch(setLobbyParams(lobbyParams));
-  dispatch(setIsLoading(false));
-
-  dispatch(push(`/lobbies/${lobbyParams.lobbyId}`));
-};
+export type LobbyAction =
+  | ReturnType<typeof setIsCreateLobbyLoadingDocument>
+  | ReturnType<typeof createLobbyCommand>
+  | ReturnType<typeof createLobbyResolvedEvent>
+  | ReturnType<typeof createLobbyRejectedEvent>;
 
 export const lobbyActions = {
-  setLobbyParams,
-  createLobbyThunk,
+  createLobbyCommand,
 };

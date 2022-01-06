@@ -1,22 +1,20 @@
-import { LoginAction, LoginActionTypes } from './login.actions';
-import { initialLoginState, LoginState } from './login.state';
+import { on, reducer } from 'ts-action';
 
-// eslint-disable-next-line @typescript-eslint/default-param-last
-export const loginReducer = (state: LoginState = initialLoginState, action: LoginAction): LoginState => {
-  switch (action.type) {
-    case LoginActionTypes.SET_LOGIN_PARAMS: {
-      return {
-        ...state,
-        username: action.payload.username,
-        userId: action.payload.userId,
-        headers: action.payload.headers,
-      };
-    }
-    case LoginActionTypes.SET_AUTH_ERROR: {
-      return { ...state, authError: action.payload };
-    }
+import { LoginStatus } from '../types';
 
-    default:
-      return state;
-  }
-};
+import { authorizeResolvedEvent, authorizeRejectedEvent, registerGuestResolvedEvent } from './login.actions';
+import { initialLoginState } from './login.state';
+
+export const loginReducer = reducer(
+  initialLoginState,
+  on(authorizeResolvedEvent, registerGuestResolvedEvent, (state, { payload }) => ({
+    ...state,
+    username: payload.username,
+    userId: payload.userId,
+    status: LoginStatus.AUTHORIZED,
+  })),
+  on(authorizeRejectedEvent, (state) => ({
+    ...state,
+    status: LoginStatus.NOT_AUTHORIZED,
+  })),
+);

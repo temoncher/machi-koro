@@ -33,7 +33,9 @@ export const Header: React.FC<HeaderProps> = ({ className }: HeaderProps) => {
   return (
     <div className={clsx('header', className)}>
       <div className="flex-1 min-w-0">
-        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{t('gameName')}</h2>
+        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          {t('gameName')}
+        </h2>
       </div>
       <div className="flex">
         <Listbox value={i18n.language} onChange={changeLanguage}>
@@ -51,10 +53,7 @@ export const Header: React.FC<HeaderProps> = ({ className }: HeaderProps) => {
                 leaveTo="opacity-0"
                 show={open}
               >
-                <Listbox.Options
-                  static
-                  className="select-langs__options"
-                >
+                <Listbox.Options static className="select-langs__options">
                   {Object.entries(languageCodeToRepresentationMap).map(([languageCode, languageRepresentation]) => (
                     <Listbox.Option
                       key={languageCode}

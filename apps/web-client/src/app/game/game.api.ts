@@ -3,15 +3,10 @@ import { CreateGameResponse } from '@machikoro/game-server-contracts';
 import { GameApiType } from './game.api.type';
 
 export namespace GameApi {
-
   export const initializeSendCreateGameRequest = (
-    { getHeaders, httpClient }: GameApiType.SendCreateGameRequestDependencies,
+    { httpClient }: GameApiType.SendCreateGameRequestDependencies,
   ): GameApiType.SendCreateGameRequest => async (gameRequestBody) => {
-    const commonHeaders = getHeaders();
-
-    const response = await httpClient.post('games', gameRequestBody, {
-      headers: commonHeaders,
-    });
+    const response = await httpClient.post('games', gameRequestBody);
 
     return response.data as CreateGameResponse;
   };

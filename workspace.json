@@ -5,6 +5,7 @@
       "root": "apps/game-server",
       "sourceRoot": "apps/game-server/src",
       "projectType": "application",
+      "tags": [],
       "targets": {
         "build": {
           "executor": "@nrwl/node:build",
@@ -39,7 +40,8 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/game-server/**/*.ts"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "executor": "@nrwl/jest:jest",
@@ -55,12 +57,14 @@
       "root": "libs/game-server-contracts",
       "sourceRoot": "libs/game-server-contracts/src",
       "projectType": "library",
+      "tags": [],
       "targets": {
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/game-server-contracts/**/*.ts"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "executor": "@nrwl/jest:jest",
@@ -76,9 +80,10 @@
       "root": "apps/web-client",
       "sourceRoot": "apps/web-client/src",
       "projectType": "application",
+      "tags": [],
       "targets": {
         "build": {
-          "executor": "@nrwl/web:build",
+          "executor": "@nrwl/web:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/web-client",
@@ -136,7 +141,8 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/web-client/**/*.{ts,tsx,js,jsx}"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "executor": "@nrwl/jest:jest",
@@ -152,6 +158,8 @@
       "root": "apps/web-client-e2e",
       "sourceRoot": "apps/web-client-e2e/src",
       "projectType": "application",
+      "tags": [],
+      "implicitDependencies": ["web-client"],
       "targets": {
         "e2e": {
           "executor": "@nrwl/cypress:cypress",
@@ -170,29 +178,10 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/web-client-e2e/**/*.{js,ts}"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
       }
     }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/react"
-  },
-  "generators": {
-    "@nrwl/react": {
-      "application": {
-        "style": "css",
-        "linter": "eslint",
-        "babel": true
-      },
-      "component": {
-        "style": "css"
-      },
-      "library": {
-        "style": "css",
-        "linter": "eslint"
-      }
-    }
-  },
-  "defaultProject": "web-client"
+  }
 }

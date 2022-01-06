@@ -4,11 +4,11 @@
 
 .loader,
 .loader:after {
-  @apply w-32 h-32 rounded-full 
+  @apply w-32 h-32 rounded-full;
 }
 .loader {
   @apply text-sm mt-2.5 mb-2.5 mr-auto ml-auto relative animate-spin border-8 border-solid;
-  --main-loader-color: #71CED9;
+  --main-loader-color: #71ced9;
   --light-loader-color: #aee4ea6e;
   border-top-color: var(--light-loader-color);
   border-right-color: var(--light-loader-color);

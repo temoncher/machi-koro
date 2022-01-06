@@ -3,21 +3,21 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: 'dosis';
-    src: url('./assets/fonts/dosis/Dosis-Bold.ttf'),
-        url('./assets/fonts/dosis/Dosis-ExtraBold.ttf'),
-        url('./assets/fonts/dosis/Dosis-ExtraLight.ttf'),
-        url('./assets/fonts/dosis/Dosis-Light.ttf'),
-        url('./assets/fonts/dosis/Dosis-Medium.ttf'),
-        url('./assets/fonts/dosis/Dosis-Regular.ttf'),
-        url('./assets/fonts/dosis/Dosis-SemiBold.ttf');
+  font-family: 'dosis';
+  src: url('./assets/fonts/dosis/Dosis-Bold.ttf'),
+    url('./assets/fonts/dosis/Dosis-ExtraBold.ttf'),
+    url('./assets/fonts/dosis/Dosis-ExtraLight.ttf'),
+    url('./assets/fonts/dosis/Dosis-Light.ttf'),
+    url('./assets/fonts/dosis/Dosis-Medium.ttf'),
+    url('./assets/fonts/dosis/Dosis-Regular.ttf'),
+    url('./assets/fonts/dosis/Dosis-SemiBold.ttf');
 }
 
 @font-face {
-    font-family: 'lithos';
-    src: url('./assets/fonts/lithos/Lithos-Pro-Regular.ttf'),
-        url('./assets/fonts/lithos/Lithos-Black-Regular.otf'),
-        url('./assets/fonts/lithos/Lithos-Pro-Bold.otf'),
-        url('./assets/fonts/lithos/Lithos-Pro-Light.otf'),
-        url('./assets/fonts/lithos/Lithos-Pro-Extra-Light.otf');
+  font-family: 'lithos';
+  src: url('./assets/fonts/lithos/Lithos-Pro-Regular.ttf'),
+    url('./assets/fonts/lithos/Lithos-Black-Regular.otf'),
+    url('./assets/fonts/lithos/Lithos-Pro-Bold.otf'),
+    url('./assets/fonts/lithos/Lithos-Pro-Light.otf'),
+    url('./assets/fonts/lithos/Lithos-Pro-Extra-Light.otf');
 }

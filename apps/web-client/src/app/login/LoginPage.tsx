@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { match } from 'ts-pattern';
+
+import { GuestLoginForm } from './GuestLoginForm';
 
 import './LoginPage.css';
-import { GuestLoginForm } from './GuestLoginForm';
 
 enum LoginPageState {
   GUEST_BUTTON = 'guest-button',
@@ -13,26 +15,20 @@ export const LoginPage: React.FC = () => {
   const [loginPageState, setLoginPageState] = useState<LoginPageState>(LoginPageState.GUEST_BUTTON);
   const { t } = useTranslation();
 
-  const renderLoginFromContent = () => {
-    switch (loginPageState) {
-      case 'guest-form':
-        return <GuestLoginForm />;
-      default:
-        return (
-          <button
-            className="login-button"
-            type="button"
-            onClick={() => { setLoginPageState(LoginPageState.GUEST_FORM); }}
-          >
-            {t('login.tryAsGuestButtonText')}
-          </button>
-        );
-    }
-  };
+  const renderLoginFromContent = () => match(loginPageState)
+    .with(LoginPageState.GUEST_FORM, () => <GuestLoginForm />)
+    .with(LoginPageState.GUEST_BUTTON, () => (
+      <button
+        className="login-button"
+        type="button"
+        onClick={() => {
+          setLoginPageState(LoginPageState.GUEST_FORM);
+        }}
+      >
+        {t('login.tryAsGuestButtonText')}
+      </button>
+    ))
+    .exhaustive();
 
-  return (
-    <div className="login-container">
-      {renderLoginFromContent()}
-    </div>
-  );
+  return <div className="login-container">{renderLoginFromContent()}</div>;
 };

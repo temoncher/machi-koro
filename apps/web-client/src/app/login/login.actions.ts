@@ -1,110 +1,72 @@
-import { RegisterGuestRequestBody } from '@machikoro/game-server-contracts';
-import { push } from 'connected-react-router';
-import { Action } from 'redux';
-import { ThunkDispatch } from 'redux-thunk';
+import { action, payload } from 'ts-action';
 
-import { setIsLoading } from '../loading';
-import { RootApiType } from '../root.api.type';
-import { RootState } from '../root.state';
-import { getAuthorizationHeader } from '../utils';
-
-import { LoginState } from './login.state';
-
-export enum LoginActionTypes {
-  SET_LOGIN_PARAMS = 'APP/SET_LOGIN_PARAMS',
-  SET_AUTH_ERROR = 'APP/SET_AUTH_ERROR',
+enum LoginActionType {
+  AUTHORIZE_COMMAND = '[COMMAND] APP/AUTH/AUTHORIZE',
+  AUTHORIZE_RESOLVED_EVENT = '[EVENT] APP/AUTH/AUTHORIZE/RESOLVED',
+  AUTHORIZE_REJECTED_EVENT = '[EVENT] APP/AUTH/AUTHORIZE/REJECTED',
+  REGISTER_GUEST_COMMAND = '[COMMAND] APP/AUTH/REGISTER_GUEST',
+  REGISTER_GUEST_RESOLVED_EVENT = '[EVENT] APP/AUTH/REGISTER_GUEST/RESOLVED',
+  REGISTER_GUEST_REJECTED_EVENT = '[EVENT] APP/AUTH/REGISTER_GUEST/REJECTED',
+  LOGIN_DOCUMENT = '[DOCUMENT] APP/AUTH/LOGIN',
+  LOGOUT_DOCUMENT = '[DOCUMENT] APP/AUTH/LOGOUT',
 }
 
-type SetLoginParamsPayload = Pick<LoginState, 'username' | 'userId' | 'headers'>;
+export const authorizeCommand = action(LoginActionType.AUTHORIZE_COMMAND);
 
-type SetLoginParams = {
-  type: LoginActionTypes.SET_LOGIN_PARAMS;
-  payload: SetLoginParamsPayload;
+export type AuthorizeResolvedPayload = {
+  username: string;
+  type: 'guest';
+  userId: string;
 };
 
-type SetAuthError = {
-  type: LoginActionTypes.SET_AUTH_ERROR;
-  payload: string | undefined;
+export const authorizeResolvedEvent = action(
+  LoginActionType.AUTHORIZE_RESOLVED_EVENT,
+  payload<AuthorizeResolvedPayload>(),
+);
+export const authorizeRejectedEvent = action(
+  LoginActionType.AUTHORIZE_REJECTED_EVENT,
+  payload<string>(),
+);
+
+export const registerGuestCommand = action(
+  LoginActionType.REGISTER_GUEST_COMMAND,
+  payload<string>(),
+);
+
+export type RegisterGuestResolvedPayload = {
+  username: string;
+  type: 'guest';
+  userId: string;
+  token: string;
+};
+
+export const registerGuestResolvedEvent = action(
+  LoginActionType.REGISTER_GUEST_RESOLVED_EVENT,
+  payload<RegisterGuestResolvedPayload>(),
+);
+export const registerGuestRejectedEvent = action(
+  LoginActionType.REGISTER_GUEST_REJECTED_EVENT,
+  payload<string>(),
+);
+
+export type LoginPayload = {
 
 };
 
-export type LoginAction = SetLoginParams | SetAuthError;
+export const loginCommand = action(LoginActionType.LOGIN_DOCUMENT);
+export const logoutCommand = action(LoginActionType.LOGOUT_DOCUMENT);
 
-export const setLoginParams = (loginParams: SetLoginParamsPayload): LoginAction => ({
-  type: LoginActionTypes.SET_LOGIN_PARAMS,
-  payload: loginParams,
-});
-
-export const setAuthError = (authError: string | undefined): LoginAction => ({
-  type: LoginActionTypes.SET_AUTH_ERROR,
-  payload: authError,
-});
-
-export const getUserData = () => async (
-  dispatch: ThunkDispatch<unknown, unknown, Action>,
-  getState: () => RootState,
-  rootApi: RootApiType.RootApi,
-): Promise<void> => {
-  try {
-    dispatch(setIsLoading(true));
-
-    const userData = await rootApi.loginApi.sendAuthMeRequest();
-
-    const loginParams: SetLoginParamsPayload = {
-      username: userData.username,
-      userId: userData.userId,
-      headers: {
-        Authorization: getAuthorizationHeader() ?? '',
-        'Content-Type': 'application/json',
-      },
-    };
-
-    dispatch(setLoginParams(loginParams));
-  } catch (error: unknown) {
-    localStorage.removeItem('token');
-
-    if (error instanceof Error) {
-      dispatch(setAuthError(error.message));
-
-      return;
-    }
-
-    throw error;
-  } finally {
-    dispatch(setIsLoading(false));
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const registerGuest = (userData: RegisterGuestRequestBody) => async (
-  dispatch: ThunkDispatch<unknown, unknown, Action>,
-  getState: () => RootState,
-  rootApi: RootApiType.RootApi,
-): Promise<void> => {
-  dispatch(setIsLoading(true));
-
-  const registerUserDataResponse = await rootApi.loginApi.sendRegisterGuestRequest(userData);
-
-  const loginParams: SetLoginParamsPayload = {
-    username: registerUserDataResponse.username,
-    userId: registerUserDataResponse.userId,
-    headers:
-    {
-      Authorization: `Bearer ${registerUserDataResponse.token || ''}`,
-      'Content-Type': 'application/json',
-    },
-  };
-
-  localStorage.setItem('token', registerUserDataResponse.token || '');
-
-  dispatch(setLoginParams(loginParams));
-  dispatch(setAuthError(undefined));
-  dispatch(setIsLoading(false));
-  dispatch(push('/'));
-};
+export type LoginAction =
+  | ReturnType<typeof authorizeCommand>
+  | ReturnType<typeof authorizeResolvedEvent>
+  | ReturnType<typeof authorizeRejectedEvent>
+  | ReturnType<typeof registerGuestCommand>
+  | ReturnType<typeof registerGuestResolvedEvent>
+  | ReturnType<typeof registerGuestRejectedEvent>
+  | ReturnType<typeof logoutCommand>;
 
 export const loginActions = {
-  setLoginParams,
-  registerGuest,
-  getUserData,
+  authorizeCommand,
+  registerGuestCommand,
+  logoutCommand,
 };

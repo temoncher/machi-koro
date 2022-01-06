@@ -1,5 +1,7 @@
+export type LobbyId = string;
+
 export type CreateLobbyResponse = {
-  lobbyId: string;
+  lobbyId: LobbyId;
 };
 
 export type CreateLobbyRequestBody = {

@@ -1,17 +1,7 @@
-import { GameAction, GameActionTypes } from './game.actions';
-import { initialGameState, GameState } from './game.state';
+import { reducer } from 'ts-action';
 
-// eslint-disable-next-line @typescript-eslint/default-param-last
-export const gameReducer = (state: GameState = initialGameState, action: GameAction): GameState => {
-  switch (action.type) {
-    case GameActionTypes.SET_GAME_ID: {
-      return {
-        ...state,
-        gameId: action.payload,
-      };
-    }
+import { initialGameState } from './game.state';
 
-    default:
-      return state;
-  }
-};
+export const gameReducer = reducer(
+  initialGameState,
+);

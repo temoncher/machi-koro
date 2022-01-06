@@ -17,7 +17,7 @@ type PlayerViewProps = {
   className?: string;
   player: User;
   coins: number;
-  gameLandmarks: Record<string, Landmark>;
+  gameLandmarks: Record<LandmarkId, Landmark>;
   status: UserStatus;
   establishments: Record<EstablishmentId, number>;
   gameEstablishments: Record<EstablishmentId, Establishment>;
@@ -26,20 +26,10 @@ type PlayerViewProps = {
 };
 
 export const PlayerView: React.FC<PlayerViewProps> = memo((playerViewProps: PlayerViewProps) => {
-  const { username } = playerViewProps.player;
-
   const playerStatusClass = useMemo(
     () => (playerViewProps.status === UserStatus.CONNECTED ? 'player-view__status--green' : 'player-view__status--red'),
     [playerViewProps.status],
   );
-
-  const onLandmarkCardClick = (landmarkId?: string) => {
-    if (!landmarkId) {
-      return;
-    }
-
-    playerViewProps.onLandmarkClick(landmarkId);
-  };
 
   const renderCard = (establishmentId: string, count: number, cardIndex: number): JSX.Element | null => {
     const currentEstablishments = playerViewProps.gameEstablishments[establishmentId];
@@ -75,24 +65,25 @@ export const PlayerView: React.FC<PlayerViewProps> = memo((playerViewProps: Play
             </span>
           </span>
         </div>
-        <p className="player-view__username">{username}</p>
+        <p className="player-view__username">{playerViewProps.player.username}</p>
       </div>
       <div className="player-view__landmarks">
-        {Object.entries(playerViewProps.gameLandmarks).map(([,landmark]) => (
+        {Object.values(playerViewProps.gameLandmarks).map((landmark) => (
           <LandmarkView
             cardInfo={landmark}
             size="xs"
             underConstruction={!!playerViewProps.landmarks[landmark.landmarkId]}
-            onClick={() => { onLandmarkCardClick(landmark.landmarkId); }}
+            onClick={() => {
+              playerViewProps.onLandmarkClick(landmark.landmarkId);
+            }}
           />
         ))}
-
       </div>
       <div
         className="player-view__cards"
         style={{ ['--cards-number' as string]: Object.values(playerViewProps.establishments).length - 1 }}
       >
-        { Object.entries(playerViewProps.establishments).map(
+        {Object.entries(playerViewProps.establishments).map(
           ([establishmentId, count], cardIndex) => renderCard(establishmentId, count, cardIndex),
         )}
       </div>
