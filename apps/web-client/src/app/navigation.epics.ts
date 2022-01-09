@@ -1,42 +1,112 @@
-import { push } from 'connected-react-router';
+import { LocationChangePayload, push } from 'connected-react-router';
+import { AnyAction } from 'redux';
 import { combineEpics } from 'redux-observable';
-import { map, mapTo } from 'rxjs';
+import {
+  filter,
+  map,
+  mapTo,
+  Observable,
+  withLatestFrom,
+} from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { createGameResolvedEvent } from './game';
-import { createLobbyResolvedEvent } from './lobby';
-import { authorizeRejectedEvent, registerGuestResolvedEvent } from './login';
+import { GameAction } from './game';
+import { LobbyAction } from './lobby';
+import { LoginAction } from './login';
+import { NavigationAction } from './navigation.actions';
+import { RootState } from './root.state';
 import { TypedEpic } from './types';
+import { RxjsUtils } from './utils';
+
+const rootPathMatches = <R extends string>(pathToMatch: R) => <T>(source: Observable<LocationChangePayload<T>>) => source.pipe(
+  filter((payload) => {
+    const [, rootPath] = payload.location.pathname.split('/');
+
+    return rootPath === pathToMatch;
+  }),
+  map((payload) => payload as LocationChangePayload<T> & {
+    location: {
+      pathname: `/${R}/${string}`;
+    };
+  }),
+);
 
 const redirectToHomePageOnRegisterGuestResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(registerGuestResolvedEvent),
+  ofType(LoginAction.registerGuestResolvedEvent),
   // `mapTo` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   mapTo(push({ pathname: '/' })),
 );
 
 const redirectToLoginPageOnAuthorizeRejectedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(authorizeRejectedEvent),
+  ofType(LoginAction.authorizeRejectedEvent),
   // `mapTo` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   mapTo(push({ pathname: '/login' })),
 );
 
 const redirectToLobbyPageOnCreateLobbyResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(createLobbyResolvedEvent),
+  ofType(LobbyAction.createLobbyResolvedEvent),
   toPayload(),
   map(({ lobbyId }) => push({ pathname: `/lobbies/${lobbyId}` })),
 );
 
-const redirectToGamePageOnCreateGameResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(createGameResolvedEvent),
+const redirectToGamePageOnGameCreatedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
+  ofType(LobbyAction.gameCreatedEvent),
   toPayload(),
-  map(({ gameId }) => push({ pathname: `/games/${gameId}` })),
+  map((gameId) => push({ pathname: `/games/${gameId}` })),
 );
 
-export const navigationEpic = combineEpics(
+const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyAction.enteredLobbyPageEvent> = (actions$) => actions$.pipe(
+  ofType(NavigationAction.locationChangeEvent),
+  toPayload(),
+  rootPathMatches('lobbies'),
+  map((payload) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, array-element-newline
+    const [,lobbies, lobbyId] = payload.location.pathname.split('/');
+
+    return lobbyId;
+  }),
+  // TODO: introduce some kind of error handling in case lobby id is not defined
+  filter(RxjsUtils.isDefined),
+  map(LobbyAction.enteredLobbyPageEvent),
+);
+
+const redirectToHomePageOnCurrentUserLeftLobbyEvent: TypedEpic<typeof push, RootState> = (actions$, state$) => actions$.pipe(
+  ofType(LobbyAction.currentUserLeftLobbyEvent),
+  toPayload(),
+  withLatestFrom(state$),
+  filter(([lobbyId, state]) => {
+    const [, currentRootPath, potentialLobbyId] = state.router.location.pathname.split('/');
+
+    return currentRootPath === 'lobbies' && potentialLobbyId === lobbyId;
+  }),
+  // `mapTo` really accepts `any` payload, therefore
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  mapTo(push({ pathname: '/' })),
+);
+
+const dispatchEnteredGamePageEventOnGamePageEnterEpic: TypedEpic<typeof GameAction.enteredGamePageEvent> = (actions$) => actions$.pipe(
+  ofType(NavigationAction.locationChangeEvent),
+  toPayload(),
+  rootPathMatches('games'),
+  map((payload) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, array-element-newline
+    const [,games, gameId] = payload.location.pathname.split('/');
+
+    return gameId;
+  }),
+  // TODO: introduce some kind of error handling in case lobby id is not defined
+  filter(RxjsUtils.isDefined),
+  map(GameAction.enteredGamePageEvent),
+);
+
+export const navigationEpic = combineEpics<AnyAction, AnyAction, RootState, unknown>(
   redirectToHomePageOnRegisterGuestResolvedEventEpic,
   redirectToLoginPageOnAuthorizeRejectedEventEpic,
   redirectToLobbyPageOnCreateLobbyResolvedEventEpic,
-  redirectToGamePageOnCreateGameResolvedEventEpic,
+  dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic,
+  redirectToGamePageOnGameCreatedEventEpic,
+  redirectToHomePageOnCurrentUserLeftLobbyEvent,
+  dispatchEnteredGamePageEventOnGamePageEnterEpic,
 );

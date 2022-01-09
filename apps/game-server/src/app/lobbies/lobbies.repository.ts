@@ -1,52 +1,104 @@
-import { Lobby } from '@machikoro/game-server-contracts';
+import { Lobby, LobbyId, UserId } from '@machikoro/game-server-contracts';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PromisifiedRedisClient } from '../utils';
 
 export namespace LobbiesRepository {
-
-  type RemoveUserFromLobby = (userToDeleteId: string, lobbyId: string) => Promise<number>;
-  type AddUserToLobby = (currentUserId: string, lobbyId: string,) => Promise<unknown>;
-  type GetLobby = (lobbyId: string) => Promise<Lobby | undefined>;
-  type CreateLobby = (hostId: string) => Promise<Lobby & { lobbyId: string } | undefined>;
+  type LeaveLobbyAsUser = (userToDeleteId: UserId, lobbyId: LobbyId) => Promise<Error | Lobby>;
+  type JoinLobbyAsUser = (currentUserId: UserId, lobbyId: LobbyId,) => Promise<Error | Lobby>;
+  type GetLobby = (lobbyId: LobbyId) => Promise<Error | Lobby>;
+  type CreateLobby = (hostId: UserId) => Promise<Error | Lobby & { lobbyId: LobbyId }>;
 
   type LobbiesRepository = {
-    removeUserFromLobby: RemoveUserFromLobby;
-    addUserToLobby: AddUserToLobby;
+    leaveUserFromLobby: LeaveLobbyAsUser;
+    joinLobbyAsUser: JoinLobbyAsUser;
     getLobby: GetLobby;
     createLobby: CreateLobby;
   };
 
-  const initializeRemoveUserFromLobby = (redisClientLobbies: PromisifiedRedisClient): RemoveUserFromLobby => async (
-    userToDeleteId: string,
-    lobbyId: string,
-  ): Promise<number> => redisClientLobbies.lrem(`${lobbyId}:users`, 1, userToDeleteId);
+  const getLobbyHostId = (redisClientLobbies: PromisifiedRedisClient) => async (
+    lobbyId: LobbyId,
+  ): Promise<string | null> => redisClientLobbies.get(`${lobbyId}:hostId`);
+  const getLobbyUsers = (redisClientLobbies: PromisifiedRedisClient) => async (
+    lobbyId: LobbyId,
+  ): Promise<string[] | null> => redisClientLobbies.lrange(`${lobbyId}:users`, 0, -1);
+  const addUserToLobby = (redisClientLobbies: PromisifiedRedisClient) => async (
+    userToAdd: UserId,
+    lobbyId: LobbyId,
+  ): Promise<unknown> => redisClientLobbies.rpush(`${lobbyId}:users`, userToAdd);
+  const removeUserFromLobby = (redisClientLobbies: PromisifiedRedisClient) => async (
+    userToRemoveId: UserId,
+    lobbyId: LobbyId,
+  ): Promise<unknown> => redisClientLobbies.lrem(`${lobbyId}:users`, 1, userToRemoveId);
 
-  const initializeAddUserToLobby = (redisClientLobbies: PromisifiedRedisClient) => async (
-    currentUserId: string,
-    lobbyId: string,
-  ): Promise<unknown> => redisClientLobbies.rpush(`${lobbyId}:users`, currentUserId);
-
-  const initializeGetLobby = (
-    redisClientLobbies: PromisifiedRedisClient,
-  ) => async (
-    lobbyId: string,
-  ): Promise<Lobby | undefined> => {
+  const initializeGetLobby = (redisClientLobbies: PromisifiedRedisClient): GetLobby => async (
+    lobbyId,
+  ) => {
     const [hostId, users] = await Promise.all([
-      redisClientLobbies.get(`${lobbyId}:hostId`), redisClientLobbies.lrange(`${lobbyId}:users`, 0, -1),
+      getLobbyHostId(redisClientLobbies)(lobbyId),
+      getLobbyUsers(redisClientLobbies)(lobbyId),
     ]);
 
-    if (!hostId || !users) {
-      return undefined;
+    if (!hostId) {
+      return new Error(`Failed to retrieve lobby(${lobbyId}) host id`);
+    }
+
+    if (!users) {
+      return new Error(`Failed to retrieve lobby(${lobbyId}) users`);
     }
 
     return { hostId, users };
   };
 
-  const initializeCreateLobby = (
-    redisClientLobbies: PromisifiedRedisClient,
-  ): CreateLobby => async (hostId) => {
-    const lobby: Lobby & { lobbyId: string } = {
+  const initializeLeaveLobby = (redisClientLobbies: PromisifiedRedisClient): LeaveLobbyAsUser => async (
+    userToRemoveId,
+    lobbyId,
+  ) => {
+    const users = await getLobbyUsers(redisClientLobbies)(lobbyId);
+
+    if (!users) {
+      return new Error(`Failed to retrieve lobby(${lobbyId}) users`);
+    }
+
+    const isUserInLobby = users.some((userId) => userId === userToRemoveId);
+
+    if (!isUserInLobby) {
+      return new Error(`User(${userToRemoveId}) is not in a lobby(${lobbyId})`);
+    }
+
+    await removeUserFromLobby(redisClientLobbies)(userToRemoveId, lobbyId);
+
+    return initializeGetLobby(redisClientLobbies)(lobbyId);
+  };
+
+  const initializeJoinLobbyAsUser = (redisClientLobbies: PromisifiedRedisClient): JoinLobbyAsUser => async (
+    userToAdd,
+    lobbyId,
+  ) => {
+    const users = await getLobbyUsers(redisClientLobbies)(lobbyId);
+
+    if (!users) {
+      return new Error(`Failed to retrieve lobby(${lobbyId}) users`);
+    }
+
+    const isUserAlreadyInLobby = users.some((userId) => userId === userToAdd);
+
+    if (!isUserAlreadyInLobby) {
+      await addUserToLobby(redisClientLobbies)(userToAdd, lobbyId);
+    }
+
+    // TODO: extract magic number into a constant
+    if (users.length > 3) {
+      return new Error(`The lobby(${lobbyId}) is already full`);
+    }
+
+    return initializeGetLobby(redisClientLobbies)(lobbyId);
+  };
+
+  const initializeCreateLobby = (redisClientLobbies: PromisifiedRedisClient): CreateLobby => async (
+    hostId,
+  ) => {
+    const lobby: Lobby & { lobbyId: LobbyId } = {
       lobbyId: uuidv4(),
       hostId,
       users: [],
@@ -58,8 +110,8 @@ export namespace LobbiesRepository {
   };
 
   export const init = (redisClientLobbies: PromisifiedRedisClient): LobbiesRepository => ({
-    removeUserFromLobby: initializeRemoveUserFromLobby(redisClientLobbies),
-    addUserToLobby: initializeAddUserToLobby(redisClientLobbies),
+    leaveUserFromLobby: initializeLeaveLobby(redisClientLobbies),
+    joinLobbyAsUser: initializeJoinLobbyAsUser(redisClientLobbies),
     getLobby: initializeGetLobby(redisClientLobbies),
     createLobby: initializeCreateLobby(redisClientLobbies),
   });

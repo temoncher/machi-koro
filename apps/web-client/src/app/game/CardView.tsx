@@ -1,6 +1,6 @@
 import { Establishment, Landmark } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { UrlUtils } from '../utils';
 
@@ -64,14 +64,7 @@ const getCommonProps = (cardInfo: CardInfo) => (
       landmarkId: undefined,
     });
 
-const CardView: React.FC<CardViewProps> = memo(({
-  className,
-  cardInfo,
-  size,
-  underConstruction,
-  quantity,
-  onClick,
-}: CardViewProps) => {
+const CardView: React.FC<CardViewProps> = (props) => {
   const {
     activation,
     name,
@@ -80,7 +73,7 @@ const CardView: React.FC<CardViewProps> = memo(({
     cost,
     descriptionText,
     domain,
-  } = getCommonProps(cardInfo);
+  } = getCommonProps(props.cardInfo);
 
   const activationDiceRange = useMemo((): string => (activation ? activation.join('-') : ''), [activation]);
   const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
@@ -96,23 +89,23 @@ const CardView: React.FC<CardViewProps> = memo(({
 
   const underConstructionIcon = useMemo((): string => UrlUtils.getStaticImage('under-construction'), []);
 
-  const scale = useMemo((): number => (size ? cardSizeToScaleMap[size] : cardSizeToScaleMap.base), [size]);
+  const scale = useMemo((): number => (props.size ? cardSizeToScaleMap[props.size] : cardSizeToScaleMap.base), [props.size]);
 
   return (
     <div
-      className={clsx('card-view-wrapper', className)}
+      className={clsx('card-view-wrapper', props.className)}
       role="button"
       style={{ ['--card-scale' as string]: scale }}
       tabIndex={0}
-      onClick={onClick}
-      onKeyDown={onClick}
+      onClick={props.onClick}
+      onKeyDown={props.onClick}
     >
       <article
         className={clsx({
           /* eslint-disable @typescript-eslint/naming-convention */
           'card-view': true,
           [backgroundClass]: true,
-          'card-view--faded': underConstruction,
+          'card-view--faded': props.underConstruction,
           /* eslint-enable @typescript-eslint/naming-convention */
         })}
         style={{ backgroundImage }}
@@ -123,9 +116,9 @@ const CardView: React.FC<CardViewProps> = memo(({
           </p>
         )}
 
-        {quantity && (
+        {props.quantity && (
           <p className="card-view__count">
-            {quantity}
+            {props.quantity}
           </p>
         )}
 
@@ -134,7 +127,7 @@ const CardView: React.FC<CardViewProps> = memo(({
             /* eslint-disable @typescript-eslint/naming-convention */
             'card-view__name': true,
             [textClass]: true,
-            'card-view__name--disabled': underConstruction,
+            'card-view__name--disabled': props.underConstruction,
             /* eslint-enable @typescript-eslint/naming-convention */
           })}
           style={{ ['--bg-image' as string]: `url('${tagSrc}')` }}
@@ -183,16 +176,16 @@ const CardView: React.FC<CardViewProps> = memo(({
         </p>
       </article>
 
-      {underConstruction && (
-      <img
-        alt="card"
-        className="card-view-wrapper__under-construction-icon"
-        src={underConstructionIcon}
-      />
+      {props.underConstruction && (
+        <img
+          alt="card"
+          className="card-view-wrapper__under-construction-icon"
+          src={underConstructionIcon}
+        />
       )}
     </div>
   );
-});
+};
 
 export const LandmarkView: React.FC<LandmarkViewProps> = (landmarkViewProps: LandmarkViewProps) => (
   <CardView

@@ -2,9 +2,11 @@ import {
   CreateGameRequestBody,
   CreateGameResponse,
   Game,
+  GameId,
   Lobby,
+  LobbyId,
   ServerError,
-  validateLobby,
+  UserId,
 } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
 
@@ -20,23 +22,24 @@ AuthMiddlewareLocals
 >;
 
 export type CreateGameRequestHandlerDependencies = {
-  createGame: (currentUserId: string, users: string[]) => Promise<Game>;
-  getLobby: (lobbyId: string) => Promise<Lobby | undefined>;
+  createGame: (currentUserId: UserId, users: UserId[]) => Promise<Game>;
+  getLobby: (lobbyId: LobbyId) => Promise<Error | Lobby>;
+  dispatchGameCreatedEvent: (payload: { lobbyId: LobbyId; gameId: GameId }) => void;
 };
 
 export const createGameRequestHandler = (
-  { createGame, getLobby }: CreateGameRequestHandlerDependencies,
+  { createGame, getLobby, dispatchGameCreatedEvent }: CreateGameRequestHandlerDependencies,
 ): CreateGameRequestHandler => async (req, res, next) => {
   try {
     const currentUserId = res.locals.currentUser.userId;
     const { lobbyId } = req.body;
 
-    const lobby = await getLobby(lobbyId);
+    const lobbyOrError = await getLobby(lobbyId);
 
-    const lobbyOrError = validateLobby(lobby);
+    if (lobbyOrError instanceof Error) {
+      // eslint-disable-next-line no-console
+      console.error(lobbyOrError.message);
 
-    if (!lobbyOrError) {
-      // TODO: emit error
       return;
     }
 
@@ -46,6 +49,8 @@ export const createGameRequestHandler = (
       gameId: game.gameId,
     };
 
+    // TODO: make this call reactive (middleware?)
+    dispatchGameCreatedEvent({ lobbyId, gameId: game.gameId });
     res.send(gamesResponse);
   } catch (error: unknown) {
     res

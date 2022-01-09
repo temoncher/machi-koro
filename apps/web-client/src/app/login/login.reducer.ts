@@ -2,18 +2,18 @@ import { on, reducer } from 'ts-action';
 
 import { LoginStatus } from '../types';
 
-import { authorizeResolvedEvent, authorizeRejectedEvent, registerGuestResolvedEvent } from './login.actions';
+import { LoginAction } from './login.actions';
 import { initialLoginState } from './login.state';
 
 export const loginReducer = reducer(
   initialLoginState,
-  on(authorizeResolvedEvent, registerGuestResolvedEvent, (state, { payload }) => ({
+  on(LoginAction.authorizeResolvedEvent, LoginAction.registerGuestResolvedEvent, (state, { payload }) => ({
     ...state,
     username: payload.username,
     userId: payload.userId,
     status: LoginStatus.AUTHORIZED,
   })),
-  on(authorizeRejectedEvent, (state) => ({
+  on(LoginAction.authorizeRejectedEvent, (state) => ({
     ...state,
     status: LoginStatus.NOT_AUTHORIZED,
   })),

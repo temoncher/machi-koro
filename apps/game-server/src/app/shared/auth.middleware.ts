@@ -1,4 +1,4 @@
-import { ServerError, User } from '@machikoro/game-server-contracts';
+import { ServerError, User, UserId } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 import { HTTPStatusCode, AppSocket } from '../types';
 
 export type AuthMiddlewareDependencies = {
-  getUser: (userId: string) => Promise<User | ZodError>;
+  getUser: (userId: UserId) => Promise<User | ZodError>;
 };
 
 export type AuthMiddlewareLocals = {
@@ -85,7 +85,7 @@ export const authMiddleware = (
 };
 
 export type AuthSocketMiddlewareDependencies = {
-  getUser: (userId: string) => Promise<User | ZodError>;
+  getUser: (userId: UserId) => Promise<User | ZodError>;
 };
 export const authSocketMiddleware = (
   { getUser }: AuthSocketMiddlewareDependencies,

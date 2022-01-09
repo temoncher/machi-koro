@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import './DicePairView.css';
-import React, { memo } from 'react';
+import React from 'react';
 
 import { DiceCombination } from '../types';
 
@@ -11,14 +11,11 @@ type DicePairViewProps = {
   rolledDiceCombination: DiceCombination | undefined;
 };
 
-export const DicePairView: React.FC<DicePairViewProps> = memo(({
-  className,
-  rolledDiceCombination,
-}: DicePairViewProps) => {
-  const [firstDice, secondDice] = rolledDiceCombination ?? [];
+export const DicePairView: React.FC<DicePairViewProps> = (props) => {
+  const [firstDice, secondDice] = props.rolledDiceCombination ?? [];
 
   return (
-    <div className={clsx('dice-container', className)}>
+    <div className={clsx('dice-container', props.className)}>
       <DiceView
         className="dice-container__dice-view"
         rolledDice={firstDice}
@@ -29,4 +26,4 @@ export const DicePairView: React.FC<DicePairViewProps> = memo(({
       />
     </div>
   );
-});
+};

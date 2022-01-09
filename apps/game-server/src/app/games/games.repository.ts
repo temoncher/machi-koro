@@ -1,7 +1,9 @@
 import {
+  GameId,
   Game,
   UsersStatusesMap,
   UserStatus,
+  UserId,
 } from '@machikoro/game-server-contracts';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,11 +11,11 @@ import { PromisifiedRedisClient } from '../utils';
 
 export namespace GameRepository {
 
-  type AddUsersToGame = (usersIds: string[], gameId: string,) => Promise<unknown>;
-  type DisconnectUserFromGame = (userToDisconnectId: string, gameId: string) => Promise<'OK'>;
-  type ConnectUserToGame = (userToConnectId: string, gameId: string,) => Promise<'OK'>;
-  type GetGame = (gameId: string) => Promise<Game | undefined>;
-  type CreateGame = (currentUserId: string, users: string[]) => Promise<Game>;
+  type AddUsersToGame = (usersIds: UserId[], gameId: GameId,) => Promise<unknown>;
+  type DisconnectUserFromGame = (userToDisconnectId: UserId, gameId: GameId) => Promise<'OK'>;
+  type ConnectUserToGame = (userToConnectId: UserId, gameId: GameId,) => Promise<'OK'>;
+  type GetGame = (gameId: GameId) => Promise<Game | undefined>;
+  type CreateGame = (currentUserId: UserId, users: UserId[]) => Promise<Game>;
 
   export type GameRepository = {
     addUsersToGame: AddUsersToGame;
@@ -24,13 +26,13 @@ export namespace GameRepository {
   };
 
   const initializeAddUsersToGame = (redisClientGames: PromisifiedRedisClient): AddUsersToGame => async (
-    usersIds: string[],
-    gameId: string,
+    usersIds: UserId[],
+    gameId: GameId,
   ): Promise<unknown> => redisClientGames.rpush(`${gameId}:users`, ...usersIds);
 
   const initializeDisconnectUserFromGame = (redisClientGames: PromisifiedRedisClient): DisconnectUserFromGame => async (
-    userToDisconnectId: string,
-    gameId: string,
+    userToDisconnectId: UserId,
+    gameId: GameId,
   ): Promise<'OK'> => redisClientGames.hmset([
     `${gameId}:usersStatusesMap`,
     userToDisconnectId,
@@ -38,8 +40,8 @@ export namespace GameRepository {
   ]);
 
   const initializeConnectUserToGame = (redisClientGames: PromisifiedRedisClient): ConnectUserToGame => async (
-    userToConnectId: string,
-    gameId: string,
+    userToConnectId: UserId,
+    gameId: GameId,
   ): Promise<'OK'> => redisClientGames.hmset([
     `${gameId}:usersStatusesMap`,
     userToConnectId,
@@ -49,7 +51,7 @@ export namespace GameRepository {
   const initializeGetGame = (
     redisClientGames: PromisifiedRedisClient,
   ): GetGame => async (
-    gameId: string,
+    gameId: GameId,
   ): Promise<Game | undefined> => {
     const [
       hostId,
@@ -78,7 +80,7 @@ export namespace GameRepository {
 
   const initializeCreateGame = (
     redisClientGames: PromisifiedRedisClient,
-  ): CreateGame => async (currentUserId: string, users: string[]) => {
+  ): CreateGame => async (currentUserId: UserId, users: UserId[]) => {
     const usersStatusesMap: UsersStatusesMap = Object.fromEntries(users.map((userId) => [userId, UserStatus.DISCONNECTED]));
 
     const game: Game = {

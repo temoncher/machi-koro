@@ -1,4 +1,4 @@
-import { User, UserWithToken } from '@machikoro/game-server-contracts';
+import { User, UserId, UserWithToken } from '@machikoro/game-server-contracts';
 import * as jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { ZodError } from 'zod';
@@ -9,8 +9,8 @@ import { PromisifiedRedisClient } from '../utils';
 import { parseUserWithTokenWithoutId, UserWithTokenWithoutId } from './user.model';
 
 export namespace UsersRepository {
-  type GetUser = (userId: string) => Promise<User | ZodError>;
-  type GetUsers = (users: string[]) => Promise<(User | ZodError)[]>;
+  type GetUser = (userId: UserId) => Promise<User | ZodError>;
+  type GetUsers = (users: UserId[]) => Promise<(User | ZodError)[]>;
   type CreateUser = ({ username, type }: Pick<User, 'username' | 'type'>) => Promise<UserWithToken>;
 
   type UsersRepository = {

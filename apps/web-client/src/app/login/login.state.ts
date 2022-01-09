@@ -1,13 +1,15 @@
+import { UserId } from '@machikoro/game-server-contracts';
+
 import { LoginStatus } from '../types';
 
 export type LoginState = {
-  username: string;
-  userId: string;
+  username: string | undefined;
+  userId: UserId | undefined;
   status: LoginStatus;
 };
 
 export const initialLoginState: LoginState = {
-  username: '',
-  userId: '',
+  username: undefined,
+  userId: undefined,
   status: LoginStatus.PENDING,
 };

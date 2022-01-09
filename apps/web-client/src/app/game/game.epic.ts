@@ -12,12 +12,7 @@ import { ofType, toPayload } from 'ts-action-operators';
 
 import { TypedEpic } from '../types';
 
-import {
-  createGameCommand,
-  createGameResolvedEvent,
-  createGameRejectedEvent,
-  GameAction,
-} from './game.actions';
+import { GameAction } from './game.actions';
 
 type CreateGameEpicDependencies = {
   createGame: (requestBody: CreateGameRequestBody) => Promise<CreateGameResponse>;
@@ -25,21 +20,28 @@ type CreateGameEpicDependencies = {
 
 const createGameEpic = (
   deps: CreateGameEpicDependencies,
-): TypedEpic<typeof createGameResolvedEvent | typeof createGameRejectedEvent> => (actions$) => actions$.pipe(
-  ofType(createGameCommand),
+): TypedEpic<typeof GameAction.createGameResolvedEvent | typeof GameAction.createGameRejectedEvent> => (actions$) => actions$.pipe(
+  ofType(GameAction.createGameCommand),
   toPayload(),
   switchMap(({ lobbyId }) => from(deps.createGame({ lobbyId })).pipe(
-    map(createGameResolvedEvent),
+    map(GameAction.createGameResolvedEvent),
     catchError((error) => {
       const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
 
-      return of(createGameRejectedEvent(errorMessage));
+      return of(GameAction.createGameRejectedEvent(errorMessage));
     }),
   )),
+);
+
+const joinGameOnGamePageEnteredEventEpic: TypedEpic<typeof GameAction.joinGameCommand> = (actions$) => actions$.pipe(
+  ofType(GameAction.enteredGamePageEvent),
+  toPayload(),
+  map(GameAction.joinGameCommand),
 );
 
 export type GameEpicDependencies = CreateGameEpicDependencies;
 
 export const gameEpic = (deps: GameEpicDependencies) => combineEpics<AnyAction, GameAction, unknown, unknown>(
   createGameEpic(deps),
+  joinGameOnGamePageEnteredEventEpic,
 );

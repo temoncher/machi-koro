@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export type UserId = string;
+
 export const FIRST_CHAR_USERNAME_REGEXP = /^[A-Za-z]/;
 export const USERNAME_REGEXP = /^[A-Za-z-_\s]+$/;
 const MIN_LENGTH_USERNAME = 1;

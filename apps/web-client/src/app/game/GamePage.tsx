@@ -1,63 +1,20 @@
-import './GamePage.css';
-import {
-  GameContext,
-  GameState,
-  UserStatus,
-} from '@machikoro/game-server-contracts';
+import { GameContext } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useTypedSelector } from '../hooks';
-import {
-  initializeSocket,
-  joinGame,
-  rollDice,
-  startGame,
-  pass,
-  buildEstablishment,
-  buildLandmark,
-} from '../socket';
 import { DiceCombination } from '../types';
-import { UrlUtils } from '../utils';
 
 import { DicePairView } from './DicePairView';
 import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
+import { useGameActions } from './useGameActions';
+
+import './GamePage.css';
 
 type GamePageProps = {
   className?: string;
-};
-
-const mockGame: GameState = {
-  gameId: '',
-  hostId: '',
-  users: [{
-    userId: 'firstPlayer',
-    username: 'Artem',
-    type: 'guest',
-  },
-  {
-    userId: 'secondPlayer',
-    username: 'Alex',
-    type: 'guest',
-  },
-  {
-    userId: 'thirdPlayer',
-    username: 'Julia',
-    type: 'guest',
-  },
-  {
-    userId: 'fourthPlayer',
-    username: 'Kirill',
-    type: 'guest',
-  }],
-  usersStatusesMap: {
-    Artem: UserStatus.CONNECTED,
-    Alex: UserStatus.DISCONNECTED,
-    Julia: UserStatus.DISCONNECTED,
-    Kirill: UserStatus.CONNECTED,
-  },
 };
 
 const mockGameContext: GameContext = {
@@ -164,46 +121,26 @@ const mockGameContext: GameContext = {
 
 const mockRolledDiceCombination: DiceCombination = [3, undefined];
 
-export const GamePage: React.FC<GamePageProps> = (({ className }: GamePageProps) => {
-  const { userId } = useTypedSelector((state) => state.loginReducer);
+export const GamePage: React.FC<GamePageProps> = (props) => {
   const { t } = useTranslation();
-  const gameId = useTypedSelector((state) => {
-    const { pathname } = state.router.location;
+  const game = useTypedSelector((state) => state.gameReducer.game);
 
-    return UrlUtils.getLastSegment(pathname);
-  });
-
-  useEffect(() => {
-    initializeSocket();
-
-    if (gameId) {
-      joinGame(gameId);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('GameId is missing');
-    }
-  }, [gameId]);
-
-  const requestToRollDice = () => {
-    rollDice(userId);
-  };
-  const requestToPass = () => {
-    pass(userId);
-  };
-  const requestToStartGame = () => {
-    if (gameId) {
-      startGame(gameId);
-    }
-  };
+  const {
+    rollDiceCommand,
+    passCommand,
+    startGameCommand,
+    buildEstablishmentCommand,
+    buildLandmarkCommand,
+  } = useGameActions();
 
   return (
-    <main className={clsx('game-page', className)}>
+    <main className={clsx('game-page', props.className)}>
       <section className="game-page__game-view">
         <EstablishmentsShopView
           className="game-page__activation-cards"
           establishments={mockGameContext.gameEstablishments}
           shop={mockGameContext.shop}
-          onEstablishmentClick={buildEstablishment(userId)}
+          onEstablishmentClick={buildEstablishmentCommand}
         />
         <DicePairView className="game-page__dice-container" rolledDiceCombination={mockRolledDiceCombination} />
         <PlayersView
@@ -213,17 +150,23 @@ export const GamePage: React.FC<GamePageProps> = (({ className }: GamePageProps)
           gameEstablishments={mockGameContext.gameEstablishments}
           gameLandmarks={mockGameContext.gameLandmarks}
           landmarksMap={mockGameContext.landmarks}
-          players={mockGame.users}
-          statusesMap={mockGame.usersStatusesMap}
-          onLandmarkClick={buildLandmark(userId)}
+          // TODO: rework this part
+          players={mockGameContext.players.map(({ userId }) => ({
+            type: 'guest',
+            userId,
+            username: userId,
+          }))}
+          // TODO: rework this part
+          statusesMap={game?.usersStatusesMap ?? {}}
+          onLandmarkClick={buildLandmarkCommand}
         />
       </section>
       <section className="game-page__game-control">
-        <button className="game-page__button" type="button" onClick={requestToStartGame}>{t('game.startGameButtonText')}</button>
-        <button className="game-page__button" type="button" onClick={requestToRollDice}>{t('game.rollDiceButtonText')}</button>
-        <button className="game-page__button" type="button" onClick={requestToPass}>{t('game.passButtonText')}</button>
+        <button className="game-page__button" type="button" onClick={startGameCommand}>{t('game.startGameButtonText')}</button>
+        <button className="game-page__button" type="button" onClick={rollDiceCommand}>{t('game.rollDiceButtonText')}</button>
+        <button className="game-page__button" type="button" onClick={passCommand}>{t('game.passButtonText')}</button>
         <button className="game-page__button" type="button">{t('game.finishTurnButtonText')}</button>
       </section>
     </main>
   );
-});
+};

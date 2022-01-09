@@ -2,8 +2,12 @@ import * as http from 'http';
 
 import {
   ClientSentEventsMap,
+  GameId,
+  UserId,
   Game,
+  Lobby,
   ServerSentEventsMap,
+  LobbyId,
 } from '@machikoro/game-server-contracts';
 import * as SocketIO from 'socket.io';
 
@@ -17,30 +21,31 @@ import {
 import { AppSocket } from './types';
 
 type OnDisconnectingDependencies = {
-  removeUserFromLobby: (userToDeleteId: string, lobbyId: string) => Promise<number>;
-  disconnectUserFromGame: (userToConnectId: string, gameId: string,) => Promise<'OK'>;
-  getGame: (gameId: string) => Promise<Game | undefined>;
+  leaveLobbyAsUser: (userToDeleteId: UserId, lobbyId: LobbyId) => Promise<Error | Lobby>;
+  disconnectUserFromGame: (userToConnectId: UserId, gameId: GameId,) => Promise<'OK'>;
+  getGame: (gameId: GameId) => Promise<Game | undefined>;
 };
 
 const onDisconnecting = (
-  { removeUserFromLobby, disconnectUserFromGame, getGame }: OnDisconnectingDependencies,
+  { leaveLobbyAsUser, disconnectUserFromGame, getGame }: OnDisconnectingDependencies,
 ) => async (socket: AppSocket): Promise<void> => {
   // authSocketMiddleware checked and put currentUser object in socket.data
-  const { currentUser: { userId, username, type } } = socket.data as AuthMiddlewareLocals;
+  const { currentUser } = socket.data as AuthMiddlewareLocals;
 
   const rooms = [...socket.rooms];
 
+  // TODO: Think about disconnect logic and "are you here" requests
   const lobbiesRequests = rooms.map(async (roomId) => {
     const game = await getGame(roomId);
 
-    const actionToPerform = game ? disconnectUserFromGame : removeUserFromLobby;
+    const actionToPerform = game ? disconnectUserFromGame : leaveLobbyAsUser;
 
-    await actionToPerform(userId, roomId);
+    await actionToPerform(currentUser.userId, roomId);
   });
 
   await Promise.all(lobbiesRequests);
 
-  rooms.forEach((roomId) => socket.in(roomId).emit('LOBBY_USER_LEFT', { userId, username, type }));
+  rooms.forEach((roomId) => socket.in(roomId).emit('LOBBY_USER_LEFT', { user: currentUser, lobbyId: roomId }));
 };
 
 type OnConnectionDependencies = HandleLobbyEventsDependencies & HandleGameEventsDependencies & OnDisconnectingDependencies;

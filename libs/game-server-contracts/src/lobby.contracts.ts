@@ -1,3 +1,5 @@
+import { UserId } from './user.model';
+
 export type LobbyId = string;
 
 export type CreateLobbyResponse = {
@@ -5,18 +7,10 @@ export type CreateLobbyResponse = {
 };
 
 export type CreateLobbyRequestBody = {
-  hostId: string;
+  hostId: UserId;
 };
 
 export type Lobby = {
-  hostId: string;
-  users: string[];
-};
-
-export const validateLobby = (lobby: Lobby | undefined): Lobby | undefined => {
-  if (!lobby || lobby.users.length > 3) {
-    return undefined;
-  }
-
-  return lobby;
+  hostId: UserId;
+  users: UserId[];
 };

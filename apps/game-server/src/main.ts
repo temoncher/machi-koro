@@ -73,28 +73,9 @@ const main = (): void => {
   }));
   app.use('/static', staticFiles);
 
-  const appRouterDependencies: AppRouterDependencies = {
-    getUser: usersRepository.getUser,
-    createUser: usersRepository.createUser,
-    createLobby: lobbiesRepository.createLobby,
-    getLobby: lobbiesRepository.getLobby,
-    createGame: gamesRepository.createGame,
-  };
-
-  app.use('/api', initializeAppRouter(appRouterDependencies));
-
-  server.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Listening at http://${hosts.MAIN}:${PORT}/`);
-  });
-
-  // eslint-disable-next-line no-console
-  server.on('error', console.error);
-
   const socketServerDependencies: SocketServerDependencies = {
-    removeUserFromLobby: lobbiesRepository.removeUserFromLobby,
-    addUserToLobby: lobbiesRepository.addUserToLobby,
-    getLobby: lobbiesRepository.getLobby,
+    leaveLobbyAsUser: lobbiesRepository.leaveUserFromLobby,
+    joinLobbyAsUser: lobbiesRepository.joinLobbyAsUser,
     getUsers: usersRepository.getUsers,
     getUser: usersRepository.getUser,
     getGame: gamesRepository.getGame,
@@ -115,7 +96,28 @@ const main = (): void => {
     },
   };
 
-  initSocketServer(socketServerConfig, socketServerDependencies, server);
+  const io = initSocketServer(socketServerConfig, socketServerDependencies, server);
+
+  const appRouterDependencies: AppRouterDependencies = {
+    getUser: usersRepository.getUser,
+    createUser: usersRepository.createUser,
+    createLobby: lobbiesRepository.createLobby,
+    getLobby: lobbiesRepository.getLobby,
+    createGame: gamesRepository.createGame,
+    dispatchGameCreatedEvent: ({ lobbyId, gameId }) => {
+      io.to(lobbyId).emit('LOBBY_GAME_CREATED', gameId);
+    },
+  };
+
+  app.use('/api', initializeAppRouter(appRouterDependencies));
+
+  server.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Listening at http://${hosts.MAIN}:${PORT}/`);
+  });
+
+  // eslint-disable-next-line no-console
+  server.on('error', console.error);
 };
 
 main();

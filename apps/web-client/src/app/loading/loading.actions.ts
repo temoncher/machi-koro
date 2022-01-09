@@ -1,16 +1,15 @@
 import { action, payload } from 'ts-action';
 
 enum LoadingActionType {
-  SET_IS_LOADING_DOCUMENT = '[Document] APP/Loading/SET_IS_LOADING',
+  SET_IS_LOADING_DOCUMENT = '[DOCUMENT] APP/LOADING/SET_IS_LOADING',
 }
 
-export const setIsLoadingDocument = action(
-  LoadingActionType.SET_IS_LOADING_DOCUMENT,
-  payload<boolean>(),
-);
+export namespace LoadingAction {
+  export const setIsLoadingDocument = action(
+    LoadingActionType.SET_IS_LOADING_DOCUMENT,
+    payload<boolean>(),
+  );
+}
 
-export type LoadingAction = ReturnType<typeof setIsLoadingDocument>;
-
-export const loadingActions = {
-  setIsLoadingDocument,
-};
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type LoadingAction = ReturnType<typeof LoadingAction.setIsLoadingDocument>;

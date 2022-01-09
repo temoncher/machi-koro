@@ -1,3 +1,4 @@
+import { AuthMeResponse, RegisterGuestRequestBody, RegisterGuestResponse } from '@machikoro/game-server-contracts';
 import { AnyAction } from 'redux';
 import { combineEpics } from 'redux-observable';
 import {
@@ -11,51 +12,41 @@ import { ofType, toPayload } from 'ts-action-operators';
 
 import { TypedEpic } from '../types';
 
-import {
-  authorizeCommand,
-  authorizeRejectedEvent,
-  authorizeResolvedEvent,
-  registerGuestCommand,
-  registerGuestRejectedEvent,
-  registerGuestResolvedEvent,
-  AuthorizeResolvedPayload,
-  RegisterGuestResolvedPayload,
-  LoginAction,
-} from './login.actions';
+import { LoginAction } from './login.actions';
 
 type AuthorizeEpicDependencies = {
-  authorize: () => Promise<AuthorizeResolvedPayload>;
+  authorize: () => Promise<AuthMeResponse>;
 };
 
 const authorizeEpic = (
   deps: AuthorizeEpicDependencies,
-): TypedEpic<typeof authorizeResolvedEvent | typeof authorizeRejectedEvent> => (actions$) => actions$.pipe(
-  ofType(authorizeCommand),
+): TypedEpic<typeof LoginAction.authorizeResolvedEvent | typeof LoginAction.authorizeRejectedEvent> => (actions$) => actions$.pipe(
+  ofType(LoginAction.authorizeCommand),
   switchMap(() => from(deps.authorize()).pipe(
-    map(authorizeResolvedEvent),
+    map(LoginAction.authorizeResolvedEvent),
     catchError((error) => {
       const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
 
-      return of(authorizeRejectedEvent(errorMessage));
+      return of(LoginAction.authorizeRejectedEvent(errorMessage));
     }),
   )),
 );
 
 type RegisterGuestEpicDependencies = {
-  registerGuest: (registerGuestRequestBody: { username: string; type: 'guest' }) => Promise<RegisterGuestResolvedPayload>;
+  registerGuest: (registerGuestRequestBody: RegisterGuestRequestBody) => Promise<RegisterGuestResponse>;
 };
 
 const registerGuestEpic = (
   deps: RegisterGuestEpicDependencies,
-): TypedEpic<typeof registerGuestResolvedEvent | typeof registerGuestRejectedEvent> => (actions$) => actions$.pipe(
-  ofType(registerGuestCommand),
+): TypedEpic<typeof LoginAction.registerGuestResolvedEvent | typeof LoginAction.registerGuestRejectedEvent> => (actions$) => actions$.pipe(
+  ofType(LoginAction.registerGuestCommand),
   toPayload(),
   switchMap((username) => from(deps.registerGuest({ username, type: 'guest' })).pipe(
-    map(registerGuestResolvedEvent),
+    map(LoginAction.registerGuestResolvedEvent),
     catchError((error) => {
       const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
 
-      return of(registerGuestRejectedEvent(errorMessage));
+      return of(LoginAction.registerGuestRejectedEvent(errorMessage));
     }),
   )),
 );
