@@ -1,6 +1,6 @@
 import './DiceView.css';
 import clsx from 'clsx';
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { Dice } from '../types';
 
@@ -18,10 +18,7 @@ const diceCountToClass = {
   [Dice.SIX]: 'dice--six',
 } as const;
 
-export const DiceView: React.FC<DiceViewProps> = memo(({
-  className,
-  rolledDice,
-}: DiceViewProps) => {
+export const DiceView: React.FC<DiceViewProps> = ({ rolledDice, className }) => {
   const diceClass = useMemo(() => (rolledDice
     ? diceCountToClass[rolledDice as keyof typeof diceCountToClass]
     : 'dice--disable'), [rolledDice]);
@@ -34,4 +31,4 @@ export const DiceView: React.FC<DiceViewProps> = memo(({
         .map((rolledDiceItem, index) => (<div key={index} className="dice__dot" />))}
     </div>
   );
-});
+};

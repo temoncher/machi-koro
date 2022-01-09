@@ -8,13 +8,9 @@ import './HomePage.css';
 
 export const HomePage: React.FC = () => {
   const { createLobbyCommand } = useLobbyActions();
-  const { username, userId } = useTypedSelector((state) => state.loginReducer);
+  const { username } = useTypedSelector((state) => state.loginReducer);
   const { isCreateLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
   const { t } = useTranslation();
-
-  const createLobbyRequest = () => {
-    createLobbyCommand({ hostId: userId });
-  };
 
   return (
     <div className="home-container">
@@ -24,7 +20,7 @@ export const HomePage: React.FC = () => {
         className="new-lobby-button"
         disabled={isCreateLobbyLoading}
         type="button"
-        onClick={createLobbyRequest}
+        onClick={createLobbyCommand}
       >
         {t('home.createNewLobbyButtonText')}
       </button>

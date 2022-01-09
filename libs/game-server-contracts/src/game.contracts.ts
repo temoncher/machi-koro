@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { UserId } from './user.model';
+
 const MAX_LENGTH_LOBBY_ID = 36;
 
 export type CommonEstablishmentDomain = 'majorEstablishment' | 'industry' | 'shopsFactoriesAndMarket' | 'restaurant';
@@ -45,8 +47,6 @@ export type Establishment = CommonEstablishmentFields & {
 };
 
 export type EstablishmentApplyEffect = Record<EstablishmentId, (context: GameContext) => GameContext>;
-
-export type UserId = string;
 
 export type GameId = string;
 

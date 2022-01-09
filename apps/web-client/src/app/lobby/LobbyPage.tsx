@@ -1,44 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGameActions } from '../game/useGameActions';
 import { useTypedSelector } from '../hooks';
-import { initializeSocket, joinLobby, leaveLobby } from '../socket';
 import { UrlUtils } from '../utils';
 
-import { PlayerCard, Player } from './PlayerCard';
+import { UserCard } from './UserCard';
+import { useLobbyActions } from './useLobbyActions';
 
 import './LobbyPage.css';
 
-const mockPlayers: Player[] = [
-  {
-    id: '1',
-    name: 'Artem',
-    status: 'active',
-    loginType: 'guest',
-  },
-  {
-    id: '2',
-    name: 'Alex',
-    status: 'active',
-    loginType: 'guest',
-  },
-  {
-    id: '3',
-    name: 'Kirill',
-    status: 'active',
-    loginType: 'guest',
-  },
-  {
-    id: '4',
-    name: 'Julia',
-    status: 'notActive',
-    loginType: 'guest',
-  },
-];
-
 export const LobbyPage: React.FC = () => {
   const { userId } = useTypedSelector((state) => state.loginReducer);
+  const lobby = useTypedSelector((state) => state.lobbyReducer.lobby);
   const { t } = useTranslation();
   const lobbyId = useTypedSelector((state) => {
     const { pathname } = state.router.location;
@@ -47,6 +21,8 @@ export const LobbyPage: React.FC = () => {
   });
 
   const { createGameCommand } = useGameActions();
+  const { leaveLobbyCommand } = useLobbyActions();
+
   const createGame = (): void => {
     if (lobbyId) {
       createGameCommand({ lobbyId });
@@ -56,20 +32,9 @@ export const LobbyPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    initializeSocket();
-
-    if (lobbyId) {
-      joinLobby(lobbyId);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('LobbyId is missing');
-    }
-  }, [lobbyId]);
-
   const requestToLeaveLobby = () => {
     if (lobbyId) {
-      leaveLobby(lobbyId);
+      leaveLobbyCommand(lobbyId);
     } else {
       // eslint-disable-next-line no-console
       console.error('LobbyId is missing');
@@ -83,11 +48,11 @@ export const LobbyPage: React.FC = () => {
           {t('lobby.playersSectionTitle')}
         </div>
         <div className="lobby-players-list__container">
-          {mockPlayers.map((player) => (
-            <PlayerCard
-              key={player.id}
-              isHighlighted={player.id === userId}
-              player={player}
+          {lobby?.users.map((user) => (
+            <UserCard
+              key={user.userId}
+              isHighlighted={user.userId === userId}
+              user={user}
             />
           ))}
         </div>

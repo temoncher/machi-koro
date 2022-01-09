@@ -1,3 +1,4 @@
 export * from './LoginStatus';
 export * from './TypedEpic';
-export * from './types';
+export * from './Dice';
+export * from './WebsocketConnectionStatus';

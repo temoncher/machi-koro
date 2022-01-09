@@ -10,12 +10,19 @@ import { loginEpic, LoginEpicDependencies } from './login';
 import { navigationEpic } from './navigation.epics';
 import { RootAction } from './root.actions';
 import { RootState } from './root.state';
+import {
+  lobbyWebsocketEpic,
+  gameWebsocketEpic,
+  websocketEpic,
+  WebsocketEpicDependencies,
+} from './websocket';
 
 export type RootEpicDependencies =
   & GameEpicDependencies
   & LobbyEpicDependencies
   & LoginEpicDependencies
-  & ConnectingEpicsDependencies;
+  & ConnectingEpicsDependencies
+  & WebsocketEpicDependencies;
 
 export const rootEpic = (deps: RootEpicDependencies) => combineEpics<RootAction, RootAction, RootState, unknown>(
   gameEpic(deps),
@@ -23,4 +30,7 @@ export const rootEpic = (deps: RootEpicDependencies) => combineEpics<RootAction,
   loginEpic(deps),
   connectingEpics(deps),
   navigationEpic,
+  websocketEpic(deps),
+  gameWebsocketEpic,
+  lobbyWebsocketEpic,
 );

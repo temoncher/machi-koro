@@ -10,7 +10,7 @@ import {
 } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
 import './PlayersView.css';
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { PlayerView } from './PlayerView';
 
@@ -23,31 +23,31 @@ type PlayersViewProps = {
   establishmentsMap: Record<UserId, Record<EstablishmentId, number>>;
   gameLandmarks: Record<LandmarkId, Landmark>;
   gameEstablishments: Record<EstablishmentId, Establishment>;
-  onLandmarkClick: (landmarkId: string) => void;
+  onLandmarkClick: (landmarkId: LandmarkId) => void;
 };
 
-export const PlayersView: React.FC<PlayersViewProps> = memo((playersViewProps: PlayersViewProps) => {
+export const PlayersView: React.FC<PlayersViewProps> = (props: PlayersViewProps) => {
   const defaultLandmarks = useMemo(
-    () => Object.fromEntries(Object.keys(playersViewProps.gameLandmarks).map((landmarkId) => [landmarkId, false])),
-    [playersViewProps.gameLandmarks],
+    () => Object.fromEntries(Object.keys(props.gameLandmarks).map((landmarkId) => [landmarkId, false])),
+    [props.gameLandmarks],
   );
 
   return (
-    <div className={clsx('players', playersViewProps.className)}>
-      {playersViewProps.players.map((player) => (
+    <div className={clsx('players', props.className)}>
+      {props.players.map((player) => (
         <PlayerView
           key={player.userId}
           className="players__player-view"
-          coins={playersViewProps.coinsMap[player.userId] ?? 0}
-          establishments={playersViewProps.establishmentsMap[player.userId] ?? {}}
-          gameEstablishments={playersViewProps.gameEstablishments}
-          gameLandmarks={playersViewProps.gameLandmarks}
-          landmarks={playersViewProps.landmarksMap[player.userId] ?? defaultLandmarks}
+          coins={props.coinsMap[player.userId] ?? 0}
+          establishments={props.establishmentsMap[player.userId] ?? {}}
+          gameEstablishments={props.gameEstablishments}
+          gameLandmarks={props.gameLandmarks}
+          landmarks={props.landmarksMap[player.userId] ?? defaultLandmarks}
           player={player}
-          status={playersViewProps.statusesMap[player.userId] ?? UserStatus.DISCONNECTED}
-          onLandmarkClick={playersViewProps.onLandmarkClick}
+          status={props.statusesMap[player.userId] ?? UserStatus.DISCONNECTED}
+          onLandmarkClick={props.onLandmarkClick}
         />
       ))}
     </div>
   );
-});
+};

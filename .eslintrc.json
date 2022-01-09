@@ -37,6 +37,7 @@
         "project": "./tsconfig.base.json"
       },
       "rules": {
+        "react/destructuring-assignment": 0,
         "react/react-in-jsx-scope": 0,
         "react/require-default-props": 0,
         "react/jsx-sort-props": [
@@ -82,13 +83,7 @@
         ],
 
         "array-bracket-newline": [1, "consistent"],
-        "array-element-newline": [
-          1,
-          {
-            "multiline": true,
-            "minItems": 3
-          }
-        ],
+        "array-element-newline": [1, "consistent"],
         "function-call-argument-newline": [1, "consistent"],
         "func-style": [1, "expression"],
         "function-paren-newline": [1, "multiline-arguments"],
@@ -144,6 +139,17 @@
           1,
           {
             "restrictedNamedExports": ["default", "then"]
+          }
+        ],
+        "no-restricted-globals": [
+          1,
+          {
+            "name": "localStorage",
+            "message": "Pass storage as a parameter instead"
+          },
+          {
+            "name": "window",
+            "message": "Pass all necessary dependencies as parameters instead"
           }
         ],
 

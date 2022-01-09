@@ -15,7 +15,7 @@ import './App.css';
 
 export const App: React.FC = () => {
   const { authorizeCommand } = useLoginActions();
-  const loginStatus = useTypedSelector((store) => store.loginReducer.status);
+  const loginStatus = useTypedSelector((state) => state.loginReducer.status);
 
   useEffect(() => {
     authorizeCommand();

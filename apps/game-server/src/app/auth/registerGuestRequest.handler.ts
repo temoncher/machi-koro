@@ -4,6 +4,7 @@ import {
   RegisterGuestRequestBody,
   User,
   UserWithToken,
+  UserId,
 } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
 import { ZodError } from 'zod';
@@ -17,7 +18,7 @@ RegisterGuestRequestBody
 >;
 
 export type RegisterGuestRequestHandlerDependencies = {
-  getUser: (userId: string) => Promise<User | ZodError>;
+  getUser: (userId: UserId) => Promise<User | ZodError>;
   createUser: ({ username, type }: Pick<User, 'username' | 'type'>) => Promise<UserWithToken>;
 };
 export const registerGuestRequestHandler = (

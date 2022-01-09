@@ -5,6 +5,8 @@ import {
   EstablishmentId,
   GameContext,
   Landmark,
+  LandmarkId,
+  UserId,
 } from '@machikoro/game-server-contracts';
 import { createMachine, assign } from 'xstate';
 
@@ -14,25 +16,25 @@ import { establishmentsEffectsMap } from './establishments';
 
 type RollDiceMessage = {
   type: 'ROLL_DICE';
-  userId: string;
+  userId: UserId;
 };
 type StartGame = {
   type: 'START_GAME';
-  usersIds: string[];
+  usersIds: UserId[];
 };
 type Pass = {
   type: 'PASS';
-  userId: string;
+  userId: UserId;
 };
 type BuildEstablishment = {
   type: 'BUILD_ESTABLISHMENT';
-  userId: string;
-  establishmentToBuild: string;
+  userId: UserId;
+  establishmentToBuild: EstablishmentId;
 };
 type BuildLandmark = {
   type: 'BUILD_LANDMARK';
-  userId: string;
-  landmarkToBuild: string;
+  userId: UserId;
+  landmarkToBuild: LandmarkId;
 };
 
 type GameMachineMessage =

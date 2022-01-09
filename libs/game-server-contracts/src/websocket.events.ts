@@ -1,22 +1,38 @@
 import {
-  UsersStatusesMap,
   GameContext,
   GameId,
-  UserId,
+  EstablishmentId,
+  LandmarkId,
+  Game,
 } from './game.contracts';
-import { User } from './user.model';
+import { LobbyId } from './lobby.contracts';
+import { User, UserId } from './user.model';
+
+type GetActionTypes<M extends ClientSentEventsMap | ServerSentEventsMap> = {
+  [T in keyof M]: {
+    type: T;
+    payload: M[T] extends (...args: any[]) => any ? Parameters<M[T]>[0] : never;
+  }
+};
 
 export type ServerSentEventsMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   // Lobby
-  LOBBY_USER_JOINED: (user: User) => void;
-  LOBBY_USER_LEFT: (user: User) => void;
-  LOBBY_STATE_UPDATED: (lobbyState: LobbyState | undefined) => void;
+  LOBBY_USER_JOINED: (payload: { user: User; lobbyId: LobbyId }) => void;
+  LOBBY_JOINED_SUCCESSFULLY: (lobbyId: LobbyId) => void;
+  LOBBY_JOIN_ERROR: () => void;
+  LOBBY_USER_LEFT: (payload: { user: User; lobbyId: LobbyId }) => void;
+  LOBBY_LEFT_SUCCESSFULLY: (lobbyId: LobbyId) => void;
+  LOBBY_LEAVE_ERROR: () => void;
+  LOBBY_STATE_UPDATED: (lobbyState: PopulatedLobbyState | undefined) => void;
   LOBBY_ERROR_MAX_USERS: () => void;
+  LOBBY_GAME_CREATED: (gameId: GameId) => void;
   // Game
   GAME_USER_JOINED: (userId: UserId) => void;
+  GAME_JOIN_ERROR: () => void;
   GAME_USER_LEFT: (userId: UserId) => void;
-  GAME_STATE_UPDATED: (gameState: GameState | undefined) => void;
+  GAME_LEAVE_ERROR: () => void;
+  GAME_STATE_UPDATED: (gameState: Game | undefined) => void;
   GAME_ERROR_ACCESS: () => void;
   GAME_ERROR: (message: string) => void;
   GAME_STARTED: (stateMachine: GameContext | undefined) => void;
@@ -26,31 +42,27 @@ export type ServerSentEventsMap = {
   BUILD_LANDMARK: (stateMachine: GameContext | undefined) => void;
   PASS: (stateMachine: GameContext | undefined) => void;
   // Common
-  JOIN_ERROR: () => void;
   SERVER_ERROR: () => void;
   /* eslint-enable @typescript-eslint/naming-convention */
 };
 
-export type LobbyState = {
-  hostId: UserId;
-  users: User[];
-};
+export type ServerSentActionTypes = GetActionTypes<ServerSentEventsMap>;
 
-export type GameState = {
-  gameId: GameId;
+export type PopulatedLobbyState = {
   hostId: UserId;
   users: User[];
-  usersStatusesMap: UsersStatusesMap;
 };
 
 export type ClientSentEventsMap = {
-  joinLobby: (lobbyId: string) => void;
-  leaveLobby: (lobbyId: string) => void;
+  joinLobby: (lobbyId: LobbyId) => void;
+  leaveLobby: (lobbyId: LobbyId) => void;
   joinGame: (gameId: GameId) => void;
   leaveGame: (gameId: GameId) => void;
   startGame: (gameId: GameId) => void;
   rollDice: (userId: UserId) => void;
   pass: (userId: UserId) => void;
-  buildEstablishment: (userId: UserId, establishment: string) => void;
-  buildLandmark: (userId: UserId, landmark: string) => void;
+  buildEstablishment: (payload: { userId: UserId; establishmentToBuild: EstablishmentId }) => void;
+  buildLandmark: (payload: { userId: UserId; landmarkToBuild: LandmarkId }) => void;
 };
+
+export type ClientSentActionTypes = GetActionTypes<ClientSentEventsMap>;

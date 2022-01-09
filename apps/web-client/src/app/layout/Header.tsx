@@ -14,7 +14,7 @@ const languageCodeToRepresentationMap = {
   'en-US': 'English (US)',
 } as const;
 
-export const Header: React.FC<HeaderProps> = ({ className }: HeaderProps) => {
+export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const { t, i18n } = useTranslation();
 
   const changeLanguage = (language: string) => {
@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ className }: HeaderProps) => {
   }, [i18n.language]);
 
   return (
-    <div className={clsx('header', className)}>
+    <div className={clsx('header', props.className)}>
       <div className="flex-1 min-w-0">
         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
           {t('gameName')}

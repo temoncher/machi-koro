@@ -7,6 +7,7 @@ import {
   applyMiddleware,
 } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
+import * as SocketIOClient from 'socket.io-client';
 
 import { RootAction } from './root.actions';
 import { RootApi } from './root.api';
@@ -26,6 +27,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 type InitStoreDependencies = {
   history: History<unknown>;
   httpClient: AxiosInstance;
+  socket: SocketIOClient.Socket;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
@@ -45,6 +47,7 @@ export const initStore = (deps: InitStoreDependencies) => {
   );
 
   const rootEpicDependencies: RootEpicDependencies = {
+    socket: deps.socket,
     authorize: rootApi.loginApi.sendAuthMeRequest,
     registerGuest: rootApi.loginApi.sendRegisterGuestRequest,
     createLobby: rootApi.lobbyApi.sendCreateLobbyRequest,

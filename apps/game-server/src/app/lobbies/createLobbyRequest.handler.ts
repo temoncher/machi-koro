@@ -1,4 +1,10 @@
-import { CreateLobbyResponse, Lobby, ServerError } from '@machikoro/game-server-contracts';
+import {
+  CreateLobbyResponse,
+  Lobby,
+  LobbyId,
+  ServerError,
+  UserId,
+} from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
 
 import { AuthMiddlewareLocals } from '../shared';
@@ -13,7 +19,7 @@ AuthMiddlewareLocals
 >;
 
 export type CreateLobbyRequestHandlerDependencies = {
-  createLobby: (hostId: string) => Promise<Lobby & { lobbyId: string } | undefined>;
+  createLobby: (hostId: UserId) => Promise<Error | Lobby & { lobbyId: LobbyId }>;
 };
 export const createLobbyRequestHandler = (
   { createLobby }: CreateLobbyRequestHandlerDependencies,
@@ -21,9 +27,9 @@ export const createLobbyRequestHandler = (
   try {
     const currentUserId = res.locals.currentUser.userId;
 
-    const lobby = await createLobby(currentUserId);
+    const lobbyOrError = await createLobby(currentUserId);
 
-    if (!lobby) {
+    if (lobbyOrError instanceof Error) {
       res
         .status(HTTPStatusCode.INTERNAL_ERROR)
         .send({ message: 'Failed to create lobby' });
@@ -32,7 +38,7 @@ export const createLobbyRequestHandler = (
     }
 
     const createLobbyResponse: CreateLobbyResponse = {
-      lobbyId: lobby.lobbyId,
+      lobbyId: lobbyOrError.lobbyId,
     };
 
     res.status(HTTPStatusCode.CREATED).send(createLobbyResponse);
