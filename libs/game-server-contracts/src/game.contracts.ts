@@ -87,10 +87,6 @@ export type ApplyEffects = (
 
 export type EstablishmentEffect = (context: GameContext) => GameContext;
 
-export type CreateGameResponse = {
-  gameId: GameId;
-};
-
 export const allGameLandmarks: Record<LandmarkId, Landmark> = {
   trainStation: {
     landmarkId: 'trainStation',
@@ -307,3 +303,7 @@ export const createGameRequestBodySchema = z.object({
 });
 
 export type CreateGameRequestBody = z.infer<typeof createGameRequestBodySchema>;
+
+export type CreateGameResponse = {
+  gameId: GameId;
+};

@@ -1,6 +1,6 @@
 import { on, reducer } from 'ts-action';
 
-import { LoginStatus } from '../types';
+import { LoginStatus } from '../types/LoginStatus';
 
 import { LoginAction } from './login.actions';
 import { initialLoginState } from './login.state';

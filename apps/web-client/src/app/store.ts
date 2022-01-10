@@ -22,12 +22,14 @@ declare global {
   }
 }
 
+// eslint-disable-next-line no-restricted-globals
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 type InitStoreDependencies = {
   history: History<unknown>;
   httpClient: AxiosInstance;
   socket: SocketIOClient.Socket;
+  storage: Storage;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
@@ -53,13 +55,13 @@ export const initStore = (deps: InitStoreDependencies) => {
     createLobby: rootApi.lobbyApi.sendCreateLobbyRequest,
     createGame: rootApi.gameApi.sendCreateGameRequest,
     cleanUpAuthToken: () => {
-      localStorage.removeItem('token');
+      deps.storage.removeItem('token');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
       deps.httpClient.defaults.headers.Authorization = '';
     },
     setAuthToken: (token: string) => {
-      localStorage.setItem('token', token);
+      deps.storage.setItem('token', token);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
       deps.httpClient.defaults.headers.Authorization = `Bearer ${token}`;

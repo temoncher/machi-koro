@@ -1,6 +1,4 @@
 import { CreateLobbyRequestBody, CreateLobbyResponse } from '@machikoro/game-server-contracts';
-import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import {
   catchError,
   from,
@@ -12,8 +10,7 @@ import {
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { RootState } from '../root.state';
-import { TypedEpic } from '../types';
+import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { LobbyAction } from './lobby.actions';
 
@@ -23,7 +20,7 @@ type CreateLobbyEpicDependencies = {
 
 const createLobbyEpic = (
   deps: CreateLobbyEpicDependencies,
-): TypedEpic<typeof LobbyAction.createLobbyResolvedEvent | typeof LobbyAction.createLobbyRejectedEvent, RootState> => (
+): TypedEpic<typeof LobbyAction.createLobbyResolvedEvent | typeof LobbyAction.createLobbyRejectedEvent> => (
   actions$,
   state$,
 ) => actions$.pipe(
@@ -68,7 +65,7 @@ const joinLobbyOnLobbyPageEnteredEventEpic: TypedEpic<typeof LobbyAction.joinLob
 
 export type LobbyEpicDependencies = CreateLobbyEpicDependencies;
 
-export const lobbyEpic = (deps: LobbyEpicDependencies) => combineEpics<AnyAction, LobbyAction, RootState, unknown>(
+export const lobbyEpic = (deps: LobbyEpicDependencies) => typedCombineEpics<LobbyAction>(
   createLobbyEpic(deps),
   showCreateLobbyLoaderOnCreateLobbyCommandEpic,
   hideCreateLobbyLoaderOnCreateLobbyResultEventEpic,

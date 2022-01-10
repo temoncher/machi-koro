@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useGameActions } from '../game/useGameActions';
 import { useTypedSelector } from '../hooks';
-import { UrlUtils } from '../utils';
+import { UrlUtils } from '../utils/url.utils';
 
 import { UserCard } from './UserCard';
 import { useLobbyActions } from './useLobbyActions';

@@ -9,7 +9,7 @@ import { Header } from './layout';
 import { Loading } from './loading';
 import { LobbyPage } from './lobby';
 import { LoginPage, useLoginActions } from './login';
-import { LoginStatus } from './types';
+import { LoginStatus } from './types/LoginStatus';
 
 import './App.css';
 

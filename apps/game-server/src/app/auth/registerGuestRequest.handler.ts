@@ -4,10 +4,8 @@ import {
   RegisterGuestRequestBody,
   User,
   UserWithToken,
-  UserId,
 } from '@machikoro/game-server-contracts';
 import { RequestHandler } from 'express';
-import { ZodError } from 'zod';
 
 import { HTTPStatusCode } from '../types';
 
@@ -18,16 +16,15 @@ RegisterGuestRequestBody
 >;
 
 export type RegisterGuestRequestHandlerDependencies = {
-  getUser: (userId: UserId) => Promise<User | ZodError>;
-  createUser: ({ username, type }: Pick<User, 'username' | 'type'>) => Promise<UserWithToken>;
+  createUser: (user: Pick<User, 'username' | 'type'>) => Promise<UserWithToken>;
 };
 export const registerGuestRequestHandler = (
-  { createUser }: RegisterGuestRequestHandlerDependencies,
+  deps: RegisterGuestRequestHandlerDependencies,
 ): RegisterGuestRequestHandler => async (req, res, next) => {
   try {
     const { type, username } = req.body;
 
-    const user = await createUser({ username, type });
+    const user = await deps.createUser({ username, type });
 
     res.status(HTTPStatusCode.CREATED).send(user);
   } catch (error: unknown) {

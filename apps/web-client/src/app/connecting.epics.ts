@@ -1,4 +1,4 @@
-import { combineEpics } from 'redux-observable';
+import { AnyAction } from 'redux';
 import {
   filter,
   ignoreElements,
@@ -12,8 +12,7 @@ import { LoadingAction } from './loading';
 import { LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { RootAction } from './root.actions';
-import { RootState } from './root.state';
-import { TypedEpic } from './types';
+import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
 import { WebsocketAction } from './websocket';
 
 const showLoaderOnAuthorizeCommandEpic: TypedEpic<typeof LoadingAction.setIsLoadingDocument> = (actions$) => actions$.pipe(
@@ -111,7 +110,7 @@ export type ConnectingEpicsDependencies =
   & CleanUpAuthTokenOnAuthorizeRejectedEventEpicDependencies
   & SetAuthTokenOnRegisterGuestResolvedEventEpicDependencies;
 
-export const connectingEpics = (deps: ConnectingEpicsDependencies) => combineEpics<RootAction, RootAction, RootState, unknown>(
+export const connectingEpics = (deps: ConnectingEpicsDependencies) => typedCombineEpics<AnyAction>(
   showLoaderOnAuthorizeCommandEpic,
   hideLoaderOnAuthorizeResultEventEpic,
   cleanUpAuthTokenOnAuthorizeRejectedEventEpic(deps),

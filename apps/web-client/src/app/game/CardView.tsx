@@ -2,7 +2,7 @@ import { Establishment, Landmark } from '@machikoro/game-server-contracts';
 import clsx from 'clsx';
 import React, { useMemo } from 'react';
 
-import { UrlUtils } from '../utils';
+import { UrlUtils } from '../utils/url.utils';
 
 import './CardView.css';
 

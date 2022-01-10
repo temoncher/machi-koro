@@ -1,8 +1,13 @@
 import { Action, AnyAction } from 'redux';
-import { Epic } from 'redux-observable';
+import { combineEpics, Epic } from 'redux-observable';
+
+import { RootState } from '../root.state';
 
 export type TypedEpic<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Output extends (...args: any[]) => Action = () => AnyAction,
-State = unknown,
-> = Epic<AnyAction, ReturnType<Output>, State, unknown>;
+> = Epic<AnyAction, ReturnType<Output>, RootState, unknown>;
+
+export const typedCombineEpics = <O extends Action>(
+  ...epics: TypedEpic<() => O>[]
+) => combineEpics<AnyAction, O, RootState, unknown>(...epics);
