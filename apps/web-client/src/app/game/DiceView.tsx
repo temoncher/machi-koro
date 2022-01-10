@@ -2,7 +2,7 @@ import './DiceView.css';
 import clsx from 'clsx';
 import React, { useMemo } from 'react';
 
-import { Dice } from '../types';
+import { Dice } from '../types/Dice';
 
 type DiceViewProps = {
   className?: string;

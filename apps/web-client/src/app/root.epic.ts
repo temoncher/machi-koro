@@ -1,5 +1,3 @@
-import { combineEpics } from 'redux-observable';
-
 import {
   connectingEpics,
   ConnectingEpicsDependencies,
@@ -8,8 +6,7 @@ import { gameEpic, GameEpicDependencies } from './game';
 import { lobbyEpic, LobbyEpicDependencies } from './lobby';
 import { loginEpic, LoginEpicDependencies } from './login';
 import { navigationEpic } from './navigation.epics';
-import { RootAction } from './root.actions';
-import { RootState } from './root.state';
+import { typedCombineEpics } from './types/TypedEpic';
 import {
   lobbyWebsocketEpic,
   gameWebsocketEpic,
@@ -24,7 +21,7 @@ export type RootEpicDependencies =
   & ConnectingEpicsDependencies
   & WebsocketEpicDependencies;
 
-export const rootEpic = (deps: RootEpicDependencies) => combineEpics<RootAction, RootAction, RootState, unknown>(
+export const rootEpic = (deps: RootEpicDependencies) => typedCombineEpics(
   gameEpic(deps),
   lobbyEpic(deps),
   loginEpic(deps),

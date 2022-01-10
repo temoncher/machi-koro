@@ -1,7 +1,7 @@
 import { ClientSentActionTypes, ServerSentActionTypes } from '@machikoro/game-server-contracts';
 import { action, payload } from 'ts-action';
 
-import { WebsocketConnectionStatus } from '../types';
+import { WebsocketConnectionStatus } from '../types/WebsocketConnectionStatus';
 
 type ServerSentActionTypesUnion = ServerSentActionTypes[keyof ServerSentActionTypes];
 type ClientSentActionTypesUnion = ClientSentActionTypes[keyof ClientSentActionTypes];

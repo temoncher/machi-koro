@@ -1,12 +1,10 @@
 import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import { filter, map, withLatestFrom } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { GameAction } from '../game';
-import { RootState } from '../root.state';
-import { TypedEpic } from '../types';
-import { RxjsUtils } from '../utils';
+import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { RxjsUtils } from '../utils/rxjs.utils';
 
 import { WebsocketAction } from './websocket.actions';
 import { ofWsEventType } from './websocket.utils';
@@ -27,7 +25,7 @@ const setGameContextOnGameStateUpdatedEventEpic: TypedEpic<typeof GameAction.set
   map((event) => GameAction.setGameDocument(event.payload)),
 );
 
-const rollDiceEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootState> = (actions$, state$) => actions$.pipe(
+const rollDiceEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$, state$) => actions$.pipe(
   ofType(GameAction.rollDiceCommand),
   withLatestFrom(state$),
   // TODO: add error handling (if userId is undefined)?
@@ -39,7 +37,7 @@ const rollDiceEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootS
   })),
 );
 
-const passEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootState> = (actions$, state$) => actions$.pipe(
+const passEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$, state$) => actions$.pipe(
   ofType(GameAction.passCommand),
   withLatestFrom(state$),
   // TODO: add error handling (if userId is undefined)?
@@ -51,7 +49,7 @@ const passEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootState
   })),
 );
 
-const startGameEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootState> = (actions$, state$) => actions$.pipe(
+const startGameEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$, state$) => actions$.pipe(
   ofType(GameAction.startGameCommand),
   withLatestFrom(state$),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,7 +68,7 @@ const startGameEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, Root
   })),
 );
 
-const buildEstablishmentEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootState> = (actions$, state$) => actions$.pipe(
+const buildEstablishmentEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$, state$) => actions$.pipe(
   ofType(GameAction.buildEstablishmentCommand),
   toPayload(),
   withLatestFrom(state$),
@@ -86,7 +84,7 @@ const buildEstablishmentEpic: TypedEpic<typeof WebsocketAction.sendWsMessageComm
   })),
 );
 
-const buildLandmarkEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, RootState> = (actions$, state$) => actions$.pipe(
+const buildLandmarkEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$, state$) => actions$.pipe(
   ofType(GameAction.buildLandmarkCommand),
   toPayload(),
   withLatestFrom(state$),
@@ -102,7 +100,7 @@ const buildLandmarkEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand, 
   })),
 );
 
-export const gameWebsocketEpic = combineEpics<AnyAction, AnyAction, RootState, unknown>(
+export const gameWebsocketEpic = typedCombineEpics<AnyAction>(
   joinGameEpic,
   setGameContextOnGameStateUpdatedEventEpic,
   rollDiceEpic,

@@ -28,13 +28,13 @@ export type CreateGameRequestHandlerDependencies = {
 };
 
 export const createGameRequestHandler = (
-  { createGame, getLobby, dispatchGameCreatedEvent }: CreateGameRequestHandlerDependencies,
+  deps: CreateGameRequestHandlerDependencies,
 ): CreateGameRequestHandler => async (req, res, next) => {
   try {
     const currentUserId = res.locals.currentUser.userId;
     const { lobbyId } = req.body;
 
-    const lobbyOrError = await getLobby(lobbyId);
+    const lobbyOrError = await deps.getLobby(lobbyId);
 
     if (lobbyOrError instanceof Error) {
       // eslint-disable-next-line no-console
@@ -43,14 +43,14 @@ export const createGameRequestHandler = (
       return;
     }
 
-    const game = await createGame(currentUserId, lobbyOrError.users);
+    const game = await deps.createGame(currentUserId, lobbyOrError.users);
 
     const gamesResponse: CreateGameResponse = {
       gameId: game.gameId,
     };
 
     // TODO: make this call reactive (middleware?)
-    dispatchGameCreatedEvent({ lobbyId, gameId: game.gameId });
+    deps.dispatchGameCreatedEvent({ lobbyId, gameId: game.gameId });
     res.send(gamesResponse);
   } catch (error: unknown) {
     res

@@ -25,7 +25,9 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
           cardInfo={establishment}
           quantity={quantity}
           size="lg"
-          onClick={() => { props.onEstablishmentClick(establishmentId); }}
+          onClick={() => {
+            props.onEstablishmentClick(establishmentId);
+          }}
         />
       );
     })}

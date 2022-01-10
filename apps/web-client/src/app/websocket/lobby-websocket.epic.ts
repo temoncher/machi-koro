@@ -1,10 +1,9 @@
 import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import { map } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { LobbyAction } from '../lobby';
-import { TypedEpic } from '../types';
+import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { WebsocketAction } from './websocket.actions';
 import { ofWsEventType } from './websocket.utils';
@@ -56,7 +55,7 @@ const dispatchGameCreatedEventOnGameCreatedWsMessageEpic: TypedEpic<typeof Lobby
   map((event) => LobbyAction.gameCreatedEvent(event.payload)),
 );
 
-export const lobbyWebsocketEpic = combineEpics<AnyAction, AnyAction, unknown, unknown>(
+export const lobbyWebsocketEpic = typedCombineEpics<AnyAction>(
   joinLobbyEpic,
   setLobbyStateOnLobbyStateUpdatedEpic,
   leaveLobbyEpic,

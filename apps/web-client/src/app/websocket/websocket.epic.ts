@@ -1,5 +1,4 @@
 import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import {
   Subject,
   mergeMap,
@@ -10,7 +9,8 @@ import {
 import * as SocketIOClient from 'socket.io-client';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { TypedEpic, WebsocketConnectionStatus } from '../types';
+import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { WebsocketConnectionStatus } from '../types/WebsocketConnectionStatus';
 
 import { WebsocketAction } from './websocket.actions';
 
@@ -85,7 +85,7 @@ export type WebsocketEpicDependencies =
   & InitializeSocketEpicDependencies
   & SendWsMessageEpicDependencies;
 
-export const websocketEpic = (deps: WebsocketEpicDependencies) => combineEpics(
+export const websocketEpic = (deps: WebsocketEpicDependencies) => typedCombineEpics<WebsocketAction>(
   initializeSocketEpic(deps),
   sendWsMessageEpic(deps),
   setConnectionStatusOnInitializeSocketResolvedEvent,

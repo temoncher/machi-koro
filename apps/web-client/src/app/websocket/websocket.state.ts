@@ -1,4 +1,4 @@
-import { WebsocketConnectionStatus } from '../types';
+import { WebsocketConnectionStatus } from '../types/WebsocketConnectionStatus';
 
 export type WebsocketState = {
   status: WebsocketConnectionStatus;

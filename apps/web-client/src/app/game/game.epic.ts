@@ -1,6 +1,4 @@
 import { CreateGameRequestBody, CreateGameResponse } from '@machikoro/game-server-contracts';
-import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import {
   catchError,
   from,
@@ -10,7 +8,7 @@ import {
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { TypedEpic } from '../types';
+import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { GameAction } from './game.actions';
 
@@ -41,7 +39,7 @@ const joinGameOnGamePageEnteredEventEpic: TypedEpic<typeof GameAction.joinGameCo
 
 export type GameEpicDependencies = CreateGameEpicDependencies;
 
-export const gameEpic = (deps: GameEpicDependencies) => combineEpics<AnyAction, GameAction, unknown, unknown>(
+export const gameEpic = (deps: GameEpicDependencies) => typedCombineEpics<GameAction>(
   createGameEpic(deps),
   joinGameOnGamePageEnteredEventEpic,
 );

@@ -1,6 +1,5 @@
 import { LocationChangePayload, push } from 'connected-react-router';
 import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import {
   filter,
   map,
@@ -14,9 +13,8 @@ import { GameAction } from './game';
 import { LobbyAction } from './lobby';
 import { LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
-import { RootState } from './root.state';
-import { TypedEpic } from './types';
-import { RxjsUtils } from './utils';
+import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
+import { RxjsUtils } from './utils/rxjs.utils';
 
 const rootPathMatches = <R extends string>(pathToMatch: R) => <T>(source: Observable<LocationChangePayload<T>>) => source.pipe(
   filter((payload) => {
@@ -26,7 +24,7 @@ const rootPathMatches = <R extends string>(pathToMatch: R) => <T>(source: Observ
   }),
   map((payload) => payload as LocationChangePayload<T> & {
     location: {
-      pathname: `/${R}/${string}`;
+      pathname: `/${R}${string}`;
     };
   }),
 );
@@ -72,7 +70,7 @@ const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyA
   map(LobbyAction.enteredLobbyPageEvent),
 );
 
-const redirectToHomePageOnCurrentUserLeftLobbyEvent: TypedEpic<typeof push, RootState> = (actions$, state$) => actions$.pipe(
+const redirectToHomePageOnCurrentUserLeftLobbyEvent: TypedEpic<typeof push> = (actions$, state$) => actions$.pipe(
   ofType(LobbyAction.currentUserLeftLobbyEvent),
   toPayload(),
   withLatestFrom(state$),
@@ -101,7 +99,7 @@ const dispatchEnteredGamePageEventOnGamePageEnterEpic: TypedEpic<typeof GameActi
   map(GameAction.enteredGamePageEvent),
 );
 
-export const navigationEpic = combineEpics<AnyAction, AnyAction, RootState, unknown>(
+export const navigationEpic = typedCombineEpics<AnyAction>(
   redirectToHomePageOnRegisterGuestResolvedEventEpic,
   redirectToLoginPageOnAuthorizeRejectedEventEpic,
   redirectToLobbyPageOnCreateLobbyResolvedEventEpic,

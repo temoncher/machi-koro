@@ -1,6 +1,6 @@
 import { UserId } from '@machikoro/game-server-contracts';
 
-import { LoginStatus } from '../types';
+import { LoginStatus } from '../types/LoginStatus';
 
 export type LoginState = {
   username: string | undefined;

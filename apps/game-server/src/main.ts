@@ -19,6 +19,7 @@ import { UsersRepository } from './app/shared';
 
 const main = (): void => {
   const PORT = process.env.port || 3333;
+  const CLIENT_PORT = 4200;
   const hosts = process.env.DEVCONTAINER
     ? {
       REDIS: 'redis',
@@ -62,7 +63,7 @@ const main = (): void => {
   const staticFiles = express.static(path.join(__dirname, 'assets', 'static'));
 
   app.use(cors({
-    origin: `http://${hosts.MAIN}:4200`,
+    origin: `http://${hosts.MAIN}:${CLIENT_PORT}`,
     credentials: true,
     methods: [
       'GET',
@@ -85,7 +86,7 @@ const main = (): void => {
 
   const socketServerConfig = {
     cors: {
-      origin: `http://${hosts.MAIN}:4200`,
+      origin: `http://${hosts.MAIN}:${CLIENT_PORT}`,
       credentials: true,
       methods: [
         'GET',

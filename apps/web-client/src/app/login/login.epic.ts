@@ -1,6 +1,4 @@
 import { AuthMeResponse, RegisterGuestRequestBody, RegisterGuestResponse } from '@machikoro/game-server-contracts';
-import { AnyAction } from 'redux';
-import { combineEpics } from 'redux-observable';
 import {
   catchError,
   from,
@@ -10,7 +8,7 @@ import {
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { TypedEpic } from '../types';
+import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { LoginAction } from './login.actions';
 
@@ -55,7 +53,7 @@ export type LoginEpicDependencies =
   & AuthorizeEpicDependencies
   & RegisterGuestEpicDependencies;
 
-export const loginEpic = (deps: LoginEpicDependencies) => combineEpics<AnyAction, LoginAction, unknown, unknown>(
+export const loginEpic = (deps: LoginEpicDependencies) => typedCombineEpics<LoginAction>(
   authorizeEpic(deps),
   registerGuestEpic(deps),
 );

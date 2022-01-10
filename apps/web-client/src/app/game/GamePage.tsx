@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useTypedSelector } from '../hooks';
-import { DiceCombination } from '../types';
+import { DiceCombination } from '../types/Dice';
 
 import { DicePairView } from './DicePairView';
 import { EstablishmentsShopView } from './EstablishmentsShopView';
