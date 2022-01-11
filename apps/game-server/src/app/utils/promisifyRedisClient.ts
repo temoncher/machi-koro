@@ -5,6 +5,7 @@ import { RedisClient } from 'redis';
 export type PromisifiedRedisClient = {
   set: (key: string, value: string) => Promise<'OK'>;
   get: (key: string) => Promise<string | null>;
+  del: (key: string[]) => Promise<number>;
   hgetall: (key: string) => Promise<Record<string, string> | null>;
   hset: (keyAndHash: [string, ...string[]]) => Promise<number>;
   hmset: (keyAndHash: [string, ...string[]]) => Promise<'OK'>;
@@ -17,6 +18,7 @@ export type PromisifiedRedisClient = {
 export const promisifyRedisClient = (redisClient: RedisClient): PromisifiedRedisClient => ({
   set: promisify(redisClient.set.bind(redisClient)),
   get: promisify(redisClient.get.bind(redisClient)),
+  del: promisify(redisClient.del.bind(redisClient)),
   hgetall: promisify(redisClient.hgetall.bind(redisClient)),
   hset: promisify(redisClient.hset.bind(redisClient)),
   hmset: promisify(redisClient.hmset.bind(redisClient)),

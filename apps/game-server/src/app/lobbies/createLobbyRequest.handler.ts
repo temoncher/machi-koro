@@ -19,7 +19,7 @@ AuthMiddlewareLocals
 >;
 
 export type CreateLobbyRequestHandlerDependencies = {
-  createLobby: (hostId: UserId) => Promise<Error | Lobby & { lobbyId: LobbyId }>;
+  createLobby: (payload: { hostId: UserId; capacity: number }) => Promise<Error | Lobby & { lobbyId: LobbyId }>;
 };
 export const createLobbyRequestHandler = (
   { createLobby }: CreateLobbyRequestHandlerDependencies,
@@ -27,7 +27,11 @@ export const createLobbyRequestHandler = (
   try {
     const currentUserId = res.locals.currentUser.userId;
 
-    const lobbyOrError = await createLobby(currentUserId);
+    const lobbyOrError = await createLobby({
+      hostId: currentUserId,
+      // TODO: make configurable
+      capacity: 4,
+    });
 
     if (lobbyOrError instanceof Error) {
       res

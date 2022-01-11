@@ -3,6 +3,7 @@ import {
   GameId,
   LobbyId,
   PopulatedLobbyState,
+  User,
 } from '@machikoro/game-server-contracts';
 import { action, payload } from 'ts-action';
 
@@ -13,14 +14,18 @@ enum LobbyActionType {
   CREATE_LOBBY_RESOLVED_EVENT = '[EVENT] APP/LOBBY/CREATE_LOBBY/RESOLVED',
   CREATE_LOBBY_REJECTED_EVENT = '[EVENT] APP/LOBBY/CREATE_LOBBY/REJECTED',
   JOIN_LOBBY_COMMAND = '[COMMAND] APP/LOBBY/JOIN_LOBBY',
+  JOIN_LOBBY_RESOLVED_EVENT = '[EVENT] APP/LOBBY/JOIN_LOBBY/RESOLVED',
+  JOIN_LOBBY_REJECTED_EVENT = '[EVENT] APP/LOBBY/JOIN_LOBBY/REJECTED',
+  HOST_CHANGED_EVENT = '[EVENT] APP/LOBBY/HOST_CHANGED',
   SET_LOBBY_DOCUMENT = '[DOCUMENT] APP/LOBBY/SET_LOBBY',
   LEAVE_LOBBY_COMMAND = '[COMMAND] APP/LOBBY/LEAVE_LOBBY',
   CURRENT_USER_LEFT_LOBBY_EVENT = '[EVENT] APP/LOBBY/CURRENT_USER_LEFT_LOBBY',
   GAME_CREATED_EVENT = '[EVENT] APP/LOBBY/GAME_CREATED',
+  USER_JOINED_EVENT = '[EVENT] APP/LOBBY/USER_JOINED',
+  USER_LEFT_EVENT = '[EVENT] APP/LOBBY/USER_LEFT',
 }
 
 export namespace LobbyAction {
-
   export const enteredLobbyPageEvent = action(
     LobbyActionType.ENTERED_LOBBY_PAGE_EVENT,
     payload<LobbyId>(),
@@ -48,6 +53,21 @@ export namespace LobbyAction {
     payload<LobbyId>(),
   );
 
+  export const joinLobbyResolvedEvent = action(
+    LobbyActionType.JOIN_LOBBY_RESOLVED_EVENT,
+    payload<string>(),
+  );
+
+  export const joinLobbyRejectedEvent = action(
+    LobbyActionType.JOIN_LOBBY_REJECTED_EVENT,
+    payload<string>(),
+  );
+
+  export const hostChangedEvent = action(
+    LobbyActionType.HOST_CHANGED_EVENT,
+    payload<{ newHost: User; lobbyId: LobbyId }>(),
+  );
+
   export const setLobbyDocument = action(
     LobbyActionType.SET_LOBBY_DOCUMENT,
     payload<PopulatedLobbyState | undefined>(),
@@ -66,6 +86,16 @@ export namespace LobbyAction {
   export const gameCreatedEvent = action(
     LobbyActionType.GAME_CREATED_EVENT,
     payload<GameId>(),
+  );
+
+  export const userJoinedEvent = action(
+    LobbyActionType.USER_JOINED_EVENT,
+    payload<{ user: User; lobbyId: LobbyId }>(),
+  );
+
+  export const userLeftEvent = action(
+    LobbyActionType.USER_LEFT_EVENT,
+    payload<{ user: User; lobbyId: LobbyId }>(),
   );
 }
 

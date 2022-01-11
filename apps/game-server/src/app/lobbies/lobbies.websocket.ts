@@ -11,11 +11,14 @@ import { AuthMiddlewareLocals } from '../shared';
 import { AppSocket } from '../types';
 
 type LeaveLobbyDependencies = {
-  leaveLobbyAsUser: (userToDeleteId: UserId, lobbyId: LobbyId) => Promise<Error | Lobby>;
+  removeUserFromLobby: (userToDeleteId: UserId, lobbyId: LobbyId) => Promise<Error | Lobby>;
+  getUser: (userId: UserId) => Promise<User | ZodError>;
   getUsers: (users: UserId[]) => Promise<(User | ZodError)[]>;
+  setLobbyHostId: (lobbyId: LobbyId, newHostId: UserId) => Promise<Error | Lobby>;
+  deleteLobby: (lobbyId: LobbyId) => Promise<Error | Lobby>;
 };
 
-const leaveLobby = ({ leaveLobbyAsUser, getUsers }: LeaveLobbyDependencies) => (socket: AppSocket) => async (lobbyId: LobbyId) => {
+const leaveLobby = (deps: LeaveLobbyDependencies) => (socket: AppSocket) => async (lobbyId: LobbyId) => {
   try {
     // authSocketMiddleware checked and put currentUser object in socket.data
     const { currentUser: { userId, username, type } } = socket.data as AuthMiddlewareLocals;
@@ -26,7 +29,7 @@ const leaveLobby = ({ leaveLobbyAsUser, getUsers }: LeaveLobbyDependencies) => (
       type,
     };
 
-    const lobbyOrError = await leaveLobbyAsUser(
+    const lobbyOrError = await deps.removeUserFromLobby(
       userId,
       lobbyId,
     );
@@ -38,7 +41,42 @@ const leaveLobby = ({ leaveLobbyAsUser, getUsers }: LeaveLobbyDependencies) => (
       return;
     }
 
-    const usersOrErrors = await getUsers(lobbyOrError.users);
+    // TODO: can be done hooked to the user-left room event?
+    const setLobbyHostOrRemoveLobby = async () => {
+      if (userId === lobbyOrError.hostId) {
+        const newHostId = lobbyOrError.users[0];
+
+        if (newHostId) {
+          const [lobby, host] = await Promise.all([
+            deps.setLobbyHostId(lobbyId, newHostId),
+            deps.getUser(newHostId),
+          ]);
+
+          if (host instanceof ZodError) {
+            return host;
+          }
+
+          socket.in(lobbyId).emit('LOBBY_HOST_CHANGED', { newHost: host, lobbyId });
+
+          return lobby;
+        }
+
+        return deps.deleteLobby(lobbyId);
+      }
+
+      return lobbyOrError;
+    };
+
+    const updatedLobby = await setLobbyHostOrRemoveLobby();
+
+    if (updatedLobby instanceof Error) {
+      // eslint-disable-next-line no-console
+      console.error(updatedLobby.message);
+
+      return;
+    }
+
+    const usersOrErrors = await deps.getUsers(updatedLobby.users);
     const hasErrors = usersOrErrors.some((possibleUser) => possibleUser instanceof ZodError);
 
     if (hasErrors) {
@@ -52,18 +90,17 @@ const leaveLobby = ({ leaveLobbyAsUser, getUsers }: LeaveLobbyDependencies) => (
     // This type cast is safe, because we already checked that possibleUsers has no errors inside of it
     const users = usersOrErrors as User[];
 
-    const newLobbyState: PopulatedLobbyState = {
-      hostId: lobbyOrError.hostId,
+    const populatedLobbyState: PopulatedLobbyState = {
+      ...updatedLobby,
       users,
     };
 
-    // TODO: close lobby on host leave
     socket.nsp.to(lobbyId).emit('LOBBY_USER_LEFT', { user, lobbyId });
     // TODO: make these commands reactive with (room events)[https://socket.io/docs/v3/rooms/#room-events]
     socket.emit('LOBBY_LEFT_SUCCESSFULLY', lobbyId);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     socket.leave(lobbyId);
-    socket.nsp.to(lobbyId).emit('LOBBY_STATE_UPDATED', newLobbyState);
+    socket.nsp.to(lobbyId).emit('LOBBY_STATE_UPDATED', populatedLobbyState);
 
     // eslint-disable-next-line no-console
     console.log(`user(${username}:${userId}) left the lobby(${lobbyId})`);
@@ -76,23 +113,24 @@ const leaveLobby = ({ leaveLobbyAsUser, getUsers }: LeaveLobbyDependencies) => (
 };
 
 type JoinLobbyDependencies = {
-  joinLobbyAsUser: (userToDeleteId: UserId, lobbyId: LobbyId) => Promise<Error | Lobby>;
+  addUserToLobby: (userToDeleteId: UserId, lobbyId: LobbyId) => Promise<Error | Lobby>;
   getUsers: (users: UserId[]) => Promise<(User | ZodError)[]>;
 };
 
 const joinLobby = ({
-  joinLobbyAsUser,
+  addUserToLobby,
   getUsers,
 }: JoinLobbyDependencies) => (socket: AppSocket) => async (lobbyId: LobbyId) => {
   try {
     // authSocketMiddleware checked and put currentUser object in socket.data
     const { currentUser: { userId, type, username } } = socket.data as AuthMiddlewareLocals;
 
-    const lobbyOrError = await joinLobbyAsUser(userId, lobbyId);
+    const lobbyOrError = await addUserToLobby(userId, lobbyId);
 
     if (lobbyOrError instanceof Error) {
       // eslint-disable-next-line no-console
       console.error(lobbyOrError.message);
+      socket.emit('LOBBY_JOIN_ERROR', lobbyOrError.message);
 
       return;
     }
@@ -131,7 +169,7 @@ const joinLobby = ({
     // eslint-disable-next-line no-console
     console.log(`user(${username}:${userId}) joined the lobby(${lobbyId})`);
   } catch (error: unknown) {
-    socket.emit('LOBBY_JOIN_ERROR');
+    socket.emit('LOBBY_JOIN_ERROR', 'Server error');
     // eslint-disable-next-line no-console
     console.error('join lobby error: ', error);
   }

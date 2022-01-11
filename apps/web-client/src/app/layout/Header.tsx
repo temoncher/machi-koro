@@ -1,4 +1,5 @@
 import { Listbox, Transition } from '@headlessui/react';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import React, { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,9 +34,9 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   return (
     <div className={clsx('header', props.className)}>
       <div className="flex-1 min-w-0">
-        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        <Link className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate" to="/">
           {t('gameName')}
-        </h2>
+        </Link>
       </div>
       <div className="flex">
         <Listbox value={i18n.language} onChange={changeLanguage}>

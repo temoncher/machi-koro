@@ -8,10 +8,12 @@ import {
 import { LobbyId } from './lobby.contracts';
 import { User, UserId } from './user.model';
 
+type AnyFunction = (...args: any[]) => any;
+
 type GetActionTypes<M extends ClientSentEventsMap | ServerSentEventsMap> = {
   [T in keyof M]: {
     type: T;
-    payload: M[T] extends (...args: any[]) => any ? Parameters<M[T]>[0] : never;
+    payload: M[T] extends AnyFunction ? Parameters<M[T]>[0] : never;
   }
 };
 
@@ -20,7 +22,8 @@ export type ServerSentEventsMap = {
   // Lobby
   LOBBY_USER_JOINED: (payload: { user: User; lobbyId: LobbyId }) => void;
   LOBBY_JOINED_SUCCESSFULLY: (lobbyId: LobbyId) => void;
-  LOBBY_JOIN_ERROR: () => void;
+  LOBBY_HOST_CHANGED: (payload: { newHost: User; lobbyId: LobbyId }) => void;
+  LOBBY_JOIN_ERROR: (message: string) => void;
   LOBBY_USER_LEFT: (payload: { user: User; lobbyId: LobbyId }) => void;
   LOBBY_LEFT_SUCCESSFULLY: (lobbyId: LobbyId) => void;
   LOBBY_LEAVE_ERROR: () => void;
