@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import { match } from 'ts-pattern';
 
 import { GamePage } from './game';
@@ -11,6 +12,7 @@ import { LobbyPage } from './lobby';
 import { LoginPage, useLoginActions } from './login';
 import { LoginStatus } from './types/LoginStatus';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 export const App: React.FC = () => {
@@ -48,6 +50,7 @@ export const App: React.FC = () => {
     <div className="app">
       <Header />
       {renderRoutes()}
+      <ToastContainer position={toast.POSITION.BOTTOM_LEFT} />
     </div>
   );
 };

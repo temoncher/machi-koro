@@ -75,8 +75,10 @@ const main = (): void => {
   app.use('/static', staticFiles);
 
   const socketServerDependencies: SocketServerDependencies = {
-    leaveLobbyAsUser: lobbiesRepository.leaveUserFromLobby,
-    joinLobbyAsUser: lobbiesRepository.joinLobbyAsUser,
+    removeUserFromLobby: lobbiesRepository.removeUserFromLobby,
+    addUserToLobby: lobbiesRepository.addUserToLobby,
+    setLobbyHostId: lobbiesRepository.setLobbyHostId,
+    deleteLobby: lobbiesRepository.deleteLobby,
     getUsers: usersRepository.getUsers,
     getUser: usersRepository.getUser,
     getGame: gamesRepository.getGame,

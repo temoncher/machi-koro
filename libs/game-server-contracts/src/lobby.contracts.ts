@@ -13,4 +13,5 @@ export type CreateLobbyRequestBody = {
 export type Lobby = {
   hostId: UserId;
   users: UserId[];
+  capacity: number;
 };

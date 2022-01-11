@@ -17,6 +17,33 @@ const joinLobbyEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (a
   })),
 );
 
+const mapJoinLobbyResolvedEventWsMessageEpic: TypedEpic<typeof LobbyAction.joinLobbyResolvedEvent> = (
+  actions$,
+) => actions$.pipe(
+  ofType(WebsocketAction.wsMessageReceivedEvent),
+  toPayload(),
+  ofWsEventType('LOBBY_JOINED_SUCCESSFULLY'),
+  map((event) => LobbyAction.joinLobbyResolvedEvent(event.payload)),
+);
+
+const mapJoinLobbyRejectedEventWsMessageEpic: TypedEpic<typeof LobbyAction.joinLobbyRejectedEvent> = (
+  actions$,
+) => actions$.pipe(
+  ofType(WebsocketAction.wsMessageReceivedEvent),
+  toPayload(),
+  ofWsEventType('LOBBY_JOIN_ERROR'),
+  map((event) => LobbyAction.joinLobbyRejectedEvent(event.payload)),
+);
+
+const mapHostChangedEventWsMessageEpic: TypedEpic<typeof LobbyAction.hostChangedEvent> = (
+  actions$,
+) => actions$.pipe(
+  ofType(WebsocketAction.wsMessageReceivedEvent),
+  toPayload(),
+  ofWsEventType('LOBBY_HOST_CHANGED'),
+  map((event) => LobbyAction.hostChangedEvent(event.payload)),
+);
+
 const setLobbyStateOnLobbyStateUpdatedEpic: TypedEpic<typeof LobbyAction.setLobbyDocument> = (actions$) => actions$.pipe(
   ofType(WebsocketAction.wsMessageReceivedEvent),
   toPayload(),
@@ -33,32 +60,51 @@ const leaveLobbyEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (
   })),
 );
 
-const dispatchCurrentUserLeftLobbyEventOnLobbyLeftSuccessfullyEventEpic: TypedEpic<typeof LobbyAction.currentUserLeftLobbyEvent> = (
+const mapCurrentUserLeftLobbyEventWsMessageEpic: TypedEpic<typeof LobbyAction.currentUserLeftLobbyEvent> = (
   actions$,
 ) => actions$.pipe(
   ofType(WebsocketAction.wsMessageReceivedEvent),
   toPayload(),
   ofWsEventType('LOBBY_LEFT_SUCCESSFULLY'),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   map((event) => LobbyAction.currentUserLeftLobbyEvent(event.payload)),
 );
 
-const dispatchGameCreatedEventOnGameCreatedWsMessageEpic: TypedEpic<typeof LobbyAction.gameCreatedEvent> = (
+const mapGameCreatedEventWsMessageEpic: TypedEpic<typeof LobbyAction.gameCreatedEvent> = (
   actions$,
 ) => actions$.pipe(
   ofType(WebsocketAction.wsMessageReceivedEvent),
   toPayload(),
   ofWsEventType('LOBBY_GAME_CREATED'),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   map((event) => LobbyAction.gameCreatedEvent(event.payload)),
+);
+
+const mapUserJoinedEventWsMessageEpic: TypedEpic<typeof LobbyAction.userJoinedEvent> = (
+  actions$,
+) => actions$.pipe(
+  ofType(WebsocketAction.wsMessageReceivedEvent),
+  toPayload(),
+  ofWsEventType('LOBBY_USER_JOINED'),
+  map((event) => LobbyAction.userJoinedEvent(event.payload)),
+);
+
+const mapUserLeftEventWsMessageEpic: TypedEpic<typeof LobbyAction.userLeftEvent> = (
+  actions$,
+) => actions$.pipe(
+  ofType(WebsocketAction.wsMessageReceivedEvent),
+  toPayload(),
+  ofWsEventType('LOBBY_USER_LEFT'),
+  map((event) => LobbyAction.userLeftEvent(event.payload)),
 );
 
 export const lobbyWebsocketEpic = typedCombineEpics<AnyAction>(
   joinLobbyEpic,
+  mapJoinLobbyResolvedEventWsMessageEpic,
+  mapJoinLobbyRejectedEventWsMessageEpic,
+  mapHostChangedEventWsMessageEpic,
   setLobbyStateOnLobbyStateUpdatedEpic,
   leaveLobbyEpic,
-  dispatchCurrentUserLeftLobbyEventOnLobbyLeftSuccessfullyEventEpic,
-  dispatchGameCreatedEventOnGameCreatedWsMessageEpic,
+  mapCurrentUserLeftLobbyEventWsMessageEpic,
+  mapGameCreatedEventWsMessageEpic,
+  mapUserJoinedEventWsMessageEpic,
+  mapUserLeftEventWsMessageEpic,
 );

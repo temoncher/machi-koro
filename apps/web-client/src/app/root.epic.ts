@@ -6,6 +6,7 @@ import { gameEpic, GameEpicDependencies } from './game';
 import { lobbyEpic, LobbyEpicDependencies } from './lobby';
 import { loginEpic, LoginEpicDependencies } from './login';
 import { navigationEpic } from './navigation.epics';
+import { notificationsEpic } from './notifications.epic';
 import { typedCombineEpics } from './types/TypedEpic';
 import {
   lobbyWebsocketEpic,
@@ -27,6 +28,7 @@ export const rootEpic = (deps: RootEpicDependencies) => typedCombineEpics(
   loginEpic(deps),
   connectingEpics(deps),
   navigationEpic,
+  notificationsEpic,
   websocketEpic(deps),
   gameWebsocketEpic,
   lobbyWebsocketEpic,
