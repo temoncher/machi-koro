@@ -1,15 +1,13 @@
-import { action, payload } from 'ts-action';
+import { payload } from 'ts-action';
 
-enum LoadingActionType {
-  SET_IS_LOADING_DOCUMENT = '[DOCUMENT] APP/LOADING/SET_IS_LOADING',
-}
+import { createActionsNamespace, GetNamespaceActionType } from '../utils/createActionsNamespace';
 
-export namespace LoadingAction {
-  export const setIsLoadingDocument = action(
-    LoadingActionType.SET_IS_LOADING_DOCUMENT,
-    payload<boolean>(),
-  );
-}
+const loadingActionTypeToPayloadMap = {
+  /* eslint-disable @typescript-eslint/naming-convention */
+  '[DOCUMENT] APP/LOADING/SET_IS_LOADING': payload<boolean>(),
+  /* eslint-enable @typescript-eslint/naming-convention */
+};
 
+export const LoadingAction = createActionsNamespace(loadingActionTypeToPayloadMap);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export type LoadingAction = ReturnType<typeof LoadingAction.setIsLoadingDocument>;
+export type LoadingAction = GetNamespaceActionType<typeof LoadingAction>;
