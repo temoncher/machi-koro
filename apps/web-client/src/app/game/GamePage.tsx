@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTypedSelector } from '../hooks';
 import { DiceCombination } from '../types/Dice';
 
-import { DiceCombinationView } from './DiceСombinationView';
+import { DiceCombinationView } from './components/DiceCombinationView';
 import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
 import { useGameActions } from './useGameActions';

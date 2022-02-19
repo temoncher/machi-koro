@@ -9,9 +9,9 @@ import {
 import { Box, Typography, SxProps } from '@mui/material';
 import React from 'react';
 
-import { CommonEstablishmentView } from './CardView';
-import { CoinView } from './CoinView';
-import { MinimizedLandmarkView } from './MinimizedCardView';
+import { CoinView } from './components/CoinView';
+import { CommonEstablishmentView } from './components/CommonEstablishmentView';
+import { MinimizedLandmarkView } from './components/MinimizedLandmarkView';
 
 type PlayerViewHeaderProps = {
   sx?: SxProps;

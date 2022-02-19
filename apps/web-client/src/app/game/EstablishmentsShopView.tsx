@@ -2,7 +2,7 @@ import { Establishment, EstablishmentId } from '@machikoro/game-server-contracts
 import { Box, SxProps } from '@mui/material';
 import React from 'react';
 
-import { CommonEstablishmentView } from './CardView';
+import { CommonEstablishmentView } from './components/CommonEstablishmentView';
 
 type EstablishmentsShopViewProps = {
   sx?: SxProps;

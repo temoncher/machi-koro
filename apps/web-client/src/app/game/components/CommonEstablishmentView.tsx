@@ -1,14 +1,11 @@
-import { Establishment, Landmark } from '@machikoro/game-server-contracts';
+import { Establishment } from '@machikoro/game-server-contracts';
 import { Box, SxProps, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { UrlUtils } from '../utils/url.utils';
+import { UrlUtils } from '../../utils/url.utils';
 
 import { CoinView } from './CoinView';
-import { UnderConstructionBackdrop } from './UnderConstructionBackdrop';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
-
-type CardInfo = Landmark | Establishment;
 
 type CardIconViewProps = {
   sx?: SxProps;
@@ -64,33 +61,18 @@ const CardNameWithEmblem: React.FC<CardNameWithTagProps> = (props) => (
   </Typography>
 );
 
-const getCommonProps = (cardInfo: CardInfo) => (
-  cardInfo.domain === 'landmark' ? {
-    ...cardInfo,
-    tag: undefined,
-    activation: undefined,
-    quantity: undefined,
-    establishmentId: undefined,
-  }
-    : {
-      ...cardInfo,
-      landmarkId: undefined,
-    });
-
 const maxTitleLength = 16;
 const maxDescritionLength = 45;
 
-type CardViewProps = {
+type CommonEstablishmentViewProps = {
   sx?: SxProps;
   className?: string;
-  cardInfo: CardInfo;
+  cardInfo: Establishment;
   quantity?: number;
-  underConstruction?: boolean;
   onClick?: () => void;
 };
 
-// eslint-disable-next-line complexity
-const CardView: React.FC<CardViewProps> = (props) => {
+export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => {
   const {
     activation,
     name,
@@ -99,9 +81,9 @@ const CardView: React.FC<CardViewProps> = (props) => {
     cost,
     descriptionText,
     domain,
-  } = getCommonProps(props.cardInfo);
+  } = props.cardInfo;
 
-  const activationDiceRange = useMemo((): string => (activation ? activation.join('-') : ''), [activation]);
+  const activationDiceRange = useMemo((): string => activation.join('-'), [activation]);
   const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
 
   return (
@@ -123,39 +105,32 @@ const CardView: React.FC<CardViewProps> = (props) => {
       onKeyDown={props.onClick}
     >
       <Box
-        sx={[
-          {
-            p: 1,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            backgroundSize: 'cover',
-            borderRadius: 2,
-            bgcolor: (theme) => theme.palette[cardColor].light,
-          },
-          !!props.underConstruction && {
-            filter: 'grayscale(100%)',
-          },
-        ]}
+        sx={{
+          p: 1.5,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          backgroundSize: 'cover',
+          borderRadius: 2,
+          bgcolor: (theme) => theme.palette[cardColor].light,
+        }}
         style={{ backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}` }}
       >
-        {domain !== 'landmark' && (
-          <Box sx={{ position: 'relative ' }}>
-            {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
-            <Typography
-              pb={3}
-              fontFamily="lithos"
-              textAlign="center"
-              fontSize={24}
-              lineHeight={0.8}
-              color={(theme) => theme.palette.common.white}
-            >
-              {activationDiceRange}
-            </Typography>
-          </Box>
-        )}
+        <Box sx={{ position: 'relative ' }}>
+          {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
+          <Typography
+            pb={3}
+            fontFamily="lithos"
+            textAlign="center"
+            fontSize={24}
+            lineHeight={0.8}
+            color={(theme) => theme.palette.common.white}
+          >
+            {activationDiceRange}
+          </Typography>
+        </Box>
 
         <Box
           sx={{
@@ -229,48 +204,6 @@ const CardView: React.FC<CardViewProps> = (props) => {
           )}
         </Box>
       </Box>
-
-      {props.underConstruction && (<UnderConstructionBackdrop />)}
     </Box>
   );
 };
-
-type LandmarkViewProps = Omit<CardViewProps, 'cardInfo'> & {
-  /* eslint-disable react/no-unused-prop-types */
-  cardInfo: Landmark;
-  underConstruction: boolean;
-  onClick?: () => void;
-  /* eslint-enable react/no-unused-prop-types */
-};
-
-export const LandmarkView: React.FC<LandmarkViewProps> = (props) => (
-  <CardView
-    /* eslint-disable react/destructuring-assignment */
-    sx={props.sx}
-    className={props.className}
-    cardInfo={props.cardInfo}
-    underConstruction={props.underConstruction}
-    onClick={props.onClick}
-    /*  eslint-enable react/destructuring-assignment */
-  />
-);
-
-type CommonEstablishmentViewProps = Omit<CardViewProps, 'cardInfo'> & {
-  /* eslint-disable react/no-unused-prop-types */
-  cardInfo: Establishment;
-  quantity: number;
-  onClick?: () => void;
-  /* eslint-enable react/no-unused-prop-types */
-};
-
-export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => (
-  <CardView
-    /* eslint-disable react/destructuring-assignment */
-    sx={props.sx}
-    className={props.className}
-    cardInfo={props.cardInfo}
-    quantity={props.quantity}
-    onClick={props.onClick}
-    /*  eslint-enable react/destructuring-assignment */
-  />
-);

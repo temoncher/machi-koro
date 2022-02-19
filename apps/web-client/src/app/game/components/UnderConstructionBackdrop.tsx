@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { UrlUtils } from '../utils/url.utils';
+import { UrlUtils } from '../../utils/url.utils';
 
 export const UnderConstructionBackdrop: React.FC = () => (
   <Box

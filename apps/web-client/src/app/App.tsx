@@ -1,5 +1,9 @@
-import { Box, CircularProgress, CssBaseline } from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
+import {
+  Box,
+  CircularProgress,
+  CssBaseline,
+  ThemeProvider,
+} from '@mui/material';
 import React, { useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
