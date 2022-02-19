@@ -1,7 +1,7 @@
 import { Box, SxProps } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { DiceCombination, Dice } from '../types/Dice';
+import { DiceCombination, Dice } from '../../types/Dice';
 
 import './DiceCombinationView.css';
 
@@ -25,16 +25,21 @@ const DiceView: React.FC<DiceViewProps> = ({ rolledDice }) => {
 
   return (
     <Box
-      sx={{
-        width: 64,
-        height: 64,
-        position: 'relative',
-        borderWidth: 4,
-        borderRadius: 4,
-        borderStyle: 'solid',
-        borderColor: (theme) => theme.palette.grey[400],
-        bgcolor: (theme) => theme.palette.common.white,
-      }}
+      sx={[
+        {
+          width: 64,
+          height: 64,
+          position: 'relative',
+          borderWidth: 4,
+          borderRadius: 4,
+          borderStyle: 'solid',
+          borderColor: (theme) => theme.palette.grey[400],
+          bgcolor: (theme) => theme.palette.common.white,
+        },
+        !rolledDice && {
+          opacity: 0.7,
+        },
+      ]}
       className={diceClass}
     >
       {rolledDice && Array(rolledDice)
@@ -69,7 +74,7 @@ export const DiceCombinationView: React.FC<DicePairViewProps> = (props) => {
     <Box
       sx={{
         p: 2,
-        '> :not(:first-child)': {
+        '> :not(div:first-of-type)': {
           mt: 2,
         },
         ...props.sx,

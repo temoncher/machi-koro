@@ -6,16 +6,30 @@
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:import/react", "airbnb/hooks"],
       "parserOptions": {
-        "project": "apps/web-client/tsconfig.app.json"
+        "project": [
+          "apps/web-client/tsconfig.app.json",
+          "apps/web-client/.storybook/tsconfig.json"
+        ]
       },
       "rules": {}
     },
     {
       "files": ["*.spec.ts", "*.spec.tsx"],
       "parserOptions": {
-        "project": "apps/web-client/tsconfig.spec.json"
+        "project": [
+          "apps/web-client/tsconfig.spec.json",
+          "apps/web-client/.storybook/tsconfig.json"
+        ]
       },
       "rules": {}
+    },
+    {
+      "files": ["*.stories.ts", "*.stories.tsx"],
+      "parserOptions": {},
+      "rules": {
+        "react/jsx-props-no-spreading": 0,
+        "import/no-extraneous-dependencies": 0
+      }
     }
   ]
 }
