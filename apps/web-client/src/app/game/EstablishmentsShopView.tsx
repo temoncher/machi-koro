@@ -1,19 +1,30 @@
-import './EstablishmentsShopView.css';
 import { Establishment, EstablishmentId } from '@machikoro/game-server-contracts';
-import clsx from 'clsx';
+import { Box, SxProps } from '@mui/material';
 import React from 'react';
 
 import { CommonEstablishmentView } from './CardView';
 
 type EstablishmentsShopViewProps = {
-  className?: string;
+  sx?: SxProps;
   establishments: Record<EstablishmentId, Establishment>;
   shop: Record<EstablishmentId, number>;
   onEstablishmentClick: (establishmentId: EstablishmentId) => void;
 };
 
 export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (props) => (
-  <div className={clsx('activation-cards', props.className)}>
+  <Box
+    sx={{
+      p: 2,
+      minWidth: 240,
+      display: 'flex',
+      borderRadius: 2,
+      bgcolor: (theme) => theme.palette.primary.light,
+      '> *': {
+        mr: 2,
+      },
+      ...props.sx,
+    }}
+  >
     {Object.entries(props.shop).map(([establishmentId, quantity]) => {
       const establishment = props.establishments[establishmentId];
 
@@ -24,12 +35,11 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
           key={establishment.name}
           cardInfo={establishment}
           quantity={quantity}
-          size="lg"
           onClick={() => {
             props.onEstablishmentClick(establishmentId);
           }}
         />
       );
     })}
-  </div>
+  </Box>
 );

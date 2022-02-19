@@ -6,14 +6,12 @@ import { RouterState } from 'connected-react-router';
  * It has something to do with cyclic dependencies
  */
 import { GameState } from './game/game.state';
-import { LoadingState } from './loading/loading.state';
 import { LobbyState } from './lobby/lobby.state';
 import { LoginState } from './login/login.state';
 import { WebsocketState } from './websocket/websocket.state';
 
 export type RootState = {
   loginReducer: LoginState;
-  loadingReducer: LoadingState;
   lobbyReducer: LobbyState;
   gameReducer: GameState;
   websocketReducer: WebsocketState;

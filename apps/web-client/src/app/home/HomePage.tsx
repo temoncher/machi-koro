@@ -1,29 +1,43 @@
+import {
+  Box,
+  Button,
+  SxProps,
+  Typography,
+} from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useTypedSelector } from '../hooks';
 import { useLobbyActions } from '../lobby';
 
-import './HomePage.css';
+type HomePageProps = {
+  sx?: SxProps;
+};
 
-export const HomePage: React.FC = () => {
+export const HomePage: React.FC<HomePageProps> = (props) => {
   const { createLobbyCommand } = useLobbyActions();
   const { username } = useTypedSelector((state) => state.loginReducer);
   const { isCreateLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
   const { t } = useTranslation();
 
   return (
-    <div className="home-container">
-      <h2 className="text-2xl">{t('home.greeting', { username })}</h2>
-      <p className="p-4 text-center">{t('home.welcomeText')}</p>
-      <button
-        className="new-lobby-button"
-        disabled={isCreateLobbyLoading}
-        type="button"
-        onClick={createLobbyCommand}
-      >
-        {t('home.createNewLobbyButtonText')}
-      </button>
-    </div>
+    <Box
+      component="main"
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...props.sx,
+      }}
+    >
+      <Box sx={{ maxWidth: 800, display: 'flex', flexDirection: 'column' }}>
+        {/* TODO: make only username bold */}
+        <Typography variant="h4">{t('home.greeting', { username })}</Typography>
+        <Typography sx={{ py: 2 }}>{t('home.welcomeText')}</Typography>
+        <Button variant="contained" disabled={isCreateLobbyLoading} onClick={createLobbyCommand}>
+          {t('home.createNewLobbyButtonText')}
+        </Button>
+      </Box>
+    </Box>
   );
 };

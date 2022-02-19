@@ -1,24 +1,29 @@
 import { GameContext } from '@machikoro/game-server-contracts';
-import clsx from 'clsx';
+import { Box, Button, SxProps } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useTypedSelector } from '../hooks';
 import { DiceCombination } from '../types/Dice';
 
-import { DicePairView } from './DicePairView';
+import { DiceCombinationView } from './DiceСombinationView';
 import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
 import { useGameActions } from './useGameActions';
 
-import './GamePage.css';
-
-type GamePageProps = {
-  className?: string;
-};
-
 const mockGameContext: GameContext = {
   gameEstablishments: {
+    wheatField: {
+      establishmentId: 'wheatField',
+      domain: 'industry',
+      tag: 'wheat',
+      name: 'Wheat field',
+      cost: 1,
+      activation: [1],
+      tagSrc: 'http://localhost:3333/static/icons/wheat.png',
+      imageSrc: 'http://localhost:3333/static/establishment-images/flower-garden.png',
+      descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
+    },
     bakery: {
       establishmentId: 'bakery',
       domain: 'shopsFactoriesAndMarket',
@@ -30,9 +35,34 @@ const mockGameContext: GameContext = {
       descriptionText: 'Get 1 coin from the bank on you turn only.',
       cost: 1,
     },
+    livestockFarm: {
+      establishmentId: 'livestockFarm',
+      domain: 'industry',
+      tag: 'livestock',
+      name: 'Livestock Farm',
+      cost: 1,
+      activation: [2],
+      tagSrc: 'http://localhost:3333/static/icons/cow.png',
+      imageSrc: 'http://localhost:3333/static/establishment-images/ranch.png',
+      descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
+    },
+    cafe: {
+      establishmentId: 'cafe',
+      domain: 'restaurant',
+      tag: 'cup',
+      name: 'Cafe',
+      cost: 2,
+      activation: [3],
+      tagSrc: 'http://localhost:3333/static/icons/cup.png',
+      imageSrc: 'http://localhost:3333/static/establishment-images/cafe.png',
+      descriptionText: 'Receive 1 coin from any player who rolls this number.',
+    },
   },
   shop: {
-    bakery: 1,
+    bakery: 10,
+    wheat: 13,
+    livestockFarm: 5,
+    cafe: 2,
   },
   activePlayerId: 'firstPlayer',
   players: [
@@ -121,6 +151,10 @@ const mockGameContext: GameContext = {
 
 const mockRolledDiceCombination: DiceCombination = [3, undefined];
 
+type GamePageProps = {
+  sx?: SxProps;
+};
+
 export const GamePage: React.FC<GamePageProps> = (props) => {
   const { t } = useTranslation();
   const game = useTypedSelector((state) => state.gameReducer.game);
@@ -134,17 +168,59 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
   } = useGameActions();
 
   return (
-    <main className={clsx('game-page', props.className)}>
-      <section className="game-page__game-view">
-        <EstablishmentsShopView
-          className="game-page__activation-cards"
-          establishments={mockGameContext.gameEstablishments}
-          shop={mockGameContext.shop}
-          onEstablishmentClick={buildEstablishmentCommand}
-        />
-        <DicePairView className="game-page__dice-container" rolledDiceCombination={mockRolledDiceCombination} />
+    <Box
+      component="main"
+      sx={{
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: (theme) => theme.palette.grey[100],
+        ...props.sx,
+      }}
+    >
+      <Box
+        component="section"
+        sx={{
+          pb: 2,
+          display: 'flex',
+          flexGrow: 1,
+          overflowY: 'auto',
+          '&::-webkit-scrollbar': {
+            width: 0,
+            height: 8,
+            cursor: 'pointer',
+          },
+          '&::-webkit-scrollbar-track': {
+            borderRadius: 2,
+            bgcolor: (theme) => theme.palette.primary.dark,
+          },
+          '&::-webkit-scrollbar-thumb': {
+            borderRadius: 2,
+            bgcolor: (theme) => theme.palette.primary.main,
+          },
+        }}
+      >
+        <Box
+          sx={{
+            mr: 2,
+            p: 2,
+            display: 'flex',
+            flexGrow: 1,
+            borderRadius: 2,
+            bgcolor: (theme) => theme.palette.primary.main,
+          }}
+        >
+          <EstablishmentsShopView
+            sx={{ flexGrow: 1 }}
+            establishments={mockGameContext.gameEstablishments}
+            shop={mockGameContext.shop}
+            onEstablishmentClick={buildEstablishmentCommand}
+          />
+          <DiceCombinationView sx={{ flexGrow: 0 }} rolledDiceCombination={mockRolledDiceCombination} />
+        </Box>
+
         <PlayersView
-          className="game-page__players"
+          sx={{ flexGrow: 0 }}
           coinsMap={mockGameContext.coins}
           establishmentsMap={mockGameContext.establishments}
           gameEstablishments={mockGameContext.gameEstablishments}
@@ -160,13 +236,25 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
           statusesMap={game?.usersStatusesMap ?? {}}
           onLandmarkClick={buildLandmarkCommand}
         />
-      </section>
-      <section className="game-page__game-control">
-        <button className="game-page__button" type="button" onClick={startGameCommand}>{t('game.startGameButtonText')}</button>
-        <button className="game-page__button" type="button" onClick={rollDiceCommand}>{t('game.rollDiceButtonText')}</button>
-        <button className="game-page__button" type="button" onClick={passCommand}>{t('game.passButtonText')}</button>
-        <button className="game-page__button" type="button">{t('game.finishTurnButtonText')}</button>
-      </section>
-    </main>
+      </Box>
+
+      <Box
+        component="section"
+        sx={{
+          flexGrow: 0,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          '> :not(:last-child)': {
+            mr: 2,
+          },
+        }}
+      >
+        <Button variant="contained" onClick={startGameCommand}>{t('game.startGameButtonText')}</Button>
+        <Button variant="contained" onClick={rollDiceCommand}>{t('game.rollDiceButtonText')}</Button>
+        <Button variant="contained" onClick={passCommand}>{t('game.passButtonText')}</Button>
+        <Button variant="contained">{t('game.finishTurnButtonText')}</Button>
+      </Box>
+    </Box>
   );
 };

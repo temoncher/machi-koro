@@ -26,7 +26,7 @@ declare global {
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 type InitStoreDependencies = {
-  history: History<unknown>;
+  history: History;
   httpClient: AxiosInstance;
   socket: SocketIOClient.Socket;
   storage: Storage;

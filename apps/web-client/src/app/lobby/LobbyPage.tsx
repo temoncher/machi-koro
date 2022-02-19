@@ -1,3 +1,9 @@
+import {
+  Button,
+  Box,
+  Typography,
+  SxProps,
+} from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,9 +14,11 @@ import { UrlUtils } from '../utils/url.utils';
 import { UserCard } from './UserCard';
 import { useLobbyActions } from './useLobbyActions';
 
-import './LobbyPage.css';
+type LobbyPageProps = {
+  sx?: SxProps;
+};
 
-export const LobbyPage: React.FC = () => {
+export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
   const { userId } = useTypedSelector((state) => state.loginReducer);
   const lobby = useTypedSelector((state) => state.lobbyReducer.lobby);
   const { t } = useTranslation();
@@ -42,37 +50,37 @@ export const LobbyPage: React.FC = () => {
   };
 
   return (
-    <div className="lobby-container">
-      <section className="lobby-players-list">
-        <div className="lobby-players-list__header">
-          {t('lobby.playersSectionTitle')}
-        </div>
-        <div className="lobby-players-list__container">
-          {lobby?.users.map((user) => (
-            <UserCard
-              key={user.userId}
-              isHighlighted={user.userId === userId}
-              user={user}
-            />
-          ))}
-        </div>
-      </section>
-      <section className="lobby-buttons-container">
-        <button
-          className="lobby-buttons-container__button"
-          type="submit"
-          onClick={createGame}
-        >
-          {t('lobby.startNewGameButtonText')}
-        </button>
-        <button
-          className="lobby-buttons-container__button"
-          type="submit"
-          onClick={requestToLeaveLobby}
-        >
-          {t('lobby.leaveLobbyButtonText')}
-        </button>
-      </section>
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...props.sx,
+      }}
+    >
+      <Box component="section">
+        <Box>
+          <Typography sx={{ mb: 2 }} variant="h6">{t('lobby.playersSectionTitle')}</Typography>
+          <Box>
+            {lobby?.users.map((user) => (
+              <UserCard
+                key={user.userId}
+                highlighted={user.userId === userId}
+                user={user}
+              />
+            ))}
+          </Box>
+        </Box>
+
+        <Box sx={{ py: 2, '> :not(:last-child).MuiButton-root': { mr: 2 } }}>
+          <Button type="submit" variant="contained" onClick={createGame}>
+            {t('lobby.startNewGameButtonText')}
+          </Button>
+          <Button variant="contained" onClick={requestToLeaveLobby}>
+            {t('lobby.leaveLobbyButtonText')}
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 };

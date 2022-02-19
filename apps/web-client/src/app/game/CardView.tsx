@@ -1,54 +1,68 @@
 import { Establishment, Landmark } from '@machikoro/game-server-contracts';
-import clsx from 'clsx';
+import { Box, SxProps, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { UrlUtils } from '../utils/url.utils';
 
-import './CardView.css';
-
-type CardSize = 'base' | 'lg' | 'sm' | 'xs';
+import { CoinView } from './CoinView';
+import { UnderConstructionBackdrop } from './UnderConstructionBackdrop';
+import { cardTypeToColorMap } from './cardTypeToColorMap';
 
 type CardInfo = Landmark | Establishment;
 
-type CardViewProps = {
-  className?: string;
-  cardInfo: CardInfo;
-  size?: CardSize;
-  quantity?: number;
-  underConstruction?: boolean;
-  onClick?: () => void;
+type CardIconViewProps = {
+  sx?: SxProps;
 };
 
-type LandmarkViewProps = Omit<CardViewProps, 'cardInfo'> & {
-  /* eslint-disable react/no-unused-prop-types */
-  cardInfo: Landmark;
-  underConstruction: boolean;
-  onClick?: () => void;
-  /* eslint-enable react/no-unused-prop-types */
+const CardIconView: React.FC<CardIconViewProps> = (props) => (
+  <Box
+    sx={{
+      width: 24,
+      height: 32,
+      textAlign: 'center',
+      borderWidth: 4,
+      borderRadius: 1,
+      borderStyle: 'solid',
+      borderColor: (theme) => theme.palette.grey[400],
+      bgcolor: (theme) => theme.palette.grey[200],
+      ...props.sx,
+    }}
+  >
+    {props.children}
+  </Box>
+);
+
+type CardNameWithTagProps = {
+  sx?: SxProps;
+  color: typeof cardTypeToColorMap[keyof typeof cardTypeToColorMap];
+  tagSrc: string;
 };
 
-type EstablishmentViewProps = Omit<CardViewProps, 'cardInfo'> & {
-  /* eslint-disable react/no-unused-prop-types */
-  cardInfo: Establishment;
-  quantity: number;
-  onClick?: () => void;
-  /* eslint-enable react/no-unused-prop-types */
-};
-
-const cardSizeToScaleMap = {
-  xs: 0.25,
-  base: 0.6,
-  sm: 0.5,
-  lg: 1,
-} as const;
-
-const cardTypeToColorMap = {
-  majorEstablishment: 'purple',
-  restaurant: 'red',
-  industry: 'blue',
-  shopsFactoriesAndMarket: 'green',
-  landmark: 'yellow',
-} as const;
+const CardNameWithEmblem: React.FC<CardNameWithTagProps> = (props) => (
+  <Typography
+    sx={{
+      pb: 1,
+      '&::before': {
+        mr: 1,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        height: 24,
+        width: 24,
+        content: '""',
+        backgroundSize: '100%',
+        backgroundImage: `url('${props.tagSrc}')`,
+      },
+      ...props.sx,
+    }}
+    fontFamily="lithos"
+    fontWeight="bold"
+    color={(theme) => theme.palette[props.color].dark}
+    textAlign="center"
+    lineHeight={0.8}
+  >
+    {props.children}
+  </Typography>
+);
 
 const getCommonProps = (cardInfo: CardInfo) => (
   cardInfo.domain === 'landmark' ? {
@@ -60,10 +74,22 @@ const getCommonProps = (cardInfo: CardInfo) => (
   }
     : {
       ...cardInfo,
-      underConstruction: undefined,
       landmarkId: undefined,
     });
 
+const maxTitleLength = 16;
+const maxDescritionLength = 45;
+
+type CardViewProps = {
+  sx?: SxProps;
+  className?: string;
+  cardInfo: CardInfo;
+  quantity?: number;
+  underConstruction?: boolean;
+  onClick?: () => void;
+};
+
+// eslint-disable-next-line complexity
 const CardView: React.FC<CardViewProps> = (props) => {
   const {
     activation,
@@ -78,135 +104,173 @@ const CardView: React.FC<CardViewProps> = (props) => {
   const activationDiceRange = useMemo((): string => (activation ? activation.join('-') : ''), [activation]);
   const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
 
-  const { backgroundImage, backgroundClass, textClass } = useMemo(
-    () => ({
-      backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}`,
-      backgroundClass: `card-view--${cardColor}`,
-      textClass: `card-view__name--${cardColor}`,
-    }),
-    [cardColor],
-  );
-
-  const underConstructionIcon = useMemo((): string => UrlUtils.getStaticImage('under-construction'), []);
-
-  const scale = useMemo((): number => (props.size ? cardSizeToScaleMap[props.size] : cardSizeToScaleMap.base), [props.size]);
-
   return (
-    <div
-      className={clsx('card-view-wrapper', props.className)}
-      role="button"
-      style={{ ['--card-scale' as string]: scale }}
-      tabIndex={0}
+    <Box
+      component="article"
+      sx={{
+        position: 'relative',
+        minWidth: 200,
+        width: 200,
+        maxWidth: 200,
+        minHeight: 300,
+        height: 300,
+        maxHeight: 300,
+        overflow: 'hidden',
+        ...props.sx,
+      }}
+      className={props.className}
       onClick={props.onClick}
       onKeyDown={props.onClick}
     >
-      <article
-        className={clsx({
-          /* eslint-disable @typescript-eslint/naming-convention */
-          'card-view': true,
-          [backgroundClass]: true,
-          'card-view--faded': props.underConstruction,
-          /* eslint-enable @typescript-eslint/naming-convention */
-        })}
-        style={{ backgroundImage }}
+      <Box
+        sx={[
+          {
+            p: 1,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            backgroundSize: 'cover',
+            borderRadius: 2,
+            bgcolor: (theme) => theme.palette[cardColor].light,
+          },
+          !!props.underConstruction && {
+            filter: 'grayscale(100%)',
+          },
+        ]}
+        style={{ backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}` }}
       >
         {domain !== 'landmark' && (
-          <p className="card-view__sum-dice">
-            {activationDiceRange}
-          </p>
+          <Box sx={{ position: 'relative ' }}>
+            {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
+            <Typography
+              pb={3}
+              fontFamily="lithos"
+              textAlign="center"
+              fontSize={24}
+              lineHeight={0.8}
+              color={(theme) => theme.palette.common.white}
+            >
+              {activationDiceRange}
+            </Typography>
+          </Box>
         )}
 
-        {props.quantity && (
-          <p className="card-view__count">
-            {props.quantity}
-          </p>
-        )}
-
-        <h2
-          className={clsx({
-            /* eslint-disable @typescript-eslint/naming-convention */
-            'card-view__name': true,
-            [textClass]: true,
-            'card-view__name--disabled': props.underConstruction,
-            /* eslint-enable @typescript-eslint/naming-convention */
-          })}
-          style={{ ['--bg-image' as string]: `url('${tagSrc}')` }}
+        <Box
+          sx={{
+            height: '15%',
+            minHeight: '15%',
+            maxHeight: '15%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          {name}
-        </h2>
+          <CardNameWithEmblem sx={{ fontSize: Math.min(20, 20 * (maxTitleLength / name.length)) }} color={cardColor} tagSrc={tagSrc}>
+            {name}
+          </CardNameWithEmblem>
+        </Box>
 
-        <div className="card-view__card-image-container">
+        <Box
+          sx={{
+            p: 1,
+            minHeight: '45%',
+            height: '45%',
+            maxHeight: '45%',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           <img
+            style={{ objectFit: 'contain' }}
             alt="card"
-            className="card-view__card-image"
             src={imageSrc}
           />
-        </div>
+        </Box>
 
-        <p className="card-view__effect">
+        <Box
+          sx={{
+            minHeight: '25%',
+            height: '25%',
+            maxHeight: '25%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative',
+          }}
+        >
+          <Typography
+            px={1}
+            fontSize={Math.min(14, 14 * (maxDescritionLength / descriptionText.length))}
+            textAlign="center"
+            color={(theme) => theme.palette.common.white}
+          >
+            {descriptionText}
+          </Typography>
+
+          {/* TODO: resolve problem with text behind the coin */}
           {cost && (
-            <>
-              <span className={clsx({
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'card-view__cost-container': true,
-                'card-view__cost-container--left': true,
-
-                /* eslint-enable @typescript-eslint/naming-convention */
-              })}
-              >
-                <span className="card-view__cost-background">
-                  <span className="card-view__cost">{cost}</span>
-                </span>
-              </span>
-
-              <span
-                className={clsx({
-                /* eslint-disable @typescript-eslint/naming-convention */
-                  'card-view__cost-container': true,
-                  'card-view__cost-container--right': true,
-
-                /* eslint-enable @typescript-eslint/naming-convention */
-                })}
-              >
-                <span className="card-view__cost-background" />
-              </span>
-            </>
+            <CoinView
+              sx={{
+                position: 'absolute',
+                left: 0,
+                bottom: 0,
+                fontSize: 16,
+                minWidth: 32,
+                width: 32,
+                minHeight: 32,
+                height: 32,
+              }}
+              type="gold"
+            >
+              {cost}
+            </CoinView>
           )}
-          {descriptionText}
-        </p>
-      </article>
+        </Box>
+      </Box>
 
-      {props.underConstruction && (
-        <img
-          alt="card"
-          className="card-view-wrapper__under-construction-icon"
-          src={underConstructionIcon}
-        />
-      )}
-    </div>
+      {props.underConstruction && (<UnderConstructionBackdrop />)}
+    </Box>
   );
 };
 
-export const LandmarkView: React.FC<LandmarkViewProps> = (landmarkViewProps: LandmarkViewProps) => (
+type LandmarkViewProps = Omit<CardViewProps, 'cardInfo'> & {
+  /* eslint-disable react/no-unused-prop-types */
+  cardInfo: Landmark;
+  underConstruction: boolean;
+  onClick?: () => void;
+  /* eslint-enable react/no-unused-prop-types */
+};
+
+export const LandmarkView: React.FC<LandmarkViewProps> = (props) => (
   <CardView
     /* eslint-disable react/destructuring-assignment */
-    cardInfo={landmarkViewProps.cardInfo}
-    className={landmarkViewProps.className}
-    size={landmarkViewProps.size}
-    underConstruction={landmarkViewProps.underConstruction}
-    onClick={landmarkViewProps.onClick}
+    sx={props.sx}
+    className={props.className}
+    cardInfo={props.cardInfo}
+    underConstruction={props.underConstruction}
+    onClick={props.onClick}
     /*  eslint-enable react/destructuring-assignment */
   />
 );
 
-export const CommonEstablishmentView: React.FC<EstablishmentViewProps> = (commonEstablishmentViewProps: EstablishmentViewProps) => (
+type CommonEstablishmentViewProps = Omit<CardViewProps, 'cardInfo'> & {
+  /* eslint-disable react/no-unused-prop-types */
+  cardInfo: Establishment;
+  quantity: number;
+  onClick?: () => void;
+  /* eslint-enable react/no-unused-prop-types */
+};
+
+export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => (
   <CardView
     /* eslint-disable react/destructuring-assignment */
-    cardInfo={commonEstablishmentViewProps.cardInfo}
-    className={commonEstablishmentViewProps.className}
-    quantity={commonEstablishmentViewProps.quantity}
-    size={commonEstablishmentViewProps.size}
-    onClick={commonEstablishmentViewProps.onClick}
+    sx={props.sx}
+    className={props.className}
+    cardInfo={props.cardInfo}
+    quantity={props.quantity}
+    onClick={props.onClick}
     /*  eslint-enable react/destructuring-assignment */
   />
 );
