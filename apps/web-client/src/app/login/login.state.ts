@@ -3,9 +3,17 @@ import { UserId } from '@machikoro/game-server-contracts';
 import { LoginStatus } from '../types/LoginStatus';
 
 export type LoginState = {
-  username: string | undefined;
-  userId: UserId | undefined;
-  status: LoginStatus;
+  status: LoginStatus.PENDING;
+  username: undefined;
+  userId: undefined;
+} | {
+  status: LoginStatus.NOT_AUTHORIZED;
+  username: undefined;
+  userId: undefined;
+} | {
+  status: LoginStatus.AUTHORIZED;
+  username: string;
+  userId: UserId;
 };
 
 export const initialLoginState: LoginState = {

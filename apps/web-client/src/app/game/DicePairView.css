@@ -1,7 +1,0 @@
-.dice-container {
-  padding: 16px;
-}
-
-.dice-container__dice-view:not(:first-child) {
-  margin-top: 16px;
-}

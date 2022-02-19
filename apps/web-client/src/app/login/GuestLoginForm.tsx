@@ -1,11 +1,16 @@
 import { FIRST_CHAR_USERNAME_REGEXP, USERNAME_REGEXP } from '@machikoro/game-server-contracts';
-import clsx from 'clsx';
+import {
+  Box,
+  Button,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
 import React, { useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { useLoginActions } from './useLoginActions';
-import './GuestLoginForm.css';
 
 type GuestFormInputs = {
   username: string;
@@ -13,7 +18,7 @@ type GuestFormInputs = {
 
 export const GuestLoginForm: React.FC = () => {
   const {
-    register,
+    control,
     // eslint-disable-next-line id-denylist
     handleSubmit,
     formState: { errors, isDirty },
@@ -46,37 +51,40 @@ export const GuestLoginForm: React.FC = () => {
   };
 
   return (
-    <div className="guest-form">
-      <h2 className="guest-form__title">{t('login.guestFormTitle')}</h2>
-      <form onSubmit={handleSubmit(login)}>
-        <label htmlFor="username">
-          {t('login.guestFormLableUsername')}
-          <input
-            className={clsx({
-              // eslint-disable-next-line @typescript-eslint/naming-convention
-              'guest-form__input': true,
-              // eslint-disable-next-line @typescript-eslint/naming-convention
-              'guest-form__input_error': errors.username,
-            })}
-            id="username"
-            maxLength={30}
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...register('username', {
-              validate: validateUsername,
-            })}
-          />
-        </label>
-        <p className="username-error">
-          {errors.username && errors.username.message}
-        </p>
-        <button
-          className="guest-form__button"
-          disabled={!!errors.username || !isDirty}
-          type="submit"
-        >
+    <Paper sx={{ minWidth: 400, p: 4 }}>
+      <Typography sx={{ mb: 2 }} variant="h4">{t('login.guestFormTitle')}</Typography>
+      <Box
+        noValidate
+        sx={{ display: 'flex', flexDirection: 'column' }}
+        component="form"
+        autoComplete="off"
+        onSubmit={handleSubmit(login)}
+      >
+        <Controller
+          control={control}
+          name="username"
+          rules={{
+            validate: validateUsername,
+          }}
+          render={({ field }) => (
+            <TextField
+              ref={field.ref}
+              required
+              sx={{ mb: 2 }}
+              name={field.name}
+              label={t('login.guestFormLableUsername')}
+              error={!!errors.username}
+              helperText={errors.username && errors.username.message}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+        <Button type="submit" variant="contained" disabled={!!errors.username || !isDirty}>
           {t('login.guestFormButton')}
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Box>
+    </Paper>
   );
 };

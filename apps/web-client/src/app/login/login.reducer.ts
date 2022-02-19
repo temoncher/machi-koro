@@ -12,9 +12,11 @@ export const loginReducer = reducer(
     username: payload.username,
     userId: payload.userId,
     status: LoginStatus.AUTHORIZED,
-  })),
+  } as const)),
   on(LoginAction.authorizeRejectedEvent, (state) => ({
     ...state,
+    username: undefined,
+    userId: undefined,
     status: LoginStatus.NOT_AUTHORIZED,
-  })),
+  } as const)),
 );

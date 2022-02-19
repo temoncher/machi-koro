@@ -1,13 +1,18 @@
-import { Listbox, Transition } from '@headlessui/react';
-import { Link } from 'react-router-dom';
-import clsx from 'clsx';
-import React, { Fragment, useMemo } from 'react';
+import {
+  Box,
+  Button,
+  MenuItem,
+  SxProps,
+  FormControl,
+  Menu,
+  Link,
+} from '@mui/material';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import './Header.css';
+import { Link as RouterLink } from 'react-router-dom';
 
 type HeaderProps = {
-  className?: string;
+  sx?: SxProps;
 };
 
 const languageCodeToRepresentationMap = {
@@ -17,6 +22,17 @@ const languageCodeToRepresentationMap = {
 
 export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const { t, i18n } = useTranslation();
+
+  const [anchorEl, setAnchorEl] = useState<EventTarget & HTMLButtonElement | undefined>(undefined);
+  const languageMenuOpen = Boolean(anchorEl);
+
+  const openLanguageMenu = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const closeLanugageMenu = () => {
+    setAnchorEl(undefined);
+  };
 
   const changeLanguage = (language: string) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -32,46 +48,42 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   }, [i18n.language]);
 
   return (
-    <div className={clsx('header', props.className)}>
-      <div className="flex-1 min-w-0">
-        <Link className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate" to="/">
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        py: 1.5,
+        px: 3,
+        ...props.sx,
+      }}
+    >
+      <Box sx={{ flexGrow: 1 }}>
+        <Link component={RouterLink} variant="h6" underline="none" to="/">
           {t('gameName')}
         </Link>
-      </div>
-      <div className="flex">
-        <Listbox value={i18n.language} onChange={changeLanguage}>
-          {({ open }) => (
-            <div className="relative">
-              <Listbox.Button className="select-langs">
-                <span className="flex items-center">
-                  <span>{languageText}</span>
-                </span>
-              </Listbox.Button>
-              <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-                show={open}
+      </Box>
+      <Box sx={{ display: 'flex' }}>
+        <FormControl>
+          <Button value={i18n.language} onClick={openLanguageMenu}>{languageText}</Button>
+          <Menu
+            anchorEl={anchorEl}
+            open={languageMenuOpen}
+            onClose={closeLanugageMenu}
+          >
+            {Object.entries(languageCodeToRepresentationMap).map(([languageCode, languageRepresentation]) => (
+              <MenuItem
+                key={languageCode}
+                value={languageCode}
+                onClick={() => {
+                  changeLanguage(languageCode);
+                }}
               >
-                <Listbox.Options static className="select-langs__options">
-                  {Object.entries(languageCodeToRepresentationMap).map(([languageCode, languageRepresentation]) => (
-                    <Listbox.Option
-                      key={languageCode}
-                      className="select-langs__option"
-                      value={languageCode}
-                    >
-                      <div className="flex items-center">
-                        <span>{languageRepresentation}</span>
-                      </div>
-                    </Listbox.Option>
-                  ))}
-                </Listbox.Options>
-              </Transition>
-            </div>
-          )}
-        </Listbox>
-      </div>
-    </div>
+                {languageRepresentation}
+              </MenuItem>
+            ))}
+          </Menu>
+        </FormControl>
+      </Box>
+    </Box>
   );
 };

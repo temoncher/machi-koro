@@ -8,14 +8,13 @@ import {
   UsersStatusesMap,
   UserStatus,
 } from '@machikoro/game-server-contracts';
-import clsx from 'clsx';
-import './PlayersView.css';
+import { Box, SxProps } from '@mui/material';
 import React, { useMemo } from 'react';
 
 import { PlayerView } from './PlayerView';
 
 type PlayersViewProps = {
-  className?: string;
+  sx?: SxProps;
   players: User[];
   statusesMap: UsersStatusesMap;
   coinsMap: Record<UserId, number>;
@@ -33,11 +32,18 @@ export const PlayersView: React.FC<PlayersViewProps> = (props: PlayersViewProps)
   );
 
   return (
-    <div className={clsx('players', props.className)}>
+    <Box
+      sx={{
+        display: 'flex',
+        '> :not(:last-child)': {
+          mr: 1,
+        },
+        ...props.sx,
+      }}
+    >
       {props.players.map((player) => (
         <PlayerView
           key={player.userId}
-          className="players__player-view"
           coins={props.coinsMap[player.userId] ?? 0}
           establishments={props.establishmentsMap[player.userId] ?? {}}
           gameEstablishments={props.gameEstablishments}
@@ -48,6 +54,6 @@ export const PlayersView: React.FC<PlayersViewProps> = (props: PlayersViewProps)
           onLandmarkClick={props.onLandmarkClick}
         />
       ))}
-    </div>
+    </Box>
   );
 };

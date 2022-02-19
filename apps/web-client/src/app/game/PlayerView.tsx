@@ -1,5 +1,3 @@
-import './PlayerView.css';
-
 import {
   Establishment,
   EstablishmentId,
@@ -8,13 +6,51 @@ import {
   User,
   UserStatus,
 } from '@machikoro/game-server-contracts';
-import clsx from 'clsx';
-import React, { useMemo } from 'react';
+import { Box, Typography, SxProps } from '@mui/material';
+import React from 'react';
 
-import { CommonEstablishmentView, LandmarkView } from './CardView';
+import { CommonEstablishmentView } from './CardView';
+import { CoinView } from './CoinView';
+import { MinimizedLandmarkView } from './MinimizedCardView';
+
+type PlayerViewHeaderProps = {
+  sx?: SxProps;
+  status: UserStatus;
+  username: string;
+  coins: number;
+};
+
+const PlayerViewHeader: React.FC<PlayerViewHeaderProps> = (props) => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      ...props.sx,
+    }}
+  >
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mr: 1,
+          height: 10,
+          width: 10,
+          borderRadius: 1e5,
+          bgcolor: (theme) => (props.status === UserStatus.CONNECTED
+            ? theme.palette.success.main
+            : theme.palette.error.main),
+        }}
+      />
+      <Typography fontFamily="lithos" fontWeight={800}>
+        {props.username}
+      </Typography>
+    </Box>
+
+    <CoinView type="bronze">{props.coins}</CoinView>
+  </Box>
+);
 
 type PlayerViewProps = {
-  className?: string;
   player: User;
   coins: number;
   gameLandmarks: Record<LandmarkId, Landmark>;
@@ -26,16 +62,25 @@ type PlayerViewProps = {
 };
 
 export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) => {
-  const playerStatusClass = useMemo(
-    () => (props.status === UserStatus.CONNECTED ? 'player-view__status--green' : 'player-view__status--red'),
-    [props.status],
-  );
-
   const renderCard = (establishmentId: EstablishmentId, count: number, cardIndex: number): JSX.Element | null => {
     const currentEstablishments = props.gameEstablishments[establishmentId];
 
-    return currentEstablishments ? (
-      <div className="player-view__card-container" style={{ ['--number' as string]: cardIndex }}>
+    if (!currentEstablishments) return null;
+
+    return (
+      <Box
+        key={establishmentId}
+        sx={{
+          '--number': cardIndex,
+          position: 'absolute',
+          top: 'calc(20px * var(--number))',
+          zIndex: 20,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          '&:hover .show-on-parent-hover': {
+            display: 'block',
+          },
+        }}
+      >
         <CommonEstablishmentView
           key={establishmentId}
           cardInfo={currentEstablishments}
@@ -43,50 +88,71 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
         />
         <CommonEstablishmentView
           key={establishmentId}
+          sx={{
+            bottom: 0,
+            right: '110%',
+            display: 'none',
+            position: 'absolute',
+          }}
+          className="show-on-parent-hover"
           cardInfo={currentEstablishments}
-          className="player-view__show-card"
           quantity={count}
-          size="lg"
         />
-      </div>
-    ) : null;
+      </Box>
+    );
   };
 
   return (
-    <div className={clsx('player-view', props.className)}>
-      <div className="player-view__info">
-        <div className="player-view__headline">
-          <div className="player-view__status-container">
-            <div className={clsx('player-view__status', playerStatusClass)} />
-          </div>
-          <span className="player-view__coins-container">
-            <span className="player-view__coins-background">
-              <span className="player-view__coins">{props.coins}</span>
-            </span>
-          </span>
-        </div>
-        <p className="player-view__username">{props.player.username}</p>
-      </div>
-      <div className="player-view__landmarks">
+    <Box
+      sx={{
+        p: 2,
+        // TODO: deal with long player names
+        minWidth: 200,
+        width: 200,
+        maxWidth: 200,
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: 2,
+        bgcolor: (theme) => theme.palette.warning.light,
+      }}
+    >
+      <PlayerViewHeader
+        sx={{ mb: 1 }}
+        status={props.status}
+        username={props.player.username}
+        coins={props.coins}
+      />
+
+      <Box
+        sx={{
+          mt: 1,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          rowGap: 2,
+        }}
+      >
         {Object.values(props.gameLandmarks).map((landmark) => (
-          <LandmarkView
+          <MinimizedLandmarkView
             cardInfo={landmark}
-            size="xs"
-            underConstruction={!!props.landmarks[landmark.landmarkId]}
+            underConstruction={!props.landmarks[landmark.landmarkId]}
             onClick={() => {
               props.onLandmarkClick(landmark.landmarkId);
             }}
           />
         ))}
-      </div>
-      <div
-        className="player-view__cards"
-        style={{ ['--cards-number' as string]: Object.values(props.establishments).length - 1 }}
+      </Box>
+
+      <Box
+        sx={{
+          height: '100%',
+          minHeight: 180 + 20 * (Object.values(props.establishments).length - 1),
+          display: 'flex',
+        }}
       >
         {Object.entries(props.establishments).map(
           ([establishmentId, count], cardIndex) => renderCard(establishmentId, count, cardIndex),
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };

@@ -2,7 +2,6 @@ import { RouterAction } from 'connected-react-router';
 import { empty } from 'ts-action';
 
 import { GameAction } from './game';
-import { LoadingAction } from './loading';
 import { LobbyAction } from './lobby';
 import { LoginAction } from './login';
 import { createActionsNamespace, GetNamespaceActionType } from './utils/createActionsNamespace';
@@ -20,7 +19,6 @@ export type RootAction =
   | GetNamespaceActionType<typeof RootAction>
   | GameAction
   | LoginAction
-  | LoadingAction
   | LobbyAction
   | RouterAction
   | WebsocketAction;
