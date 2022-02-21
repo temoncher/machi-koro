@@ -12,4 +12,4 @@ jobs:
         uses: actions/checkout@v2
       - run: yarn install --frozen-lockfile && yarn build functions
       - name: Deploy firebase functions
-        run: yarn firebase deploy --only functions -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION" --token "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MACHI_KORO_DEV }}"
+        run: yarn firebase deploy --only functions -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION" --token "${{ secrets.FIREBASE_TOKEN_MACHI_KORO_DEV }}"
