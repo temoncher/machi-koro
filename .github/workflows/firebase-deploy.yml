@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
-      - run: yarn build functions
+      - run: yarn install --frozen-lockfile && yarn build functions
       - name: Deploy firebase functions
         uses: w9jds/firebase-action@master
         with:
