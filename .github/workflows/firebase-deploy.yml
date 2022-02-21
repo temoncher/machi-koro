@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
       - name: Install Dependencies
         run: yarn install
       - name: Build client
         run: yarn nx run-many --target=build --projects=functions,web-client
       - name: Archive Production Artifact
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: apps
           path: dist/apps
@@ -27,14 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
       - name: Download Artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v2
         with:
           name: apps
           path: dist/apps
       - name: Deploy firebase hosting
-        uses: w9jds/firebase-action@master
+        uses: w9jds/firebase-action@v2
         with:
           args: deploy --only hosting -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
         env:
@@ -46,14 +46,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
       - name: Download Artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v2
         with:
           name: apps
           path: dist/apps
       - name: Deploy firebase functions
-        uses: w9jds/firebase-action@master
+        uses: w9jds/firebase-action@v2
         with:
           args: deploy --only functions -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
         env:
