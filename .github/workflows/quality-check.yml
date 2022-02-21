@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: '14'
       - run: yarn install
+      - run: yarn nx affected --target=lint --parallel=3
       - run: yarn nx affected --target=build --parallel=3
       - run: yarn nx affected --target=test --parallel=2
   pr:
@@ -36,5 +37,6 @@ jobs:
         with:
           node-version: '14'
       - run: yarn install
+      - run: yarn nx affected --target=lint --parallel=2
       - run: yarn nx affected --target=build --parallel=3
       - run: yarn nx affected --target=test --parallel=2
