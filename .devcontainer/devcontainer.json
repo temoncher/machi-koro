@@ -2,14 +2,14 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.194.3/containers/typescript-node
 {
   "name": "MACHI-KORO",
-  "dockerComposeFile": "docker-compose.dev-container.yaml",
-  "service": "whole-app",
-  "shutdownAction": "stopCompose",
-  "workspaceFolder": "/workspace",
-
-  // Use this environment variable if you need to bind mount your local source code into a new container.
-  "remoteEnv": {
-    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Update 'VARIANT' to pick a Node version: 16, 14, 12.
+    // Append -bullseye or -buster to pin to an OS version.
+    // Use the -bullseye variants if you are on a M1 mac.
+    "args": {
+      "VARIANT": "16-bullseye"
+    }
   },
 
   // Set *default* container specific settings.json values on container create.
@@ -17,16 +17,14 @@
 
   // Add the IDs of extensions you want installed when the container is created.
   "extensions": [
-    "ms-azuretools.vscode-docker",
     "nrwl.angular-console",
-    "esbenp.prettier-vscode",
     "firsttris.vscode-jest-runner",
     "dbaeumer.vscode-eslint",
     "eamodio.gitlens"
   ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [4200],
+  // "forwardPorts": [3333, 6006],
 
   // Use 'postCreateCommand' to run commands after the container is created.
   // "postCreateCommand": "yarn install",
