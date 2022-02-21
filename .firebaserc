@@ -1,15 +1,5 @@
 {
   "projects": {
-    "default": "machi-koro-dev",
-    "dev": "machi-koro-dev"
-  },
-  "targets": {
-    "machi-koro-dev": {
-      "hosting": {
-        "app": [
-          "machi-koro-dev"
-        ]
-      }
-    }
+    "default": "machi-koro-dev"
   }
 }
