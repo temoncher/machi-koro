@@ -36,10 +36,9 @@ jobs:
       - name: Deploy firebase hosting
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only hosting -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
+          args: deploy -P dev --only hosting -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MACHI_KORO_DEV }}
-          PROJECT_ID: dev
   deploy-functions:
     name: Deploy functions
     needs: build
@@ -55,7 +54,6 @@ jobs:
       - name: Deploy firebase functions
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only functions -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
+          args: deploy -P dev --only functions -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MACHI_KORO_DEV }}
-          PROJECT_ID: dev
