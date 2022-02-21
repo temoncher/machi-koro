@@ -34,7 +34,7 @@ jobs:
           name: apps
           path: dist/apps
       - name: Deploy firebase hosting
-        uses: w9jds/firebase-action@v2
+        uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
         env:
@@ -53,7 +53,7 @@ jobs:
           name: apps
           path: dist/apps
       - name: Deploy firebase functions
-        uses: w9jds/firebase-action@v2
+        uses: w9jds/firebase-action@master
         with:
           args: deploy --only functions -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION"
         env:
