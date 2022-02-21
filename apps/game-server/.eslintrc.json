@@ -3,15 +3,17 @@
   "ignorePatterns": ["!**/*"],
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": "apps/game-server/tsconfig.app.json"
+      },
       "rules": {}
     },
     {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.js", "*.jsx"],
+      "files": ["*.spec.ts", "*.test.ts"],
+      "parserOptions": {
+        "project": "apps/game-server/tsconfig.spec.json"
+      },
       "rules": {}
     }
   ]

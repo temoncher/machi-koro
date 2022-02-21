@@ -4,13 +4,18 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {}
+      "parserOptions": {
+        "project": "apps/web-client-e2e/tsconfig.e2e.json"
+      },
+      "rules": {
+        "no-console": 1
+      }
     },
     {
       "files": ["src/plugins/index.js"],
       "rules": {
-        "@typescript-eslint/no-var-requires": "off",
-        "no-undef": "off"
+        "@typescript-eslint/no-var-requires": 0,
+        "no-undef": 0
       }
     }
   ]

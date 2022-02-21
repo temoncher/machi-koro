@@ -1,34 +1,126 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
-import * as express from 'express';
-import * as SocketIO from 'socket.io'
 import * as http from 'http';
+import * as path from 'path';
 
-const PORT = process.env.port || 3333;
+import * as cors from 'cors';
+import * as express from 'express';
+import * as redis from 'redis';
 
-const app = express();
-const server = http.createServer(app);
-const io = new SocketIO.Server(server, { cors: { origin: '*' }});
+import {
+  initializeAppRouter,
+  LobbiesRepository,
+  RedisDbInstance,
+  promisifyRedisClient,
+  initSocketServer,
+  AppRouterDependencies,
+  SocketServerDependencies,
+} from './app';
+import { GameRepository } from './app/games';
+import { UsersRepository } from './app/shared';
 
-app.get('/game', (req, res) => {
-  res.send({ message: 'Welcome to game-server!' });
-});
+const main = (): void => {
+  const PORT = process.env.port || 3333;
+  const CLIENT_PORT = 4200;
+  const hosts = process.env.DEVCONTAINER
+    ? {
+      REDIS: 'redis',
+      MAIN: '127.0.0.1',
+    }
+    : {
+      REDIS: 'localhost',
+      MAIN: 'localhost',
+    };
 
-server.listen(PORT, () => {
-  console.log(`Listening at http://localhost:${PORT}/game`);
-});
+  const app = express();
+  const server = http.createServer(app);
 
-server.on('error', console.error);
+  const redisClientUsers = redis.createClient({
+    host: hosts.REDIS,
+    port: 6379,
+    db: RedisDbInstance.GUESTS,
+  });
+  const redisClientLobbies = redis.createClient({
+    host: hosts.REDIS,
+    port: 6379,
+    db: RedisDbInstance.LOBBIES,
+  });
+  const redisClientGames = redis.createClient({
+    host: hosts.REDIS,
+    port: 6379,
+    db: RedisDbInstance.GAMES,
+  });
 
-io.on('connection', (socket) => {
-  console.log('a user connected', socket.id);
+  redisClientUsers.on('error', (error) => {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  });
 
-  socket.on('greeting', () => {
-    console.log(`socket by id ${socket.id} greets us!`);
+  const lobbiesRepository = LobbiesRepository.init(promisifyRedisClient(redisClientLobbies));
+  const usersRepository = UsersRepository.init(promisifyRedisClient(redisClientUsers));
+  const gamesRepository = GameRepository.init(promisifyRedisClient(redisClientGames));
 
-    socket.emit('greet-back');
-  })
-});
+  app.use(express.json());
+
+  const staticFiles = express.static(path.join(__dirname, 'assets', 'static'));
+
+  app.use(cors({
+    origin: `http://${hosts.MAIN}:${CLIENT_PORT}`,
+    credentials: true,
+    methods: [
+      'GET',
+      'PUT',
+      'POST',
+      'OPTIONS',
+    ],
+  }));
+  app.use('/static', staticFiles);
+
+  const socketServerDependencies: SocketServerDependencies = {
+    removeUserFromLobby: lobbiesRepository.removeUserFromLobby,
+    addUserToLobby: lobbiesRepository.addUserToLobby,
+    setLobbyHostId: lobbiesRepository.setLobbyHostId,
+    deleteLobby: lobbiesRepository.deleteLobby,
+    getUsers: usersRepository.getUsers,
+    getUser: usersRepository.getUser,
+    getGame: gamesRepository.getGame,
+    connectUserToGame: gamesRepository.connectUserToGame,
+    disconnectUserFromGame: gamesRepository.disconnectUserFromGame,
+  };
+
+  const socketServerConfig = {
+    cors: {
+      origin: `http://${hosts.MAIN}:${CLIENT_PORT}`,
+      credentials: true,
+      methods: [
+        'GET',
+        'PUT',
+        'POST',
+        'OPTIONS',
+      ],
+    },
+  };
+
+  const io = initSocketServer(socketServerConfig, socketServerDependencies, server);
+
+  const appRouterDependencies: AppRouterDependencies = {
+    getUser: usersRepository.getUser,
+    createUser: usersRepository.createUser,
+    createLobby: lobbiesRepository.createLobby,
+    getLobby: lobbiesRepository.getLobby,
+    createGame: gamesRepository.createGame,
+    dispatchGameCreatedEvent: ({ lobbyId, gameId }) => {
+      io.to(lobbyId).emit('LOBBY_GAME_CREATED', gameId);
+    },
+  };
+
+  app.use('/api', initializeAppRouter(appRouterDependencies));
+
+  server.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Listening at http://${hosts.MAIN}:${PORT}/`);
+  });
+
+  // eslint-disable-next-line no-console
+  server.on('error', console.error);
+};
+
+main();
