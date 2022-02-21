@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build-client:
+  build:
     name: Build client
     runs-on: ubuntu-latest
     steps:
@@ -15,15 +15,15 @@ jobs:
       - name: Install Dependencies
         run: yarn install
       - name: Build client
-        run: yarn build web-client
+        run: yarn nx run-many --target=build --projects=functions,web-client
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
-          name: web-client
-          path: dist/apps/web-client
+          name: apps
+          path: dist/apps
   deploy-hosting:
     name: Deploy hosting
-    needs: build-client
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -31,8 +31,8 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@master
         with:
-          name: web-client
-          path: dist/apps/web-client
+          name: apps
+          path: dist/apps
       - name: Deploy firebase hosting
         uses: w9jds/firebase-action@master
         with:
@@ -40,24 +40,9 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MACHI_KORO_DEV }}
           PROJECT_ID: dev
-  build-functions:
-    name: Build functions
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Install Dependencies
-        run: yarn install
-      - name: Build functions
-        run: yarn build functions
-      - name: Archive Production Artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: functions
-          path: dist/apps/functions
   deploy-functions:
     name: Deploy functions
-    needs: build-functions
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -65,8 +50,8 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@master
         with:
-          name: functions
-          path: dist/apps/functions
+          name: apps
+          path: dist/apps
       - name: Deploy firebase functions
         uses: w9jds/firebase-action@master
         with:
