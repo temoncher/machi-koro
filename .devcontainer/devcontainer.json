@@ -20,7 +20,8 @@
     "nrwl.angular-console",
     "firsttris.vscode-jest-runner",
     "dbaeumer.vscode-eslint",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "toba.vsfire"
   ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
