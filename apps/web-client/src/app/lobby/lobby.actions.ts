@@ -1,8 +1,7 @@
 import {
-  CreateLobbyResponse,
   GameId,
+  Lobby,
   LobbyId,
-  PopulatedLobbyState,
   User,
 } from '@machikoro/game-server-contracts';
 import { empty, payload } from 'ts-action';
@@ -14,13 +13,13 @@ const lobbyActionTypeToPayloadMap = {
   '[EVENT] APP/LOBBY/ENTERED_LOBBY_PAGE': payload<LobbyId>(),
   '[DOCUMENT] APP/LOBBY/SET_IS_CREATE_LOBBY_LOADING': payload<boolean>(),
   '[COMMAND] APP/LOBBY/CREATE_LOBBY': empty(),
-  '[EVENT] APP/LOBBY/CREATE_LOBBY_RESOLVED': payload<CreateLobbyResponse>(),
+  '[EVENT] APP/LOBBY/CREATE_LOBBY_RESOLVED': payload<Lobby>(),
   '[EVENT] APP/LOBBY/CREATE_LOBBY_REJECTED': payload<string>(),
   '[COMMAND] APP/LOBBY/JOIN_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_RESOLVED': payload<string>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_REJECTED': payload<string>(),
   '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHost: User; lobbyId: LobbyId }>(),
-  '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<PopulatedLobbyState | undefined>(),
+  '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),
   '[COMMAND] APP/LOBBY/LEAVE_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/CURRENT_USER_LEFT_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/GAME_CREATED': payload<GameId>(),

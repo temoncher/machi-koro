@@ -1,4 +1,4 @@
-import { UserId } from './user.model';
+import { UserId, User } from './user.model';
 
 export type LobbyId = string;
 
@@ -11,7 +11,8 @@ export type CreateLobbyRequestBody = {
 };
 
 export type Lobby = {
+  lobbyId: LobbyId;
   hostId: UserId;
-  users: UserId[];
+  users: Record<UserId, User>;
   capacity: number;
 };

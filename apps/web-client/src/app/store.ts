@@ -1,13 +1,8 @@
 import { AxiosInstance } from 'axios';
 import { routerMiddleware } from 'connected-react-router';
-import { signInAnonymously, Auth } from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-  Firestore,
-} from 'firebase/firestore';
+import { Auth } from 'firebase/auth';
+import { Database } from 'firebase/database';
+import { Firestore } from 'firebase/firestore';
 import { History } from 'history';
 import {
   createStore,
@@ -19,13 +14,14 @@ import { authState } from 'rxfire/auth';
 import {
   of,
   from,
-  map,
   switchMap,
 } from 'rxjs';
 import * as SocketIOClient from 'socket.io-client';
 
+import { createFirebaseLobby, getFirebaseLobbyState$, joinFirebaseLobby } from './firebase-api/firebase-lobbies.api';
+import { getFirebaseUserData, registerFirebaseUser } from './firebase-api/firebase-users.api';
+import { GameApi } from './game';
 import { RootAction } from './root.actions';
-import { RootApi } from './root.api';
 import { rootEpic, RootEpicDependencies } from './root.epic';
 import { rootReducer } from './root.reducer';
 import { RootState } from './root.state';
@@ -46,12 +42,13 @@ type InitStoreDependencies = {
   socket: SocketIOClient.Socket;
   storage: Storage;
   firebaseAuth: Auth;
+  firebaseDb: Database;
   firestore: Firestore;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
   const epicMiddleware = createEpicMiddleware<RootAction, RootAction, RootState, unknown>();
-  const rootApi = RootApi.init({ httpClient: deps.httpClient });
+  const gameApi = GameApi.init(deps);
 
   const store = createStore(
     rootReducer(deps.history),
@@ -71,40 +68,14 @@ export const initStore = (deps: InitStoreDependencies) => {
       switchMap((userState) => {
         if (!userState) return of(undefined);
 
-        const userDocumentRef = doc(deps.firestore, 'users', userState.uid);
-
-        return from(getDoc(userDocumentRef)).pipe(
-          map((userSnapshot) => {
-            if (!userSnapshot.exists()) return undefined;
-
-            // TODO: extract this method into service and peform validation
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-            const user = userSnapshot.data() as { uid: string; username: string };
-
-            return {
-              userId: user.uid,
-              username: user.username,
-            };
-          }),
-        );
+        return from(getFirebaseUserData(deps.firestore)(userState.uid));
       }),
     ),
-    registerGuest: async (username: string) => {
-      const anonymusCredentials = await signInAnonymously(deps.firebaseAuth);
-
-      await setDoc(doc(deps.firestore, 'users', anonymusCredentials.user.uid), {
-        uid: anonymusCredentials.user.uid,
-        username,
-        createdAt: serverTimestamp(),
-      });
-
-      return {
-        userId: anonymusCredentials.user.uid,
-        username,
-      };
-    },
-    createLobby: rootApi.lobbyApi.sendCreateLobbyRequest,
-    createGame: rootApi.gameApi.sendCreateGameRequest,
+    joinLobby: joinFirebaseLobby(deps.firebaseDb),
+    getLobbyState$: getFirebaseLobbyState$(deps.firebaseDb),
+    registerGuest: registerFirebaseUser(deps.firestore, deps.firebaseAuth),
+    createLobby: createFirebaseLobby(deps.firebaseDb),
+    createGame: gameApi.sendCreateGameRequest,
   };
 
   epicMiddleware.run(rootEpic(rootEpicDependencies));

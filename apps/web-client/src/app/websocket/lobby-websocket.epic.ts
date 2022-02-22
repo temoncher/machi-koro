@@ -44,13 +44,6 @@ const mapHostChangedEventWsMessageEpic: TypedEpic<typeof LobbyAction.hostChanged
   map((event) => LobbyAction.hostChangedEvent(event.payload)),
 );
 
-const setLobbyStateOnLobbyStateUpdatedEpic: TypedEpic<typeof LobbyAction.setLobbyDocument> = (actions$) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_STATE_UPDATED'),
-  map((event) => LobbyAction.setLobbyDocument(event.payload)),
-);
-
 const leaveLobbyEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$) => actions$.pipe(
   ofType(LobbyAction.leaveLobbyCommand),
   toPayload(),
@@ -101,7 +94,6 @@ export const lobbyWebsocketEpic = typedCombineEpics<AnyAction>(
   mapJoinLobbyResolvedEventWsMessageEpic,
   mapJoinLobbyRejectedEventWsMessageEpic,
   mapHostChangedEventWsMessageEpic,
-  setLobbyStateOnLobbyStateUpdatedEpic,
   leaveLobbyEpic,
   mapCurrentUserLeftLobbyEventWsMessageEpic,
   mapGameCreatedEventWsMessageEpic,

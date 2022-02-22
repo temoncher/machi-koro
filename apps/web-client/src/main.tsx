@@ -50,6 +50,7 @@ const main = () => {
     history,
     httpClient,
     firebaseAuth,
+    firebaseDb,
     firestore,
     // eslint-disable-next-line no-restricted-globals
     storage: window.localStorage,

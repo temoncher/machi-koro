@@ -1,8 +1,8 @@
-import { PopulatedLobbyState } from '@machikoro/game-server-contracts';
+import { Lobby } from '@machikoro/game-server-contracts';
 
 export type LobbyState = {
   isCreateLobbyLoading: boolean;
-  lobby: PopulatedLobbyState | undefined;
+  lobby: Lobby | undefined;
 };
 
 export const initialLobbyState: LobbyState = {

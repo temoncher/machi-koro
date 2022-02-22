@@ -62,7 +62,7 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
         <Box>
           <Typography sx={{ mb: 2 }} variant="h6">{t('lobby.playersSectionTitle')}</Typography>
           <Box>
-            {lobby?.users.map((user) => (
+            {lobby && Object.values(lobby.users).map((user) => (
               <UserCard
                 key={user.userId}
                 highlighted={user.userId === userId}
