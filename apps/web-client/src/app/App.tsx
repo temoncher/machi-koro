@@ -4,7 +4,7 @@ import {
   CssBaseline,
   ThemeProvider,
 } from '@mui/material';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { match } from 'ts-pattern';
@@ -14,20 +14,14 @@ import { HomePage } from './home';
 import { useTypedSelector } from './hooks';
 import { Header } from './layout';
 import { LobbyPage } from './lobby';
-import { LoginPage, useLoginActions } from './login';
+import { LoginPage } from './login';
 import { theme } from './theme';
 import { LoginStatus } from './types/LoginStatus';
 
 import 'react-toastify/dist/ReactToastify.css';
 
 export const App: React.FC = () => {
-  const { authorizeCommand } = useLoginActions();
   const loginStatus = useTypedSelector((state) => state.loginReducer.status);
-
-  useEffect(() => {
-    authorizeCommand();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const renderRoutes = () => match(loginStatus)
     .with(LoginStatus.PENDING, () => <CircularProgress />)

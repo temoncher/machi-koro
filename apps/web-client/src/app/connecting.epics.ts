@@ -1,9 +1,10 @@
 import { AnyAction } from 'redux';
 import {
   filter,
-  ignoreElements,
+  map,
   mapTo,
-  tap,
+  Observable,
+  switchMap,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
@@ -12,37 +13,6 @@ import { NavigationAction } from './navigation.actions';
 import { RootAction } from './root.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
 import { WebsocketAction } from './websocket';
-
-type CleanUpAuthTokenOnAuthorizeRejectedEventEpicDependencies = {
-  cleanUpAuthToken: () => void;
-};
-
-const cleanUpAuthTokenOnAuthorizeRejectedEventEpic = (
-  deps: CleanUpAuthTokenOnAuthorizeRejectedEventEpicDependencies,
-): TypedEpic<never> => (actions$) => actions$.pipe(
-  ofType(LoginAction.authorizeRejectedEvent),
-  tap(deps.cleanUpAuthToken),
-  // `ignoreElements` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  ignoreElements(),
-);
-
-type SetAuthTokenOnRegisterGuestResolvedEventEpicDependencies = {
-  setAuthToken: (token: string) => void;
-};
-
-const setAuthTokenOnRegisterGuestResolvedEventEpic = (
-  deps: SetAuthTokenOnRegisterGuestResolvedEventEpicDependencies,
-): TypedEpic<never> => (actions$) => actions$.pipe(
-  ofType(LoginAction.registerGuestResolvedEvent),
-  toPayload(),
-  tap(({ token }) => {
-    deps.setAuthToken(token);
-  }),
-  // `ignoreElements` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  ignoreElements(),
-);
 
 const dispatchAppStartedEventOnFirstRenderEpic: TypedEpic<typeof RootAction.appStartedEvent> = (actions$) => actions$.pipe(
   ofType(NavigationAction.locationChangeEvent),
@@ -60,13 +30,33 @@ const initializeWebsocketOnAppStartEventEpic: TypedEpic<typeof WebsocketAction.i
   mapTo(WebsocketAction.initializeSocketCommand()),
 );
 
-export type ConnectingEpicsDependencies =
-  & CleanUpAuthTokenOnAuthorizeRejectedEventEpicDependencies
-  & SetAuthTokenOnRegisterGuestResolvedEventEpicDependencies;
+type AuthorizeEpicDependencies = {
+  authState$: Observable<{ username: string; userId: string } | undefined>;
+};
+
+const syncAuthStateOnAppStartedEvent = (
+  deps: AuthorizeEpicDependencies,
+): TypedEpic<typeof LoginAction.authorizeResolvedEvent | typeof LoginAction.authorizeRejectedEvent> => (actions$) => actions$.pipe(
+  ofType(RootAction.appStartedEvent),
+  switchMap(() => deps.authState$.pipe(
+    map((user) => {
+      if (!user) {
+        return LoginAction.authorizeRejectedEvent('Signed out');
+      }
+
+      return LoginAction.authorizeResolvedEvent({
+        type: 'guest',
+        userId: user.userId,
+        username: user.username,
+      });
+    }),
+  )),
+);
+
+export type ConnectingEpicsDependencies = AuthorizeEpicDependencies;
 
 export const connectingEpics = (deps: ConnectingEpicsDependencies) => typedCombineEpics<AnyAction>(
-  cleanUpAuthTokenOnAuthorizeRejectedEventEpic(deps),
-  setAuthTokenOnRegisterGuestResolvedEventEpic(deps),
   dispatchAppStartedEventOnFirstRenderEpic,
   initializeWebsocketOnAppStartEventEpic,
+  syncAuthStateOnAppStartedEvent(deps),
 );
