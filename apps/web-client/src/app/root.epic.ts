@@ -1,7 +1,4 @@
-import {
-  connectingEpics,
-  ConnectingEpicsDependencies,
-} from './connecting.epics';
+import { connectingEpics, ConnectingEpicsDependencies } from './connecting.epics';
 import { gameEpic, GameEpicDependencies } from './game';
 import { lobbyEpic, LobbyEpicDependencies } from './lobby';
 import { loginEpic, LoginEpicDependencies } from './login';
@@ -18,6 +15,7 @@ import {
 export type RootEpicDependencies =
   & GameEpicDependencies
   & LobbyEpicDependencies
+  & LoginEpicDependencies
   & LoginEpicDependencies
   & ConnectingEpicsDependencies
   & WebsocketEpicDependencies;

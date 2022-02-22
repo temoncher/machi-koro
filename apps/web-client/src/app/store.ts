@@ -1,5 +1,13 @@
 import { AxiosInstance } from 'axios';
 import { routerMiddleware } from 'connected-react-router';
+import { signInAnonymously, Auth } from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  Firestore,
+} from 'firebase/firestore';
 import { History } from 'history';
 import {
   createStore,
@@ -7,6 +15,13 @@ import {
   applyMiddleware,
 } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
+import { authState } from 'rxfire/auth';
+import {
+  of,
+  from,
+  map,
+  switchMap,
+} from 'rxjs';
 import * as SocketIOClient from 'socket.io-client';
 
 import { RootAction } from './root.actions';
@@ -30,6 +45,8 @@ type InitStoreDependencies = {
   httpClient: AxiosInstance;
   socket: SocketIOClient.Socket;
   storage: Storage;
+  firebaseAuth: Auth;
+  firestore: Firestore;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
@@ -50,22 +67,44 @@ export const initStore = (deps: InitStoreDependencies) => {
 
   const rootEpicDependencies: RootEpicDependencies = {
     socket: deps.socket,
-    authorize: rootApi.loginApi.sendAuthMeRequest,
-    registerGuest: rootApi.loginApi.sendRegisterGuestRequest,
+    authState$: authState(deps.firebaseAuth).pipe(
+      switchMap((userState) => {
+        if (!userState) return of(undefined);
+
+        const userDocumentRef = doc(deps.firestore, 'users', userState.uid);
+
+        return from(getDoc(userDocumentRef)).pipe(
+          map((userSnapshot) => {
+            if (!userSnapshot.exists()) return undefined;
+
+            // TODO: extract this method into service and peform validation
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            const user = userSnapshot.data() as { uid: string; username: string };
+
+            return {
+              userId: user.uid,
+              username: user.username,
+            };
+          }),
+        );
+      }),
+    ),
+    registerGuest: async (username: string) => {
+      const anonymusCredentials = await signInAnonymously(deps.firebaseAuth);
+
+      await setDoc(doc(deps.firestore, 'users', anonymusCredentials.user.uid), {
+        uid: anonymusCredentials.user.uid,
+        username,
+        createdAt: serverTimestamp(),
+      });
+
+      return {
+        userId: anonymusCredentials.user.uid,
+        username,
+      };
+    },
     createLobby: rootApi.lobbyApi.sendCreateLobbyRequest,
     createGame: rootApi.gameApi.sendCreateGameRequest,
-    cleanUpAuthToken: () => {
-      deps.storage.removeItem('token');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
-      deps.httpClient.defaults.headers.Authorization = '';
-    },
-    setAuthToken: (token: string) => {
-      deps.storage.setItem('token', token);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
-      deps.httpClient.defaults.headers.Authorization = `Bearer ${token}`;
-    },
   };
 
   epicMiddleware.run(rootEpic(rootEpicDependencies));
