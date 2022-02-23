@@ -42,9 +42,9 @@ const showUserLeftLobbyNotification: TypedEpic<never> = (actions$, state$) => ac
 const showJoinLobbyError: TypedEpic<never> = (actions$) => actions$.pipe(
   ofType(JoinLobbyAction.joinLobbyRejectedEvent),
   tap((action) => {
-    if (action.payload instanceof Error) {
-      toast.error(`Failed to join the lobby: ${action.payload.message}`);
-    }
+    // eslint-disable-next-line no-console
+    console.error(action.payload);
+    toast.error('Failed to join the lobby');
   }),
   // `ignoreElements` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

@@ -7,6 +7,8 @@ import { RouterState } from 'connected-react-router';
  */
 import { GameState } from './game/game.state';
 import { createLobbyReducer } from './home/createLobby.endpoint';
+import { joinLobbyReducer } from './lobby/joinLobby.endpoint';
+import { leaveLobbyReducer } from './lobby/leaveLobby.endpoint';
 import { LobbyState } from './lobby/lobby.state';
 import { LoginState } from './login/login.state';
 import { registerGuestReducer } from './login/registerGuest.endpoint';
@@ -20,5 +22,7 @@ export type RootState = {
   requests: {
     registerGuestReducer: GetStateType<typeof registerGuestReducer>;
     createLobbyReducer: GetStateType<typeof createLobbyReducer>;
+    joinLobbyReducer: GetStateType<typeof joinLobbyReducer>;
+    leaveLobbyReducer: GetStateType<typeof leaveLobbyReducer>;
   };
 };

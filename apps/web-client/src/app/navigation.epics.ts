@@ -14,7 +14,7 @@ import { ofType, toPayload } from 'ts-action-operators';
 
 import { GameAction } from './game';
 import { CreateLobbyAction } from './home';
-import { LobbyAction } from './lobby';
+import { JoinLobbyAction, LobbyAction } from './lobby';
 import { RegisterGuestAction, LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
@@ -52,6 +52,13 @@ const leftPage = <R extends string>(pathToMatch: R) => (actions$: Observable<Any
 
 const redirectToHomePageOnRegisterGuestResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
   ofType(RegisterGuestAction.registerGuestResolvedEvent),
+  // `mapTo` really accepts `any` payload, therefore
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  mapTo(push({ pathname: '/' })),
+);
+
+const redirectToHomePageOnJoinLobbyRejectedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
+  ofType(JoinLobbyAction.joinLobbyRejectedEvent),
   // `mapTo` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   mapTo(push({ pathname: '/' })),
@@ -135,6 +142,7 @@ const dispatchEnteredGamePageEventOnGamePageEnter: TypedEpic<typeof GameAction.e
 
 export const navigationEpic = typedCombineEpics<AnyAction>(
   redirectToHomePageOnRegisterGuestResolvedEventEpic,
+  redirectToHomePageOnJoinLobbyRejectedEventEpic,
   redirectToLoginPageOnAuthorizeRejectedEventEpic,
   redirectToLobbyPageOnCreateLobbyResolvedEventEpic,
   dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic,

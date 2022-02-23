@@ -3,4 +3,5 @@ export const LOBBY_EN_TRANSLATIONS = {
   playersSectionTitle: 'Players',
   guestCardSubtitleText: 'Logged in as guest',
   leaveLobbyButtonText: 'Leave lobby',
+  leaveLobbyButtonTextLoading: 'Leaving...',
 };

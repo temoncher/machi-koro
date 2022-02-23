@@ -1,4 +1,5 @@
 import { LobbyId } from '@machikoro/game-server-contracts';
+import { LoadingButton } from '@mui/lab';
 import {
   Button,
   Box,
@@ -23,6 +24,7 @@ type LobbyPageProps = {
 export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
   const { userId } = useTypedSelector((state) => state.loginReducer);
   const lobby = useTypedSelector((state) => state.lobbyReducer.lobby);
+  const { isLoading } = useTypedSelector((state) => state.requests.leaveLobbyReducer);
   const { t } = useTranslation();
   const lobbyId = useTypedSelector((state) => {
     const { pathname } = state.router.location;
@@ -42,13 +44,8 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
     }
   };
 
-  const requestToLeaveLobby = () => {
-    if (lobbyId) {
-      dispatch(LobbyAction.leaveLobbyCommand(lobbyId));
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('LobbyId is missing');
-    }
+  const dispatchLeaveLobbyButtonClickedEvent = () => {
+    dispatch(LobbyAction.leaveLobbyButtonClickedEvent());
   };
 
   return (
@@ -79,9 +76,14 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
           <Button type="submit" variant="contained" onClick={createGame}>
             {t('lobby.startNewGameButtonText')}
           </Button>
-          <Button variant="contained" onClick={requestToLeaveLobby}>
+          <LoadingButton
+            variant="contained"
+            loading={isLoading}
+            loadingIndicator={t('lobby.leaveLobbyButtonTextLoading')}
+            onClick={dispatchLeaveLobbyButtonClickedEvent}
+          >
             {t('lobby.leaveLobbyButtonText')}
-          </Button>
+          </LoadingButton>
         </Box>
       </Box>
     </Box>

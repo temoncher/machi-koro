@@ -5,7 +5,7 @@ import {
   User,
   UserId,
 } from '@machikoro/game-server-contracts';
-import { payload } from 'ts-action';
+import { empty, payload } from 'ts-action';
 
 import { createActionsNamespace, GetNamespaceActionType } from '../utils/createActionsNamespace';
 
@@ -13,9 +13,9 @@ const lobbyActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/LOBBY/ENTERED_LOBBY_PAGE': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/LEFT_LOBBY_PAGE': payload<LobbyId>(),
+  '[EVENT] APP/LOBBY/LEAVE_LOBBY_BUTTON_CLICKED': empty(),
   '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHostId: UserId; lobbyId: LobbyId }>(),
   '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),
-  '[COMMAND] APP/LOBBY/LEAVE_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/CURRENT_USER_LEFT_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/GAME_CREATED': payload<GameId>(),
   '[EVENT] APP/LOBBY/USER_JOINED': payload<{ user: User; lobbyId: LobbyId }>(),

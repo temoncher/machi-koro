@@ -48,7 +48,6 @@ export const HomePage: React.FC<HomePageProps> = (props) => {
           loading={isLoading}
           variant="contained"
           loadingIndicator={t('home.createNewLobbyButtonTextLoading')}
-          disabled={isLoading}
           onClick={dispatchCreateLobbyCommand}
         >
           {t('home.createNewLobbyButtonText')}

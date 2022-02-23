@@ -5,4 +5,5 @@ export const LOBBY_RU_TRANSLATIONS: typeof LOBBY_EN_TRANSLATIONS = {
   playersSectionTitle: 'Игроки',
   guestCardSubtitleText: 'Вошел как гость',
   leaveLobbyButtonText: 'Покинуть лобби',
+  leaveLobbyButtonTextLoading: 'Покидаем...',
 };

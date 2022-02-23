@@ -3,11 +3,11 @@
     "lobbies": {
       "$lobbyId": {
         ".read": "auth !== null",
-        ".write": "(!data.exists() && auth !== null) || (data.exists() && data.child('hostId').val() === auth.uid)",
+        ".write": "(!data.exists() && auth !== null && newData.child('hostId').isString()) || data.child('hostId').val() === auth.uid",
         "users": {
           "$userId": {
             ".validate": "newData.exists() && newData.child('userId').val() === auth.uid && newData.child('username').isString()",
-            ".write": "auth.uid === $userId"
+            ".write": "data.parent().exists() && auth.uid === $userId"
           }
         }
       }
