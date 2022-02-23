@@ -7,13 +7,14 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 import { useGameActions } from '../game/useGameActions';
 import { useTypedSelector } from '../hooks';
 import { UrlUtils } from '../utils/url.utils';
 
 import { UserCard } from './UserCard';
-import { useLobbyActions } from './useLobbyActions';
+import { LobbyAction } from './lobby.actions';
 
 type LobbyPageProps = {
   sx?: SxProps;
@@ -30,7 +31,7 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
   });
 
   const { createGameCommand } = useGameActions();
-  const { leaveLobbyCommand } = useLobbyActions();
+  const dispatch = useDispatch();
 
   const createGame = (): void => {
     if (lobbyId) {
@@ -43,7 +44,7 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
 
   const requestToLeaveLobby = () => {
     if (lobbyId) {
-      leaveLobbyCommand(lobbyId);
+      dispatch(LobbyAction.leaveLobbyCommand(lobbyId));
     } else {
       // eslint-disable-next-line no-console
       console.error('LobbyId is missing');

@@ -5,7 +5,7 @@ import {
   User,
   UserId,
 } from '@machikoro/game-server-contracts';
-import { empty, payload } from 'ts-action';
+import { payload } from 'ts-action';
 
 import { createActionsNamespace, GetNamespaceActionType } from '../utils/createActionsNamespace';
 
@@ -13,10 +13,6 @@ const lobbyActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/LOBBY/ENTERED_LOBBY_PAGE': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/LEFT_LOBBY_PAGE': payload<LobbyId>(),
-  '[DOCUMENT] APP/LOBBY/SET_IS_CREATE_LOBBY_LOADING': payload<boolean>(),
-  '[COMMAND] APP/LOBBY/CREATE_LOBBY': empty(),
-  '[EVENT] APP/LOBBY/CREATE_LOBBY_RESOLVED': payload<Lobby>(),
-  '[EVENT] APP/LOBBY/CREATE_LOBBY_REJECTED': payload<string>(),
   '[COMMAND] APP/LOBBY/JOIN_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_RESOLVED': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_REJECTED': payload<string>(),
@@ -33,8 +29,3 @@ const lobbyActionTypeToPayloadMap = {
 export const LobbyAction = createActionsNamespace(lobbyActionTypeToPayloadMap);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type LobbyAction = GetNamespaceActionType<typeof LobbyAction>;
-
-export const lobbyActions = {
-  createLobbyCommand: LobbyAction.createLobbyCommand,
-  leaveLobbyCommand: LobbyAction.leaveLobbyCommand,
-};

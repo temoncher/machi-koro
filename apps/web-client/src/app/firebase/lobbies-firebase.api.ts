@@ -1,22 +1,17 @@
-import { Lobby, LobbyId } from '@machikoro/game-server-contracts';
+import { LobbyId } from '@machikoro/game-server-contracts';
 import {
   push,
   ref,
   set,
   remove,
-  get,
   child,
   serverTimestamp,
   onDisconnect,
   Database,
 } from 'firebase/database';
 
-import {
-  CreateLobby,
-  GetLobby,
-  JoinLobby,
-  LeaveLobby,
-} from '../lobby';
+import { CreateLobby } from '../home';
+import { JoinLobby, LeaveLobby } from '../lobby';
 
 export const leaveFirebaseLobby = (firebaseDb: Database): LeaveLobby => async (userId, lobbyId) => {
   const lobbyUserRef = child(ref(firebaseDb), `lobbies/${lobbyId}/users/${userId}`);

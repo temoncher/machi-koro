@@ -13,6 +13,7 @@ import {
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { GameAction } from './game';
+import { CreateLobbyAction } from './home';
 import { LobbyAction } from './lobby';
 import { RegisterGuestAction, LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
@@ -64,7 +65,7 @@ const redirectToLoginPageOnAuthorizeRejectedEventEpic: TypedEpic<typeof push> = 
 );
 
 const redirectToLobbyPageOnCreateLobbyResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(LobbyAction.createLobbyResolvedEvent),
+  ofType(CreateLobbyAction.createLobbyResolvedEvent),
   toPayload(),
   map(({ lobbyId }) => push({ pathname: `/lobbies/${lobbyId}` })),
 );

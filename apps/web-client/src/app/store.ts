@@ -25,6 +25,7 @@ import {
 } from './firebase/lobbies-firebase.api';
 import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
 import { GameApi } from './game';
+import { createLobbyEpic } from './home';
 import { registerGuestEpic } from './login';
 import { RootAction } from './root.actions';
 import { rootEpic, RootEpicDependencies } from './root.epic';
@@ -77,7 +78,6 @@ export const initStore = (deps: InitStoreDependencies) => {
     ),
     leaveLobby: leaveFirebaseLobby(deps.firebaseDb),
     joinLobby: joinFirebaseLobby(deps.firebaseDb),
-    createLobby: createFirebaseLobby(deps.firebaseDb),
     createGame: gameApi.sendCreateGameRequest,
   };
 
@@ -85,6 +85,7 @@ export const initStore = (deps: InitStoreDependencies) => {
     combineEpics<AnyAction, AnyAction, RootState, unknown>(
       rootEpic(rootEpicDependencies),
       registerGuestEpic(registerFirebaseGuest(deps.firestore, deps.firebaseAuth)),
+      createLobbyEpic(createFirebaseLobby(deps.firebaseDb)),
     ),
   );
 

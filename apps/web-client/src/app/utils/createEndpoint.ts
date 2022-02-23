@@ -34,10 +34,10 @@ type RequestNamespace<N extends string, A, R> = {
 
 export type GetStateType<T> = T extends Reducer<infer R> ? R : never;
 
-export const createEndpoint = <Req extends (arg: any) => Promise<any>>() => <N extends string>(name: N) => {
+export const createEndpoint = <Req extends (...args: any[]) => Promise<any>>() => <N extends string>(name: N) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 
-  type A = Parameters<Req>[0];
+  type A = Parameters<Req>;
   type R = ReturnType<Req> extends Promise<infer Res> ? Res : never;
 
   const toCamel = (str: string) => str.split('_')
@@ -89,10 +89,10 @@ export const createEndpoint = <Req extends (arg: any) => Promise<any>>() => <N e
     })),
   );
 
-  const epicFactory = (request: (arg: A) => Promise<R>): Epic<AnyAction, AnyAction, unknown, unknown> => (actions$) => actions$.pipe(
+  const epicFactory = (request: (...args: A) => Promise<R>): Epic<AnyAction, AnyAction, unknown, unknown> => (actions$) => actions$.pipe(
     ofType(fireRequestCommand),
     toPayload(),
-    switchMap((actionPayload) => from(request(actionPayload)).pipe(
+    switchMap((actionPayload) => from(request(...actionPayload)).pipe(
       map(requestResolvedEvent),
       catchError((error) => of(requestRejectedEvent(error))),
     )),

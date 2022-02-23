@@ -1,24 +1,30 @@
+import { LoadingButton } from '@mui/lab';
 import {
   Box,
-  Button,
   SxProps,
   Typography,
 } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 import { useTypedSelector } from '../hooks';
-import { useLobbyActions } from '../lobby';
+
+import { CreateLobbyAction } from './createLobby.endpoint';
 
 type HomePageProps = {
   sx?: SxProps;
 };
 
 export const HomePage: React.FC<HomePageProps> = (props) => {
-  const { createLobbyCommand } = useLobbyActions();
-  const { username } = useTypedSelector((state) => state.loginReducer);
-  const { isCreateLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
+  const dispatch = useDispatch();
+  const { userId, username } = useTypedSelector((state) => state.loginReducer);
+  const { isLoading } = useTypedSelector((state) => state.requests.createLobbyReducer);
   const { t } = useTranslation();
+
+  const dispatchCreateLobbyCommand = () => {
+    dispatch(CreateLobbyAction.createLobbyCommand([userId!, 4]));
+  };
 
   return (
     <Box
@@ -38,9 +44,15 @@ export const HomePage: React.FC<HomePageProps> = (props) => {
           {t('home.greeting.end')}
         </Typography>
         <Typography sx={{ py: 2 }}>{t('home.welcomeText')}</Typography>
-        <Button variant="contained" disabled={isCreateLobbyLoading} onClick={createLobbyCommand}>
+        <LoadingButton
+          loading={isLoading}
+          variant="contained"
+          loadingIndicator={t('home.createNewLobbyButtonTextLoading')}
+          disabled={isLoading}
+          onClick={dispatchCreateLobbyCommand}
+        >
           {t('home.createNewLobbyButtonText')}
-        </Button>
+        </LoadingButton>
       </Box>
     </Box>
   );

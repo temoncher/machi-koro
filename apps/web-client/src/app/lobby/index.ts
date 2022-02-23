@@ -5,4 +5,3 @@ export * from './lobbies.api.types';
 export * from './lobby.reducer';
 export * from './lobby.actions';
 export * from './lobby.epic';
-export * from './useLobbyActions';

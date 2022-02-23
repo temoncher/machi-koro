@@ -6,6 +6,7 @@ import { RouterState } from 'connected-react-router';
  * It has something to do with cyclic dependencies
  */
 import { GameState } from './game/game.state';
+import { createLobbyReducer } from './home/createLobby.endpoint';
 import { LobbyState } from './lobby/lobby.state';
 import { LoginState } from './login/login.state';
 import { registerGuestReducer } from './login/registerGuest.endpoint';
@@ -18,5 +19,6 @@ export type RootState = {
   router: RouterState;
   requests: {
     registerGuestReducer: GetStateType<typeof registerGuestReducer>;
+    createLobbyReducer: GetStateType<typeof createLobbyReducer>;
   };
 };

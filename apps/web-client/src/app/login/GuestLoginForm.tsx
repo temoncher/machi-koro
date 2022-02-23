@@ -51,7 +51,7 @@ export const GuestLoginForm: React.FC = () => {
   }, [t]);
 
   const login = ({ username }: GuestFormInputs) => {
-    dispatch(RegisterGuestAction.registerGuestCommand(username));
+    dispatch(RegisterGuestAction.registerGuestCommand([username]));
   };
 
   return (
@@ -90,9 +90,9 @@ export const GuestLoginForm: React.FC = () => {
           variant="contained"
           loading={isLoading}
           disabled={!!errors.username || !isDirty}
-          loadingIndicator={t('login.guestFormButtonLoading')}
+          loadingIndicator={t('login.registerGuestButtonTextLoading')}
         >
-          {t('login.guestFormButton')}
+          {t('login.registerGuestButtonText')}
         </LoadingButton>
       </Box>
     </Paper>
