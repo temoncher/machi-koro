@@ -70,9 +70,9 @@ const redirectToLobbyPageOnCreateLobbyResolvedEventEpic: TypedEpic<typeof push> 
 );
 
 const redirectToGamePageOnGameCreatedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(LobbyAction.gameCreatedEvent),
+  ofType(GameAction.createGameResolvedEvent),
   toPayload(),
-  map((gameId) => push({ pathname: `/games/${gameId}` })),
+  map(({ gameId }) => push({ pathname: `/games/${gameId}` })),
 );
 
 const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyAction.enteredLobbyPageEvent> = (actions$) => actions$.pipe(

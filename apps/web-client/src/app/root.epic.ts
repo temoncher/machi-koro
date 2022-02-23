@@ -7,7 +7,6 @@ import { navigationEpic } from './navigation.epics';
 import { notificationsEpic } from './notifications.epic';
 import { typedCombineEpics } from './types/TypedEpic';
 import {
-  lobbyWebsocketEpic,
   gameWebsocketEpic,
   websocketEpic,
   WebsocketEpicDependencies,
@@ -31,6 +30,5 @@ export const rootEpic = (deps: RootEpicDependencies) => typedCombineEpics(
   notificationsEpic,
   websocketEpic(deps),
   gameWebsocketEpic,
-  lobbyWebsocketEpic,
   firebaseLobbiesEpic(deps),
 );
