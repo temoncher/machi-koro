@@ -14,7 +14,7 @@ import { ofType, toPayload } from 'ts-action-operators';
 
 import { GameAction } from './game';
 import { LobbyAction } from './lobby';
-import { LoginAction } from './login';
+import { RegisterGuestAction, LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
 import { isDefined } from './utils/isDefined';
@@ -50,7 +50,7 @@ const leftPage = <R extends string>(pathToMatch: R) => (actions$: Observable<Any
 );
 
 const redirectToHomePageOnRegisterGuestResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(LoginAction.registerGuestResolvedEvent),
+  ofType(RegisterGuestAction.registerGuestResolvedEvent),
   // `mapTo` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   mapTo(push({ pathname: '/' })),

@@ -1,5 +1,9 @@
 import { action, ActionCreator, Typed } from 'ts-action';
 
+import { PayloadActionCreator } from './PayloadActionCreator';
+import { SnakeToCamel } from './SnakeToCamel';
+import { capitalize } from './capitalize';
+
 type Empty = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _as: 'empty';
@@ -13,13 +17,7 @@ type Payload<P> = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _p: P;
 };
-type PayloadActionCreator<K extends string, P> = ActionCreator<K, (payload: P) => Typed<{
-  payload: P;
-}, K>>;
 
-type SnakeToCamel<T extends string> = T extends `${infer TBefore}_${infer TAfter}`
-  ? `${Lowercase<TBefore>}${Capitalize<SnakeToCamel<TAfter>>}`
-  : Lowercase<T>;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type TakeLastAfter<T extends string, A extends string> = T extends `${infer TBefore}${A}${infer TAfter}`
   ? TakeLastAfter<TAfter, A>
@@ -30,7 +28,6 @@ type ExtractActionType<T extends string> = T extends `[${infer AType}]${string}`
 type ActionType = 'DOCUMENT' | 'EVENT' | 'COMMAND';
 type ActionName = `[${ActionType}] ${string}`;
 
-const capitalizeLowercased = (str: string) => str.charAt(0).toUpperCase() + str.toLocaleLowerCase().slice(1);
 export const createActionsNamespace = <R extends Record<ActionName, Payload<unknown> | Empty>>(actionTypeToPayloadMap: R): {
   [
   K in keyof R as K extends string
@@ -49,11 +46,11 @@ export const createActionsNamespace = <R extends Record<ActionName, Payload<unkn
       .map(([type, actionPayload]) => {
         const createdAction = action(type, actionPayload as any);
         const [uppercasedActionType] = type.slice(1).split(']');
-        const actionType = capitalizeLowercased(uppercasedActionType!);
+        const actionType = capitalize(uppercasedActionType!.toLocaleLowerCase());
         const actionPath = type.split('/');
         const actionName = actionPath[actionPath.length - 1]!
           .split('_')
-          .map((word, wordIndex) => (wordIndex === 0 ? word.toLocaleLowerCase() : capitalizeLowercased(word)))
+          .map((word, wordIndex) => (wordIndex === 0 ? word.toLocaleLowerCase() : capitalize(word.toLocaleLowerCase())))
           .join('');
 
         return [actionName + actionType, createdAction];

@@ -4,10 +4,11 @@ import { LoginStatus } from '../types/LoginStatus';
 
 import { LoginAction } from './login.actions';
 import { initialLoginState } from './login.state';
+import { RegisterGuestAction } from './registerGuest.endpoint';
 
 export const loginReducer = reducer(
   initialLoginState,
-  on(LoginAction.authorizeResolvedEvent, LoginAction.registerGuestResolvedEvent, (state, { payload }) => ({
+  on(LoginAction.authorizeResolvedEvent, RegisterGuestAction.registerGuestResolvedEvent, (state, { payload }) => ({
     ...state,
     username: payload.username,
     userId: payload.userId,

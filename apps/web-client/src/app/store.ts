@@ -8,8 +8,9 @@ import {
   createStore,
   compose,
   applyMiddleware,
+  AnyAction,
 } from 'redux';
-import { createEpicMiddleware } from 'redux-observable';
+import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import { authState } from 'rxfire/auth';
 import {
   of,
@@ -24,6 +25,7 @@ import {
 } from './firebase/lobbies-firebase.api';
 import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
 import { GameApi } from './game';
+import { registerGuestEpic } from './login';
 import { RootAction } from './root.actions';
 import { rootEpic, RootEpicDependencies } from './root.epic';
 import { rootReducer } from './root.reducer';
@@ -75,12 +77,16 @@ export const initStore = (deps: InitStoreDependencies) => {
     ),
     leaveLobby: leaveFirebaseLobby(deps.firebaseDb),
     joinLobby: joinFirebaseLobby(deps.firebaseDb),
-    registerGuest: registerFirebaseGuest(deps.firestore, deps.firebaseAuth),
     createLobby: createFirebaseLobby(deps.firebaseDb),
     createGame: gameApi.sendCreateGameRequest,
   };
 
-  epicMiddleware.run(rootEpic(rootEpicDependencies));
+  epicMiddleware.run(
+    combineEpics<AnyAction, AnyAction, RootState, unknown>(
+      rootEpic(rootEpicDependencies),
+      registerGuestEpic(registerFirebaseGuest(deps.firestore, deps.firebaseAuth)),
+    ),
+  );
 
   return store;
 };

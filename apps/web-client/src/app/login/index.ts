@@ -5,5 +5,4 @@ export * from './login.api.types';
 export * from './login.reducer';
 export * from './login.state';
 export * from './login.actions';
-export * from './login.epic';
-export * from './useLoginActions';
+export * from './registerGuest.endpoint';

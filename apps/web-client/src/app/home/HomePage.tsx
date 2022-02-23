@@ -31,8 +31,12 @@ export const HomePage: React.FC<HomePageProps> = (props) => {
       }}
     >
       <Box sx={{ maxWidth: 800, display: 'flex', flexDirection: 'column' }}>
-        {/* TODO: make only username bold */}
-        <Typography variant="h4">{t('home.greeting', { username })}</Typography>
+        <Typography variant="h4">
+          {/* TODO: figure out how to use string interpolation with bold wrapper */}
+          {t('home.greeting.start')}
+          <b>{username}</b>
+          {t('home.greeting.end')}
+        </Typography>
         <Typography sx={{ py: 2 }}>{t('home.welcomeText')}</Typography>
         <Button variant="contained" disabled={isCreateLobbyLoading} onClick={createLobbyCommand}>
           {t('home.createNewLobbyButtonText')}

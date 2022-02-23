@@ -8,10 +8,15 @@ import { RouterState } from 'connected-react-router';
 import { GameState } from './game/game.state';
 import { LobbyState } from './lobby/lobby.state';
 import { LoginState } from './login/login.state';
+import { registerGuestReducer } from './login/registerGuest.endpoint';
+import { GetStateType } from './utils/createEndpoint';
 
 export type RootState = {
   loginReducer: LoginState;
   lobbyReducer: LobbyState;
   gameReducer: GameState;
   router: RouterState;
+  requests: {
+    registerGuestReducer: GetStateType<typeof registerGuestReducer>;
+  };
 };

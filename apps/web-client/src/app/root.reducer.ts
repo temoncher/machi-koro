@@ -4,7 +4,7 @@ import { Reducer, combineReducers } from 'redux';
 
 import { gameReducer } from './game';
 import { lobbyReducer } from './lobby';
-import { loginReducer } from './login';
+import { registerGuestReducer, loginReducer } from './login';
 import { RootState } from './root.state';
 
 export const rootReducer = (history: History): Reducer<RootState> => combineReducers({
@@ -12,4 +12,7 @@ export const rootReducer = (history: History): Reducer<RootState> => combineRedu
   lobbyReducer,
   gameReducer,
   router: connectRouter(history),
+  requests: combineReducers({
+    registerGuestReducer,
+  }),
 });

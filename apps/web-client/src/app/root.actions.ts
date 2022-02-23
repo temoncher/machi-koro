@@ -3,7 +3,7 @@ import { empty } from 'ts-action';
 
 import { GameAction } from './game';
 import { LobbyAction } from './lobby';
-import { LoginAction } from './login';
+import { RegisterGuestAction, LoginAction } from './login';
 import { createActionsNamespace, GetNamespaceActionType } from './utils/createActionsNamespace';
 
 const rootActionTypeToPayloadMap = {
@@ -19,4 +19,5 @@ export type RootAction =
   | GameAction
   | LoginAction
   | LobbyAction
-  | RouterAction;
+  | RouterAction
+  | GetNamespaceActionType<typeof RegisterGuestAction>;
