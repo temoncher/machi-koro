@@ -228,7 +228,6 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
           landmarksMap={mockGameContext.landmarks}
           // TODO: rework this part
           players={mockGameContext.players.map(({ userId }) => ({
-            type: 'guest',
             userId,
             username: userId,
           }))}

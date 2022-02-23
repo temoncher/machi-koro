@@ -45,7 +45,6 @@ const syncAuthStateOnAppStartedEvent = (
       }
 
       return LoginAction.authorizeResolvedEvent({
-        type: 'guest',
         userId: user.userId,
         username: user.username,
       });

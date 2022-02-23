@@ -7,7 +7,7 @@ export const USERNAME_REGEXP = /^[A-Za-z-_\s]+$/;
 const MIN_LENGTH_USERNAME = 1;
 const MAX_LENGTH_USERNAME = 30;
 
-export const usernameSchema = z
+const usernameSchema = z
   .string()
   .min(MIN_LENGTH_USERNAME, {
     message: `'username' must be between ${String(
@@ -26,16 +26,10 @@ export const usernameSchema = z
     message: "'username' must contain only A-Z, a-z, -, _ characters",
   });
 
-export type Username = z.infer<typeof usernameSchema>;
-
-export const userTypeSchema = z.enum(['guest']);
-export type UserType = z.infer<typeof userTypeSchema>;
-
 const userIdShema = z.string();
 
 export const userSchema = z.object({
   username: usernameSchema,
-  type: userTypeSchema,
   userId: userIdShema,
 });
 

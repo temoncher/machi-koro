@@ -8,7 +8,6 @@ import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 import { WebsocketAction } from './websocket.actions';
 import { ofWsEventType } from './websocket.utils';
 
-
 const mapHostChangedEventWsMessageEpic: TypedEpic<typeof LobbyAction.hostChangedEvent> = (
   actions$,
 ) => actions$.pipe(

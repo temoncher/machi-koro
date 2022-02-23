@@ -94,7 +94,7 @@ const joinLobbyEpic = (
   ofType(LobbyAction.joinLobbyCommand),
   toPayload(),
   waitUntilAuthorized(state$),
-  switchMap(([lobbyId, { userId, username }]) => from(deps.joinLobby({ type: 'guest', userId, username }, lobbyId)).pipe(
+  switchMap(([lobbyId, { userId, username }]) => from(deps.joinLobby({ userId, username }, lobbyId)).pipe(
     // `mapTo` really accepts `any` payload, therefore
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     mapTo(LobbyAction.joinLobbyResolvedEvent(lobbyId)),
