@@ -12,7 +12,6 @@ import { LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { RootAction } from './root.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
-import { WebsocketAction } from './websocket';
 
 const dispatchAppStartedEventOnFirstRenderEpic: TypedEpic<typeof RootAction.appStartedEvent> = (actions$) => actions$.pipe(
   ofType(NavigationAction.locationChangeEvent),
@@ -21,13 +20,6 @@ const dispatchAppStartedEventOnFirstRenderEpic: TypedEpic<typeof RootAction.appS
   // `mapTo` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   mapTo(RootAction.appStartedEvent()),
-);
-
-const initializeWebsocketOnAppStartEventEpic: TypedEpic<typeof WebsocketAction.initializeSocketCommand> = (actions$) => actions$.pipe(
-  ofType(RootAction.appStartedEvent),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  mapTo(WebsocketAction.initializeSocketCommand()),
 );
 
 type AuthorizeEpicDependencies = {
@@ -56,6 +48,5 @@ export type ConnectingEpicsDependencies = AuthorizeEpicDependencies;
 
 export const connectingEpics = (deps: ConnectingEpicsDependencies) => typedCombineEpics<AnyAction>(
   dispatchAppStartedEventOnFirstRenderEpic,
-  initializeWebsocketOnAppStartEventEpic,
   syncAuthStateOnAppStartedEvent(deps),
 );

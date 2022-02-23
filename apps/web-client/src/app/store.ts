@@ -16,7 +16,6 @@ import {
   from,
   switchMap,
 } from 'rxjs';
-import * as SocketIOClient from 'socket.io-client';
 
 import {
   createFirebaseLobby,
@@ -43,7 +42,6 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 type InitStoreDependencies = {
   history: History;
   httpClient: AxiosInstance;
-  socket: SocketIOClient.Socket;
   storage: Storage;
   firebaseAuth: Auth;
   firebaseDb: Database;
@@ -68,7 +66,6 @@ export const initStore = (deps: InitStoreDependencies) => {
 
   const rootEpicDependencies: RootEpicDependencies = {
     firebaseDb: deps.firebaseDb,
-    socket: deps.socket,
     authState$: authState(deps.firebaseAuth).pipe(
       switchMap((userState) => {
         if (!userState) return of(undefined);

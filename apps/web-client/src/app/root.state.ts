@@ -8,12 +8,10 @@ import { RouterState } from 'connected-react-router';
 import { GameState } from './game/game.state';
 import { LobbyState } from './lobby/lobby.state';
 import { LoginState } from './login/login.state';
-import { WebsocketState } from './websocket/websocket.state';
 
 export type RootState = {
   loginReducer: LoginState;
   lobbyReducer: LobbyState;
   gameReducer: GameState;
-  websocketReducer: WebsocketState;
   router: RouterState;
 };

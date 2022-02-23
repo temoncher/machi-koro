@@ -10,8 +10,6 @@ import {
   onDisconnect,
   Database,
 } from 'firebase/database';
-import { object } from 'rxfire/database';
-import { map } from 'rxjs';
 
 import {
   CreateLobby,
@@ -32,16 +30,6 @@ export const joinFirebaseLobby = (firebaseDb: Database): JoinLobby => async (use
 
   /** Make sure user is removed from the lobby in case browser closes */
   void onDisconnect(lobbyUserRef).remove();
-};
-export const getFirebaseLobby = (firebaseDb: Database): GetLobby => async (lobbyId) => {
-  const lobbyRef = child(ref(firebaseDb), `lobbies/${lobbyId}`);
-  const lobbySnapshot = await get(lobbyRef);
-
-  if (!lobbySnapshot.exists()) return undefined;
-
-  const lobby = lobbySnapshot.val() as Lobby & { createdAt: unknown };
-
-  return lobby;
 };
 export const createFirebaseLobby = (firebaseDb: Database): CreateLobby => async (hostId, capacity) => {
   const createdLobbyRef = await push(ref(firebaseDb, 'lobbies'), {

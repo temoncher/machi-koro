@@ -5,7 +5,6 @@ import { GameAction } from './game';
 import { LobbyAction } from './lobby';
 import { LoginAction } from './login';
 import { createActionsNamespace, GetNamespaceActionType } from './utils/createActionsNamespace';
-import { WebsocketAction } from './websocket';
 
 const rootActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
@@ -20,5 +19,4 @@ export type RootAction =
   | GameAction
   | LoginAction
   | LobbyAction
-  | RouterAction
-  | WebsocketAction;
+  | RouterAction;
