@@ -8,15 +8,6 @@ import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 import { WebsocketAction } from './websocket.actions';
 import { ofWsEventType } from './websocket.utils';
 
-const mapHostChangedEventWsMessageEpic: TypedEpic<typeof LobbyAction.hostChangedEvent> = (
-  actions$,
-) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_HOST_CHANGED'),
-  map((event) => LobbyAction.hostChangedEvent(event.payload)),
-);
-
 const mapGameCreatedEventWsMessageEpic: TypedEpic<typeof LobbyAction.gameCreatedEvent> = (
   actions$,
 ) => actions$.pipe(
@@ -27,6 +18,5 @@ const mapGameCreatedEventWsMessageEpic: TypedEpic<typeof LobbyAction.gameCreated
 );
 
 export const lobbyWebsocketEpic = typedCombineEpics<AnyAction>(
-  mapHostChangedEventWsMessageEpic,
   mapGameCreatedEventWsMessageEpic,
 );

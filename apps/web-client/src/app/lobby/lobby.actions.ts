@@ -3,6 +3,7 @@ import {
   Lobby,
   LobbyId,
   User,
+  UserId,
 } from '@machikoro/game-server-contracts';
 import { empty, payload } from 'ts-action';
 
@@ -19,7 +20,7 @@ const lobbyActionTypeToPayloadMap = {
   '[COMMAND] APP/LOBBY/JOIN_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_RESOLVED': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_REJECTED': payload<string>(),
-  '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHost: User; lobbyId: LobbyId }>(),
+  '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHostId: UserId; lobbyId: LobbyId }>(),
   '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),
   '[COMMAND] APP/LOBBY/LEAVE_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/CURRENT_USER_LEFT_LOBBY': payload<LobbyId>(),

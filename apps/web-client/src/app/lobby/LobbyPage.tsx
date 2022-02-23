@@ -62,12 +62,13 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
       <Box component="section">
         <Box>
           <Typography sx={{ mb: 2 }} variant="h6">{t('lobby.playersSectionTitle')}</Typography>
-          <Box>
+          <Box sx={{ '> *': { mb: 1 } }}>
             {lobby?.users && Object.values(lobby.users).map((user) => (
               <UserCard
                 key={user.userId}
                 highlighted={user.userId === userId}
                 user={user}
+                withCrown={user.userId === lobby.hostId}
               />
             ))}
           </Box>

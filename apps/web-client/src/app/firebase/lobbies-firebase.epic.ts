@@ -1,4 +1,4 @@
-import { Lobby, User } from '@machikoro/game-server-contracts';
+import { Lobby, User, UserId } from '@machikoro/game-server-contracts';
 import { Database, ref } from 'firebase/database';
 import { AnyAction } from 'redux';
 import { ListenEvent, object, stateChanges } from 'rxfire/database';
@@ -92,13 +92,40 @@ const mapUserRemovedChangeToLobbyUserLeftEvent = (
   )),
 );
 
+type MapHostChangeToLobbyHostChangedEventDependencies = {
+  firebaseDb: Database;
+};
+
+const mapHostChangeToLobbyHostChangedEvent = (
+  deps: MapUserRemovedChangeToLobbyUserLeftEventDependencies,
+): TypedEpic<typeof LobbyAction.hostChangedEvent> => (actions$) => actions$.pipe(
+  ofType(LobbyAction.joinLobbyResolvedEvent),
+  toPayload(),
+  switchMap((lobbyId) => stateChanges(
+    ref(deps.firebaseDb, `lobbies/${lobbyId}`),
+    { events: [ListenEvent.changed] },
+  ).pipe(
+    // TODO: check if this takeUntil really unsubscribes from lobby state object
+    takeUntil(actions$.pipe(ofType(LobbyAction.currentUserLeftLobbyEvent))),
+    filter((lobbyChange) => lobbyChange.snapshot.key === 'hostId'),
+    map((hostIdChange) => {
+      // TODO: perform validation
+      const hostId = hostIdChange.snapshot.val() as UserId;
+
+      return LobbyAction.hostChangedEvent({ lobbyId, newHostId: hostId });
+    }),
+  )),
+);
+
 export type FirebaseLobbiesEpicDependencies =
   & SyncLobbyStateDependencies
   & MapUserRemovedChangeToLobbyUserLeftEventDependencies
-  & MapUserAddedChangeToLobbyUserJoinedEventDependencies;
+  & MapUserAddedChangeToLobbyUserJoinedEventDependencies
+  & MapHostChangeToLobbyHostChangedEventDependencies;
 
 export const firebaseLobbiesEpic = (deps: FirebaseLobbiesEpicDependencies) => typedCombineEpics<AnyAction>(
   syncLobbyState(deps),
   mapUserAddedChangeToLobbyUserJoinedEvent(deps),
   mapUserRemovedChangeToLobbyUserLeftEvent(deps),
+  mapHostChangeToLobbyHostChangedEvent(deps),
 );

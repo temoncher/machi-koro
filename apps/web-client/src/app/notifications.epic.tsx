@@ -17,7 +17,8 @@ const showUserJoinedLobbyNotification: TypedEpic<never> = (actions$, state$) => 
   withLatestFrom(state$),
   filter(([{ user }, state]) => state.loginReducer.userId !== user.userId),
   tap(([{ user }]) => {
-    toast.info(`User ${user.username} joined the lobby`);
+    // eslint-disable-next-line react/jsx-one-expression-per-line
+    toast.info(<p>User <b>{user.username}</b> joined the lobby</p>);
   }),
   // `ignoreElements` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -30,7 +31,8 @@ const showUserLeftLobbyNotification: TypedEpic<never> = (actions$, state$) => ac
   withLatestFrom(state$),
   filter(([{ user }, state]) => state.loginReducer.userId !== user.userId),
   tap(([{ user }]) => {
-    toast.info(`User ${user.username} left the lobby`);
+    // eslint-disable-next-line react/jsx-one-expression-per-line
+    toast.info(<p>User <b>{user.username}</b> left the lobby</p>);
   }),
   // `ignoreElements` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -48,11 +50,19 @@ const showJoinLobbyError: TypedEpic<never> = (actions$) => actions$.pipe(
   ignoreElements(),
 );
 
-const showHostChangedNotification: TypedEpic<never> = (actions$) => actions$.pipe(
+const showHostChangedNotification: TypedEpic<never> = (actions$, state$) => actions$.pipe(
   ofType(LobbyAction.hostChangedEvent),
   toPayload(),
-  tap(({ newHost }) => {
-    toast.info(`Host changed! New host is ${newHost.username}`);
+  withLatestFrom(state$),
+  tap(([{ newHostId }, state]) => {
+    const newHost = state.lobbyReducer.lobby?.users?.[newHostId];
+
+    if (newHost) {
+      // eslint-disable-next-line react/jsx-one-expression-per-line
+      toast.info(<p>Host changed! New host is <b>{newHost.username}</b>!</p>);
+    } else {
+      throw new Error('Host not found');
+    }
   }),
   // `ignoreElements` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
