@@ -11,12 +11,13 @@ import { createActionsNamespace, GetNamespaceActionType } from '../utils/createA
 const lobbyActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/LOBBY/ENTERED_LOBBY_PAGE': payload<LobbyId>(),
+  '[EVENT] APP/LOBBY/LEFT_LOBBY_PAGE': payload<LobbyId>(),
   '[DOCUMENT] APP/LOBBY/SET_IS_CREATE_LOBBY_LOADING': payload<boolean>(),
   '[COMMAND] APP/LOBBY/CREATE_LOBBY': empty(),
   '[EVENT] APP/LOBBY/CREATE_LOBBY_RESOLVED': payload<Lobby>(),
   '[EVENT] APP/LOBBY/CREATE_LOBBY_REJECTED': payload<string>(),
   '[COMMAND] APP/LOBBY/JOIN_LOBBY': payload<LobbyId>(),
-  '[EVENT] APP/LOBBY/JOIN_LOBBY_RESOLVED': payload<string>(),
+  '[EVENT] APP/LOBBY/JOIN_LOBBY_RESOLVED': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/JOIN_LOBBY_REJECTED': payload<string>(),
   '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHost: User; lobbyId: LobbyId }>(),
   '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),

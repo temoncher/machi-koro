@@ -10,7 +10,7 @@ service cloud.firestore {
       allow write: if request.auth.uid == userId &&
         request.resource.data["uid"] == userId &&
         request.resource.data["username"] is string &&
-        request.resource.data["username"].size() > 4 &&
+        request.resource.data["username"].size() > 0 &&
         request.resource.data["username"].size() <= 30
     }
   }

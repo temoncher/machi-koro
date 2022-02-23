@@ -20,11 +20,10 @@ import * as SocketIOClient from 'socket.io-client';
 
 import {
   createFirebaseLobby,
-  getFirebaseLobbyState$,
   joinFirebaseLobby,
   leaveFirebaseLobby,
-} from './firebase-api/firebase-lobbies.api';
-import { getFirebaseUserData, registerFirebaseGuest } from './firebase-api/firebase-users.api';
+} from './firebase/lobbies-firebase.api';
+import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
 import { GameApi } from './game';
 import { RootAction } from './root.actions';
 import { rootEpic, RootEpicDependencies } from './root.epic';
@@ -68,6 +67,7 @@ export const initStore = (deps: InitStoreDependencies) => {
   );
 
   const rootEpicDependencies: RootEpicDependencies = {
+    firebaseDb: deps.firebaseDb,
     socket: deps.socket,
     authState$: authState(deps.firebaseAuth).pipe(
       switchMap((userState) => {
@@ -78,7 +78,6 @@ export const initStore = (deps: InitStoreDependencies) => {
     ),
     leaveLobby: leaveFirebaseLobby(deps.firebaseDb),
     joinLobby: joinFirebaseLobby(deps.firebaseDb),
-    getLobbyState$: getFirebaseLobbyState$(deps.firebaseDb),
     registerGuest: registerFirebaseGuest(deps.firestore, deps.firebaseAuth),
     createLobby: createFirebaseLobby(deps.firebaseDb),
     createGame: gameApi.sendCreateGameRequest,

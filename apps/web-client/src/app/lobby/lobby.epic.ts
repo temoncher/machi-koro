@@ -5,7 +5,6 @@ import {
   mapTo,
   of,
   switchMap,
-  takeUntil,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
@@ -14,7 +13,6 @@ import { waitUntilAuthorized } from '../utils/waitUntilAuthorized';
 
 import {
   CreateLobby,
-  GetLobbyState$,
   JoinLobby,
   LeaveLobby,
 } from './lobbies.api.types';
@@ -68,22 +66,6 @@ const joinLobbyOnLobbyPageEnteredEventEpic: TypedEpic<typeof LobbyAction.joinLob
   map(LobbyAction.joinLobbyCommand),
 );
 
-type UpdateLobbyStateOnJoinLobbyResolvedEvent = {
-  getLobbyState$: GetLobbyState$;
-};
-
-const updateLobbyStateOnJoinLobbyResolvedEvent = (
-  deps: UpdateLobbyStateOnJoinLobbyResolvedEvent,
-): TypedEpic<typeof LobbyAction.setLobbyDocument> => (actions$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyResolvedEvent),
-  toPayload(),
-  switchMap((lobbyId) => deps.getLobbyState$(lobbyId).pipe(
-    // TODO: check if this takeUntil really unsubscribes from lobby state object
-    takeUntil(actions$.pipe(ofType(LobbyAction.currentUserLeftLobbyEvent))),
-    map((newLobbyState) => LobbyAction.setLobbyDocument(newLobbyState)),
-  )),
-);
-
 type JoinLobbyEpicDependencies = {
   joinLobby: JoinLobby;
 };
@@ -110,6 +92,7 @@ type LeaveLobbyEpicDependencies = {
   leaveLobby: LeaveLobby;
 };
 
+// TODO?: leave lobby when navigating out of lobbies page?
 const leaveLobbyEpic = (
   deps: LeaveLobbyEpicDependencies,
 ): TypedEpic<typeof LobbyAction.currentUserLeftLobbyEvent> => (actions$, state$) => actions$.pipe(
@@ -127,15 +110,13 @@ const leaveLobbyEpic = (
 export type LobbyEpicDependencies =
   & LeaveLobbyEpicDependencies
   & JoinLobbyEpicDependencies
-  & CreateLobbyEpicDependencies
-  & UpdateLobbyStateOnJoinLobbyResolvedEvent;
+  & CreateLobbyEpicDependencies;
 
 export const lobbyEpic = (deps: LobbyEpicDependencies) => typedCombineEpics<LobbyAction>(
   createLobbyEpic(deps),
   showCreateLobbyLoaderOnCreateLobbyCommandEpic,
   hideCreateLobbyLoaderOnCreateLobbyResultEventEpic,
   joinLobbyOnLobbyPageEnteredEventEpic,
-  updateLobbyStateOnJoinLobbyResolvedEvent(deps),
   joinLobbyEpic(deps),
   leaveLobbyEpic(deps),
 );

@@ -1,3 +1,4 @@
+import { LobbyId } from '@machikoro/game-server-contracts';
 import {
   Button,
   Box,
@@ -25,7 +26,7 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
   const lobbyId = useTypedSelector((state) => {
     const { pathname } = state.router.location;
 
-    return UrlUtils.getLastSegment(pathname);
+    return UrlUtils.getLastSegment(pathname) as LobbyId | undefined;
   });
 
   const { createGameCommand } = useGameActions();

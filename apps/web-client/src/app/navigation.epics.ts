@@ -1,10 +1,13 @@
+import { LobbyId } from '@machikoro/game-server-contracts';
 import { LocationChangePayload, push } from 'connected-react-router';
 import { AnyAction } from 'redux';
 import {
   filter,
+  first,
   map,
   mapTo,
   Observable,
+  switchMap,
   withLatestFrom,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
@@ -27,6 +30,23 @@ const rootPathMatches = <R extends string>(pathToMatch: R) => <T>(source$: Obser
       pathname: `/${R}${string}`;
     };
   }),
+);
+
+const leftPage = <R extends string>(pathToMatch: R) => (actions$: Observable<AnyAction>) => actions$.pipe(
+  ofType(NavigationAction.locationChangeEvent),
+  toPayload(),
+  rootPathMatches(pathToMatch),
+  switchMap((previousPayload) => actions$.pipe(
+    ofType(NavigationAction.locationChangeEvent),
+    first(),
+    toPayload(),
+    filter((payload) => {
+      const [, rootPath] = payload.location.pathname.split('/');
+
+      return rootPath !== pathToMatch;
+    }),
+    map((payload) => ({ previousPayload, payload })),
+  )),
 );
 
 const redirectToHomePageOnRegisterGuestResolvedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
@@ -60,14 +80,14 @@ const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyA
   toPayload(),
   rootPathMatches('lobbies'),
   map((payload) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, array-element-newline
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [,lobbies, lobbyId] = payload.location.pathname.split('/');
 
     return lobbyId;
   }),
   // TODO: introduce some kind of error handling in case lobby id is not defined
   filter(isDefined),
-  map(LobbyAction.enteredLobbyPageEvent),
+  map((lobbyId) => LobbyAction.enteredLobbyPageEvent(lobbyId as LobbyId)),
 );
 
 const redirectToHomePageOnCurrentUserLeftLobbyEvent: TypedEpic<typeof push> = (actions$, state$) => actions$.pipe(
@@ -84,12 +104,25 @@ const redirectToHomePageOnCurrentUserLeftLobbyEvent: TypedEpic<typeof push> = (a
   mapTo(push({ pathname: '/' })),
 );
 
-const dispatchEnteredGamePageEventOnGamePageEnterEpic: TypedEpic<typeof GameAction.enteredGamePageEvent> = (actions$) => actions$.pipe(
+const dispatchLeftLobbyPageEventOnLobbyPageLeave: TypedEpic<typeof LobbyAction.leftLobbyPageEvent> = (actions$) => actions$.pipe(
+  leftPage('lobbies'),
+  map(({ previousPayload }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [,lobbies, lobbyId] = previousPayload.location.pathname.split('/');
+
+    return lobbyId;
+  }),
+  // TODO: introduce some kind of error handling in case lobby id is not defined
+  filter(isDefined),
+  map((lobbyId) => LobbyAction.leftLobbyPageEvent(lobbyId as LobbyId)),
+);
+
+const dispatchEnteredGamePageEventOnGamePageEnter: TypedEpic<typeof GameAction.enteredGamePageEvent> = (actions$) => actions$.pipe(
   ofType(NavigationAction.locationChangeEvent),
   toPayload(),
   rootPathMatches('games'),
   map((payload) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, array-element-newline
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [,games, gameId] = payload.location.pathname.split('/');
 
     return gameId;
@@ -106,5 +139,6 @@ export const navigationEpic = typedCombineEpics<AnyAction>(
   dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic,
   redirectToGamePageOnGameCreatedEventEpic,
   redirectToHomePageOnCurrentUserLeftLobbyEvent,
-  dispatchEnteredGamePageEventOnGamePageEnterEpic,
+  dispatchEnteredGamePageEventOnGamePageEnter,
+  dispatchLeftLobbyPageEventOnLobbyPageLeave,
 );

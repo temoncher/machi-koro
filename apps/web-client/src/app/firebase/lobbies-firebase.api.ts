@@ -1,4 +1,4 @@
-import { Lobby } from '@machikoro/game-server-contracts';
+import { Lobby, LobbyId } from '@machikoro/game-server-contracts';
 import {
   push,
   ref,
@@ -16,7 +16,6 @@ import { map } from 'rxjs';
 import {
   CreateLobby,
   GetLobby,
-  GetLobbyState$,
   JoinLobby,
   LeaveLobby,
 } from '../lobby';
@@ -33,17 +32,6 @@ export const joinFirebaseLobby = (firebaseDb: Database): JoinLobby => async (use
 
   /** Make sure user is removed from the lobby in case browser closes */
   void onDisconnect(lobbyUserRef).remove();
-};
-export const getFirebaseLobbyState$ = (firebaseDb: Database): GetLobbyState$ => (lobbyId) => {
-  const lobbyRef = child(ref(firebaseDb), `lobbies/${lobbyId}`);
-
-  return object(lobbyRef).pipe(
-    map((lobbyChange) => {
-      if (!lobbyChange.snapshot.exists()) return undefined;
-
-      return lobbyChange.snapshot.val() as Lobby;
-    }),
-  );
 };
 export const getFirebaseLobby = (firebaseDb: Database): GetLobby => async (lobbyId) => {
   const lobbyRef = child(ref(firebaseDb), `lobbies/${lobbyId}`);
@@ -63,9 +51,11 @@ export const createFirebaseLobby = (firebaseDb: Database): CreateLobby => async 
     createdAt: serverTimestamp(),
   });
 
+  const lobbyId = createdLobbyRef.key! as LobbyId;
+
   return {
     // This cast is safe because only root database has a `null` key
-    lobbyId: createdLobbyRef.key!,
+    lobbyId,
     hostId,
     capacity,
     users: {},
