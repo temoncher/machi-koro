@@ -6,6 +6,7 @@
         ".write": "(!data.exists() && auth !== null) || (data.exists() && data.child('hostId').val() === auth.uid)",
         "users": {
           "$userId": {
+            ".validate": "newData.exists() && newData.child('userId').val() === auth.uid && newData.child('username').isString()",
             ".write": "auth.uid === $userId"
           }
         }

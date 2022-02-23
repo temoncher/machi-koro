@@ -6,13 +6,18 @@ import {
   of,
   switchMap,
   takeUntil,
-  withLatestFrom,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { waitUntilAuthorized } from '../utils/waitUntilAuthorized';
 
-import { CreateLobby, GetLobbyState$, JoinLobby } from './lobbies.api.types';
+import {
+  CreateLobby,
+  GetLobbyState$,
+  JoinLobby,
+  LeaveLobby,
+} from './lobbies.api.types';
 import { LobbyAction } from './lobby.actions';
 
 type CreateLobbyEpicDependencies = {
@@ -26,12 +31,10 @@ const createLobbyEpic = (
   state$,
 ) => actions$.pipe(
   ofType(LobbyAction.createLobbyCommand),
-  withLatestFrom(state$),
-  // TODO: add error handling (if userId is undefined)?
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  map(([action, state]) => state.loginReducer.userId as string),
+  waitUntilAuthorized(state$),
   // TODO: replace hardcoded capacity with user defined value
-  switchMap((hostId) => from(deps.createLobby(hostId, 4)).pipe(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  switchMap(([action, { userId }]) => from(deps.createLobby(userId, 4)).pipe(
     map(LobbyAction.createLobbyResolvedEvent),
     catchError((error) => {
       const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
@@ -81,20 +84,17 @@ const updateLobbyStateOnJoinLobbyResolvedEvent = (
   )),
 );
 
-type JoinLobbyDependencies = {
+type JoinLobbyEpicDependencies = {
   joinLobby: JoinLobby;
 };
 
-const joinLobby = (
-  deps: JoinLobbyDependencies,
+const joinLobbyEpic = (
+  deps: JoinLobbyEpicDependencies,
 ): TypedEpic<typeof LobbyAction.joinLobbyResolvedEvent | typeof LobbyAction.joinLobbyRejectedEvent> => (actions$, state$) => actions$.pipe(
   ofType(LobbyAction.joinLobbyCommand),
   toPayload(),
-  withLatestFrom(state$),
-  // TODO: add error handling (if userId is undefined)?
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  map(([lobbyId, state]) => [lobbyId, state.loginReducer.userId!, state.loginReducer.username!] as const),
-  switchMap(([lobbyId, userId, username]) => from(deps.joinLobby({ type: 'guest', userId, username }, lobbyId)).pipe(
+  waitUntilAuthorized(state$),
+  switchMap(([lobbyId, { userId, username }]) => from(deps.joinLobby({ type: 'guest', userId, username }, lobbyId)).pipe(
     // `mapTo` really accepts `any` payload, therefore
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     mapTo(LobbyAction.joinLobbyResolvedEvent(lobbyId)),
@@ -106,8 +106,27 @@ const joinLobby = (
   )),
 );
 
+type LeaveLobbyEpicDependencies = {
+  leaveLobby: LeaveLobby;
+};
+
+const leaveLobbyEpic = (
+  deps: LeaveLobbyEpicDependencies,
+): TypedEpic<typeof LobbyAction.currentUserLeftLobbyEvent> => (actions$, state$) => actions$.pipe(
+  ofType(LobbyAction.leaveLobbyCommand),
+  toPayload(),
+  waitUntilAuthorized(state$),
+  switchMap(([lobbyId, { userId }]) => from(deps.leaveLobby(userId, lobbyId)).pipe(
+    // `mapTo` really accepts `any` payload, therefore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    mapTo(LobbyAction.currentUserLeftLobbyEvent(lobbyId)),
+    // TODO: error handling
+  )),
+);
+
 export type LobbyEpicDependencies =
-  & JoinLobbyDependencies
+  & LeaveLobbyEpicDependencies
+  & JoinLobbyEpicDependencies
   & CreateLobbyEpicDependencies
   & UpdateLobbyStateOnJoinLobbyResolvedEvent;
 
@@ -117,5 +136,6 @@ export const lobbyEpic = (deps: LobbyEpicDependencies) => typedCombineEpics<Lobb
   hideCreateLobbyLoaderOnCreateLobbyResultEventEpic,
   joinLobbyOnLobbyPageEnteredEventEpic,
   updateLobbyStateOnJoinLobbyResolvedEvent(deps),
-  joinLobby(deps),
+  joinLobbyEpic(deps),
+  leaveLobbyEpic(deps),
 );

@@ -8,9 +8,10 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 
-import { GetUserData, RegisterUser } from '../user.api.types';
+import { RegisterGuest } from '../login';
+import { GetUserData } from '../user.api.types';
 
-export const registerFirebaseUser = (firestore: Firestore, firebaseAuth: Auth): RegisterUser => async (username) => {
+export const registerFirebaseGuest = (firestore: Firestore, firebaseAuth: Auth): RegisterGuest => async (username) => {
   const anonymusCredentials = await signInAnonymously(firebaseAuth);
 
   await setDoc(doc(firestore, 'users', anonymusCredentials.user.uid), {

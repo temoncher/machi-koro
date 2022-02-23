@@ -14,9 +14,9 @@ import { LobbyAction } from './lobby';
 import { LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
-import { RxjsUtils } from './utils/rxjs.utils';
+import { isDefined } from './utils/isDefined';
 
-const rootPathMatches = <R extends string>(pathToMatch: R) => <T>(source: Observable<LocationChangePayload<T>>) => source.pipe(
+const rootPathMatches = <R extends string>(pathToMatch: R) => <T>(source$: Observable<LocationChangePayload<T>>) => source$.pipe(
   filter((payload) => {
     const [, rootPath] = payload.location.pathname.split('/');
 
@@ -66,7 +66,7 @@ const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyA
     return lobbyId;
   }),
   // TODO: introduce some kind of error handling in case lobby id is not defined
-  filter(RxjsUtils.isDefined),
+  filter(isDefined),
   map(LobbyAction.enteredLobbyPageEvent),
 );
 
@@ -95,7 +95,7 @@ const dispatchEnteredGamePageEventOnGamePageEnterEpic: TypedEpic<typeof GameActi
     return gameId;
   }),
   // TODO: introduce some kind of error handling in case lobby id is not defined
-  filter(RxjsUtils.isDefined),
+  filter(isDefined),
   map(GameAction.enteredGamePageEvent),
 );
 

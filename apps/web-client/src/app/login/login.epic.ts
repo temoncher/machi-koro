@@ -10,9 +10,10 @@ import { ofType, toPayload } from 'ts-action-operators';
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { LoginAction } from './login.actions';
+import { RegisterGuest } from './login.api.types';
 
 type RegisterGuestEpicDependencies = {
-  registerGuest: (username: string) => Promise<{ userId: string; username: string }>;
+  registerGuest: RegisterGuest;
 };
 
 const registerGuestEpic = (

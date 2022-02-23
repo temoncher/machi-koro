@@ -8,32 +8,6 @@ import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 import { WebsocketAction } from './websocket.actions';
 import { ofWsEventType } from './websocket.utils';
 
-const joinLobbyEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyCommand),
-  toPayload(),
-  map((lobbyId) => WebsocketAction.sendWsMessageCommand({
-    type: 'joinLobby',
-    payload: lobbyId,
-  })),
-);
-
-const mapJoinLobbyResolvedEventWsMessageEpic: TypedEpic<typeof LobbyAction.joinLobbyResolvedEvent> = (
-  actions$,
-) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_JOINED_SUCCESSFULLY'),
-  map((event) => LobbyAction.joinLobbyResolvedEvent(event.payload)),
-);
-
-const mapJoinLobbyRejectedEventWsMessageEpic: TypedEpic<typeof LobbyAction.joinLobbyRejectedEvent> = (
-  actions$,
-) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_JOIN_ERROR'),
-  map((event) => LobbyAction.joinLobbyRejectedEvent(event.payload)),
-);
 
 const mapHostChangedEventWsMessageEpic: TypedEpic<typeof LobbyAction.hostChangedEvent> = (
   actions$,
@@ -42,24 +16,6 @@ const mapHostChangedEventWsMessageEpic: TypedEpic<typeof LobbyAction.hostChanged
   toPayload(),
   ofWsEventType('LOBBY_HOST_CHANGED'),
   map((event) => LobbyAction.hostChangedEvent(event.payload)),
-);
-
-const leaveLobbyEpic: TypedEpic<typeof WebsocketAction.sendWsMessageCommand> = (actions$) => actions$.pipe(
-  ofType(LobbyAction.leaveLobbyCommand),
-  toPayload(),
-  map((lobbyId) => WebsocketAction.sendWsMessageCommand({
-    type: 'leaveLobby',
-    payload: lobbyId,
-  })),
-);
-
-const mapCurrentUserLeftLobbyEventWsMessageEpic: TypedEpic<typeof LobbyAction.currentUserLeftLobbyEvent> = (
-  actions$,
-) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_LEFT_SUCCESSFULLY'),
-  map((event) => LobbyAction.currentUserLeftLobbyEvent(event.payload)),
 );
 
 const mapGameCreatedEventWsMessageEpic: TypedEpic<typeof LobbyAction.gameCreatedEvent> = (
@@ -90,12 +46,7 @@ const mapUserLeftEventWsMessageEpic: TypedEpic<typeof LobbyAction.userLeftEvent>
 );
 
 export const lobbyWebsocketEpic = typedCombineEpics<AnyAction>(
-  joinLobbyEpic,
-  mapJoinLobbyResolvedEventWsMessageEpic,
-  mapJoinLobbyRejectedEventWsMessageEpic,
   mapHostChangedEventWsMessageEpic,
-  leaveLobbyEpic,
-  mapCurrentUserLeftLobbyEventWsMessageEpic,
   mapGameCreatedEventWsMessageEpic,
   mapUserJoinedEventWsMessageEpic,
   mapUserLeftEventWsMessageEpic,
