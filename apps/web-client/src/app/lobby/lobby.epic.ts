@@ -1,45 +1,24 @@
 import {
-  catchError,
   from,
   map,
   mapTo,
-  of,
   switchMap,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { GetNamespaceActionType } from '../utils/createActionsNamespace';
 import { waitUntilAuthorized } from '../utils/waitUntilAuthorized';
 
-import { JoinLobby, LeaveLobby } from './lobbies.api.types';
+import { JoinLobbyAction } from './joinLobby.endpoint';
+import { LeaveLobby } from './lobbies.api.types';
 import { LobbyAction } from './lobby.actions';
 
-const joinLobbyOnLobbyPageEnteredEventEpic: TypedEpic<typeof LobbyAction.joinLobbyCommand> = (actions$) => actions$.pipe(
+const joinLobbyOnLobbyPageEnteredEventEpic: TypedEpic<typeof JoinLobbyAction.joinLobbyCommand> = (actions$, state$) => actions$.pipe(
   ofType(LobbyAction.enteredLobbyPageEvent),
   toPayload(),
-  map(LobbyAction.joinLobbyCommand),
-);
-
-type JoinLobbyEpicDependencies = {
-  joinLobby: JoinLobby;
-};
-
-const joinLobbyEpic = (
-  deps: JoinLobbyEpicDependencies,
-): TypedEpic<typeof LobbyAction.joinLobbyResolvedEvent | typeof LobbyAction.joinLobbyRejectedEvent> => (actions$, state$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyCommand),
-  toPayload(),
   waitUntilAuthorized(state$),
-  switchMap(([lobbyId, { userId, username }]) => from(deps.joinLobby({ userId, username }, lobbyId)).pipe(
-    // `mapTo` really accepts `any` payload, therefore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    mapTo(LobbyAction.joinLobbyResolvedEvent(lobbyId)),
-    catchError((error) => {
-      const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
-
-      return of(LobbyAction.joinLobbyRejectedEvent(errorMessage));
-    }),
-  )),
+  map(([lobbyId, { userId, username }]) => JoinLobbyAction.joinLobbyCommand([{ userId, username }, lobbyId])),
 );
 
 type LeaveLobbyEpicDependencies = {
@@ -61,12 +40,9 @@ const leaveLobbyEpic = (
   )),
 );
 
-export type LobbyEpicDependencies =
-  & LeaveLobbyEpicDependencies
-  & JoinLobbyEpicDependencies;
+export type LobbyEpicDependencies = LeaveLobbyEpicDependencies;
 
-export const lobbyEpic = (deps: LobbyEpicDependencies) => typedCombineEpics<LobbyAction>(
+export const lobbyEpic = (deps: LobbyEpicDependencies) => typedCombineEpics<LobbyAction | GetNamespaceActionType<typeof JoinLobbyAction>>(
   joinLobbyOnLobbyPageEnteredEventEpic,
-  joinLobbyEpic(deps),
   leaveLobbyEpic(deps),
 );

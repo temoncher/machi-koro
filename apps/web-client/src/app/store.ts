@@ -26,6 +26,7 @@ import {
 import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
 import { GameApi } from './game';
 import { createLobbyEpic } from './home';
+import { joinLobbyEpic } from './lobby';
 import { registerGuestEpic } from './login';
 import { RootAction } from './root.actions';
 import { rootEpic, RootEpicDependencies } from './root.epic';
@@ -77,7 +78,6 @@ export const initStore = (deps: InitStoreDependencies) => {
       }),
     ),
     leaveLobby: leaveFirebaseLobby(deps.firebaseDb),
-    joinLobby: joinFirebaseLobby(deps.firebaseDb),
     createGame: gameApi.sendCreateGameRequest,
   };
 
@@ -86,6 +86,7 @@ export const initStore = (deps: InitStoreDependencies) => {
       rootEpic(rootEpicDependencies),
       registerGuestEpic(registerFirebaseGuest(deps.firestore, deps.firebaseAuth)),
       createLobbyEpic(createFirebaseLobby(deps.firebaseDb)),
+      joinLobbyEpic(joinFirebaseLobby(deps.firebaseDb)),
     ),
   );
 

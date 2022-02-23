@@ -11,7 +11,7 @@ import {
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { LobbyAction } from '../lobby';
+import { JoinLobbyAction, LobbyAction } from '../lobby';
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 type SyncLobbyStateDependencies = {
@@ -21,7 +21,7 @@ type SyncLobbyStateDependencies = {
 const syncLobbyState = (
   deps: SyncLobbyStateDependencies,
 ): TypedEpic<typeof LobbyAction.setLobbyDocument> => (actions$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyResolvedEvent),
+  ofType(JoinLobbyAction.joinLobbyResolvedEvent),
   toPayload(),
   switchMap((lobbyId) => object(ref(deps.firebaseDb, `lobbies/${lobbyId}`)).pipe(
     // TODO: check if this takeUntil really unsubscribes from lobby state object
@@ -42,7 +42,7 @@ type MapUserAddedChangeToLobbyUserJoinedEventDependencies = {
 const mapUserAddedChangeToLobbyUserJoinedEvent = (
   deps: MapUserAddedChangeToLobbyUserJoinedEventDependencies,
 ): TypedEpic<typeof LobbyAction.userJoinedEvent> => (actions$, state$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyResolvedEvent),
+  ofType(JoinLobbyAction.joinLobbyResolvedEvent),
   toPayload(),
   switchMap((lobbyId) => stateChanges(
     ref(deps.firebaseDb, `lobbies/${lobbyId}/users`),
@@ -74,7 +74,7 @@ type MapUserRemovedChangeToLobbyUserLeftEventDependencies = {
 const mapUserRemovedChangeToLobbyUserLeftEvent = (
   deps: MapUserRemovedChangeToLobbyUserLeftEventDependencies,
 ): TypedEpic<typeof LobbyAction.userLeftEvent> => (actions$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyResolvedEvent),
+  ofType(JoinLobbyAction.joinLobbyResolvedEvent),
   toPayload(),
   switchMap((lobbyId) => stateChanges(
     ref(deps.firebaseDb, `lobbies/${lobbyId}/users`),
@@ -99,7 +99,7 @@ type MapHostChangeToLobbyHostChangedEventDependencies = {
 const mapHostChangeToLobbyHostChangedEvent = (
   deps: MapUserRemovedChangeToLobbyUserLeftEventDependencies,
 ): TypedEpic<typeof LobbyAction.hostChangedEvent> => (actions$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyResolvedEvent),
+  ofType(JoinLobbyAction.joinLobbyResolvedEvent),
   toPayload(),
   switchMap((lobbyId) => stateChanges(
     ref(deps.firebaseDb, `lobbies/${lobbyId}`),

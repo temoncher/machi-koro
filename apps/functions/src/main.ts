@@ -1,9 +1,6 @@
 import { Lobby, LobbyId, User } from '@machikoro/game-server-contracts';
 import * as functions from 'firebase-functions';
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
-
 export const onLobbyUserRemove = functions
   .database
   .ref('/lobbies/{lobbyId}/users/{userId}')

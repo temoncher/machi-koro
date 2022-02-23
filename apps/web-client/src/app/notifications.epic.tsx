@@ -8,7 +8,7 @@ import {
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { LobbyAction } from './lobby';
+import { JoinLobbyAction, LobbyAction } from './lobby';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
 
 const showUserJoinedLobbyNotification: TypedEpic<never> = (actions$, state$) => actions$.pipe(
@@ -40,10 +40,11 @@ const showUserLeftLobbyNotification: TypedEpic<never> = (actions$, state$) => ac
 );
 
 const showJoinLobbyError: TypedEpic<never> = (actions$) => actions$.pipe(
-  ofType(LobbyAction.joinLobbyRejectedEvent),
-  toPayload(),
-  tap((message) => {
-    toast.error(`Failed to join the lobby: ${message}`);
+  ofType(JoinLobbyAction.joinLobbyRejectedEvent),
+  tap((action) => {
+    if (action.payload instanceof Error) {
+      toast.error(`Failed to join the lobby: ${action.payload.message}`);
+    }
   }),
   // `ignoreElements` really accepts `any` payload, therefore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

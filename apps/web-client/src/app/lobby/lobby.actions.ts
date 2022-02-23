@@ -13,9 +13,6 @@ const lobbyActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/LOBBY/ENTERED_LOBBY_PAGE': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/LEFT_LOBBY_PAGE': payload<LobbyId>(),
-  '[COMMAND] APP/LOBBY/JOIN_LOBBY': payload<LobbyId>(),
-  '[EVENT] APP/LOBBY/JOIN_LOBBY_RESOLVED': payload<LobbyId>(),
-  '[EVENT] APP/LOBBY/JOIN_LOBBY_REJECTED': payload<string>(),
   '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHostId: UserId; lobbyId: LobbyId }>(),
   '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),
   '[COMMAND] APP/LOBBY/LEAVE_LOBBY': payload<LobbyId>(),
