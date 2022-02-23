@@ -1,4 +1,3 @@
-import { LobbyId } from '@machikoro/game-server-contracts';
 import { LoadingButton } from '@mui/lab';
 import {
   Button,
@@ -10,9 +9,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-import { useGameActions } from '../game/useGameActions';
 import { useTypedSelector } from '../hooks';
-import { UrlUtils } from '../utils/url.utils';
 
 import { UserCard } from './UserCard';
 import { LobbyAction } from './lobby.actions';
@@ -26,22 +23,11 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
   const lobby = useTypedSelector((state) => state.lobbyReducer.lobby);
   const { isLoading } = useTypedSelector((state) => state.requests.leaveLobbyReducer);
   const { t } = useTranslation();
-  const lobbyId = useTypedSelector((state) => {
-    const { pathname } = state.router.location;
 
-    return UrlUtils.getLastSegment(pathname) as LobbyId | undefined;
-  });
-
-  const { createGameCommand } = useGameActions();
   const dispatch = useDispatch();
 
-  const createGame = (): void => {
-    if (lobbyId) {
-      createGameCommand({ lobbyId });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('LobbyId is missing');
-    }
+  const dispatchCreateGameButtonClickedEvent = () => {
+    dispatch(LobbyAction.createGameButtonClickedEvent());
   };
 
   const dispatchLeaveLobbyButtonClickedEvent = () => {
@@ -73,7 +59,7 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
         </Box>
 
         <Box sx={{ py: 2, '> :not(:last-child).MuiButton-root': { mr: 2 } }}>
-          <Button type="submit" variant="contained" onClick={createGame}>
+          <Button type="submit" variant="contained" onClick={dispatchCreateGameButtonClickedEvent}>
             {t('lobby.startNewGameButtonText')}
           </Button>
           <LoadingButton

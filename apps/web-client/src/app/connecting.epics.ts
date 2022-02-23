@@ -1,3 +1,4 @@
+import { User } from '@machikoro/game-server-contracts';
 import { AnyAction } from 'redux';
 import {
   filter,
@@ -23,7 +24,7 @@ const dispatchAppStartedEventOnFirstRenderEpic: TypedEpic<typeof RootAction.appS
 );
 
 type AuthorizeEpicDependencies = {
-  authState$: Observable<{ username: string; userId: string } | undefined>;
+  authState$: Observable<User | undefined>;
 };
 
 const syncAuthStateOnAppStartedEvent = (
@@ -36,10 +37,7 @@ const syncAuthStateOnAppStartedEvent = (
         return LoginAction.authorizeRejectedEvent('Signed out');
       }
 
-      return LoginAction.authorizeResolvedEvent({
-        userId: user.userId,
-        username: user.username,
-      });
+      return LoginAction.authorizeResolvedEvent(user);
     }),
   )),
 );

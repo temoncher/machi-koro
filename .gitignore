@@ -46,6 +46,7 @@ junit.xml
 .cypress_cache
 
 # Firebase
+.emulators-cache
 .firebaserc
 firebase-debug.log
 firestore-debug.log

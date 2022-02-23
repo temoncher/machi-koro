@@ -1,5 +1,4 @@
 export * from './GamePage';
-export * from './game.api';
 export * from './game.actions';
 export * from './game.epic';
 export * from './game.reducer';

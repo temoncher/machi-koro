@@ -4,7 +4,7 @@ import {
   Landmark,
   LandmarkId,
   User,
-  UserStatus,
+  PlayerConnectionStatus,
 } from '@machikoro/game-server-contracts';
 import { Box, Typography, SxProps } from '@mui/material';
 import React from 'react';
@@ -15,7 +15,7 @@ import { MinimizedLandmarkView } from './components/MinimizedLandmarkView';
 
 type PlayerViewHeaderProps = {
   sx?: SxProps;
-  status: UserStatus;
+  status: PlayerConnectionStatus;
   username: string;
   coins: number;
 };
@@ -36,7 +36,7 @@ const PlayerViewHeader: React.FC<PlayerViewHeaderProps> = (props) => (
           height: 10,
           width: 10,
           borderRadius: 1e5,
-          bgcolor: (theme) => (props.status === UserStatus.CONNECTED
+          bgcolor: (theme) => (props.status === PlayerConnectionStatus.CONNECTED
             ? theme.palette.success.main
             : theme.palette.error.main),
         }}
@@ -54,7 +54,7 @@ type PlayerViewProps = {
   player: User;
   coins: number;
   gameLandmarks: Record<LandmarkId, Landmark>;
-  status: UserStatus;
+  status: PlayerConnectionStatus;
   establishments: Record<EstablishmentId, number>;
   gameEstablishments: Record<EstablishmentId, Establishment>;
   landmarks: Record<LandmarkId, boolean>;

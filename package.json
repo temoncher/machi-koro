@@ -5,7 +5,7 @@
   "scripts": {
     "nx": "nx",
     "dev": "NODE_ENV=development concurrently --kill-others \"yarn build functions --watch\" \"yarn build web-client --watch\"",
-    "emulators": "firebase emulators:start",
+    "emulators": "firebase emulators:start --import=./.emulators-cache",
     "test-ci": "nx run-many --all --target=test --reporters=jest-junit --codeCoverage --coverageReporters=clover,text",
     "lint-ci": "nx run-many --all --target=lint --format gitlab .",
     "serve": "nx serve",

@@ -1,4 +1,4 @@
-import { LobbyId } from '@machikoro/game-server-contracts';
+import { GameId, LobbyId } from '@machikoro/game-server-contracts';
 import { LocationChangePayload, push } from 'connected-react-router';
 import { AnyAction } from 'redux';
 import {
@@ -14,7 +14,7 @@ import { ofType, toPayload } from 'ts-action-operators';
 
 import { GameAction } from './game';
 import { CreateLobbyAction } from './home';
-import { JoinLobbyAction, LobbyAction } from './lobby';
+import { CreateGameAction, JoinLobbyAction, LobbyAction } from './lobby';
 import { RegisterGuestAction, LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
@@ -78,7 +78,7 @@ const redirectToLobbyPageOnCreateLobbyResolvedEventEpic: TypedEpic<typeof push> 
 );
 
 const redirectToGamePageOnGameCreatedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(GameAction.createGameResolvedEvent),
+  ofType(CreateGameAction.createGameResolvedEvent),
   toPayload(),
   map(({ gameId }) => push({ pathname: `/games/${gameId}` })),
 );
@@ -133,7 +133,7 @@ const dispatchEnteredGamePageEventOnGamePageEnter: TypedEpic<typeof GameAction.e
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [,games, gameId] = payload.location.pathname.split('/');
 
-    return gameId;
+    return gameId as GameId | undefined;
   }),
   // TODO: introduce some kind of error handling in case lobby id is not defined
   filter(isDefined),

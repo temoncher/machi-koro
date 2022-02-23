@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { UserId } from './user.model';
+import { UserId, User } from './user.model';
 
 const MAX_LENGTH_LOBBY_ID = 36;
 
@@ -48,22 +48,23 @@ export type Establishment = CommonEstablishmentFields & {
 
 export type EstablishmentApplyEffect = Record<EstablishmentId, (context: GameContext) => GameContext>;
 
-export type GameId = string;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type GameId = string & { readonly GAME_ID: unique symbol };
 
 export type Player = { userId: UserId };
 
-export enum UserStatus {
+export enum PlayerConnectionStatus {
   CONNECTED = 'CONNECTED',
   DISCONNECTED = 'DISCONNECTED',
 }
 
-export type UsersStatusesMap = Record<UserId, UserStatus >;
+export type PlayerConnectionStatusesMap = Record<UserId, PlayerConnectionStatus>;
 
 export type Game = {
   gameId: GameId;
   hostId: UserId;
-  users: UserId[];
-  usersStatusesMap: UsersStatusesMap;
+  players: Record<UserId, User>;
+  playersConnectionStatuses: PlayerConnectionStatusesMap;
 };
 
 export type GameContext = {
@@ -76,7 +77,7 @@ export type GameContext = {
   coins: Record<UserId, number>;
   landmarks: Record<UserId, Record<LandmarkId, boolean>>;
   rollDiceResult: number;
-  winnerId: UserId;
+  winnerId: UserId | undefined;
 };
 
 export type ApplyEffects = (

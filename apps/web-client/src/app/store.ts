@@ -1,3 +1,4 @@
+import { UserId } from '@machikoro/game-server-contracts';
 import { AxiosInstance } from 'axios';
 import { routerMiddleware } from 'connected-react-router';
 import { Auth } from 'firebase/auth';
@@ -18,15 +19,15 @@ import {
   switchMap,
 } from 'rxjs';
 
+import { createFirebaseGame } from './firebase/games-firebase.api';
 import {
   createFirebaseLobby,
   joinFirebaseLobby,
   leaveFirebaseLobby,
 } from './firebase/lobbies-firebase.api';
 import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
-import { GameApi } from './game';
 import { createLobbyEpic } from './home';
-import { joinLobbyEpic, leaveLobbyEpic } from './lobby';
+import { joinLobbyEpic, leaveLobbyEpic, createGameEpic } from './lobby';
 import { registerGuestEpic } from './login';
 import { RootAction } from './root.actions';
 import { rootEpic, RootEpicDependencies } from './root.epic';
@@ -54,7 +55,6 @@ type InitStoreDependencies = {
 
 export const initStore = (deps: InitStoreDependencies) => {
   const epicMiddleware = createEpicMiddleware<RootAction, RootAction, RootState, unknown>();
-  const gameApi = GameApi.init(deps);
 
   const store = createStore(
     rootReducer(deps.history),
@@ -74,10 +74,9 @@ export const initStore = (deps: InitStoreDependencies) => {
       switchMap((userState) => {
         if (!userState) return of(undefined);
 
-        return from(getFirebaseUserData(deps.firestore)(userState.uid));
+        return from(getFirebaseUserData(deps.firestore)(userState.uid as UserId));
       }),
     ),
-    createGame: gameApi.sendCreateGameRequest,
   };
 
   epicMiddleware.run(
@@ -87,6 +86,7 @@ export const initStore = (deps: InitStoreDependencies) => {
       createLobbyEpic(createFirebaseLobby(deps.firebaseDb)),
       joinLobbyEpic(joinFirebaseLobby(deps.firebaseDb)),
       leaveLobbyEpic(leaveFirebaseLobby(deps.firebaseDb)),
+      createGameEpic(createFirebaseGame(deps.firebaseDb)),
     ),
   );
 

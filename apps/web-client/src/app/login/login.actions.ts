@@ -1,11 +1,11 @@
-import { AuthMeResponse } from '@machikoro/game-server-contracts';
+import { User } from '@machikoro/game-server-contracts';
 import { payload } from 'ts-action';
 
 import { createActionsNamespace, GetNamespaceActionType } from '../utils/createActionsNamespace';
 
 const loginActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
-  '[EVENT] APP/AUTH/AUTHORIZE_RESOLVED': payload<AuthMeResponse>(),
+  '[EVENT] APP/AUTH/AUTHORIZE_RESOLVED': payload<User>(),
   '[EVENT] APP/AUTH/AUTHORIZE_REJECTED': payload<string>(),
   /* eslint-enable @typescript-eslint/naming-convention */
 };

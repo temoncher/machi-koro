@@ -11,6 +11,24 @@
           }
         }
       }
+    },
+    "games": {
+      "$gameId": {
+        ".read": "auth !== null",
+        ".write": "(!data.exists() && auth !== null && newData.child('hostId').isString()) || data.child('hostId').val() === auth.uid",
+        "players": {
+          "$playerId": {
+            ".validate": "newData.child('playerId').val() === auth.uid && newData.child('username').isString()",
+            ".write": "data.parent().exists() && auth.uid === $playerId"
+          }
+        },
+        "playersConnectionStatuses": {
+          "$playerId": {
+            ".validate": "newData.val().matches(/^(CONNECTED|DISCONNECTED)$/)",
+            ".write": "data.parent().exists() && auth.uid === $playerId"
+          }
+        }
+      }
     }
   }
 }

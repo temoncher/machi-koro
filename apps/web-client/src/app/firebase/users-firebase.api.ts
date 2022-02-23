@@ -1,3 +1,4 @@
+import { User, UserId } from '@machikoro/game-server-contracts';
 import { signInAnonymously, Auth } from 'firebase/auth';
 import {
   doc,
@@ -5,7 +6,6 @@ import {
   setDoc,
   serverTimestamp,
   Firestore,
-  Timestamp,
 } from 'firebase/firestore';
 
 import { RegisterGuest } from '../login';
@@ -15,13 +15,13 @@ export const registerFirebaseGuest = (firestore: Firestore, firebaseAuth: Auth):
   const anonymusCredentials = await signInAnonymously(firebaseAuth);
 
   await setDoc(doc(firestore, 'users', anonymusCredentials.user.uid), {
-    uid: anonymusCredentials.user.uid,
+    userId: anonymusCredentials.user.uid,
     username,
     createdAt: serverTimestamp(),
   });
 
   return {
-    userId: anonymusCredentials.user.uid,
+    userId: anonymusCredentials.user.uid as UserId,
     username,
   };
 };
@@ -35,10 +35,7 @@ export const getFirebaseUserData = (firestore: Firestore): GetUserData => async 
 
   // TODO: peform validation
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const user = userSnapshot.data() as { uid: string; username: string; createdAt: Timestamp };
+  const user = userSnapshot.data() as User;
 
-  return {
-    userId: user.uid,
-    username: user.username,
-  };
+  return user;
 };

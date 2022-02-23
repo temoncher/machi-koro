@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 
 import { useTypedSelector } from '../hooks';
 
-import { CreateLobbyAction } from './createLobby.endpoint';
+import { HomeAction } from './home.actions';
 
 type HomePageProps = {
   sx?: SxProps;
@@ -18,12 +18,12 @@ type HomePageProps = {
 
 export const HomePage: React.FC<HomePageProps> = (props) => {
   const dispatch = useDispatch();
-  const { userId, username } = useTypedSelector((state) => state.loginReducer);
+  const { username } = useTypedSelector((state) => state.loginReducer);
   const { isLoading } = useTypedSelector((state) => state.requests.createLobbyReducer);
   const { t } = useTranslation();
 
-  const dispatchCreateLobbyCommand = () => {
-    dispatch(CreateLobbyAction.createLobbyCommand([userId!, 4]));
+  const dispatchCreateLobbyButtonClickedEvent = () => {
+    dispatch(HomeAction.createLobbyButtonClickedEvent());
   };
 
   return (
@@ -48,7 +48,7 @@ export const HomePage: React.FC<HomePageProps> = (props) => {
           loading={isLoading}
           variant="contained"
           loadingIndicator={t('home.createNewLobbyButtonTextLoading')}
-          onClick={dispatchCreateLobbyCommand}
+          onClick={dispatchCreateLobbyButtonClickedEvent}
         >
           {t('home.createNewLobbyButtonText')}
         </LoadingButton>

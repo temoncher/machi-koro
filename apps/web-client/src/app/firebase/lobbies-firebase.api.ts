@@ -36,10 +36,10 @@ export const createFirebaseLobby = (firebaseDb: Database): CreateLobby => async 
     createdAt: serverTimestamp(),
   });
 
+  // This cast is safe because only root database has a `null` key
   const lobbyId = createdLobbyRef.key! as LobbyId;
 
   return {
-    // This cast is safe because only root database has a `null` key
     lobbyId,
     hostId,
     capacity,

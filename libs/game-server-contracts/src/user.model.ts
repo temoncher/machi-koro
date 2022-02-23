@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export type UserId = string;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type UserId = string & { readonly USER_ID: unique symbol };
 
 export const FIRST_CHAR_USERNAME_REGEXP = /^[A-Za-z]/;
 export const USERNAME_REGEXP = /^[A-Za-z-_\s]+$/;
@@ -33,4 +34,4 @@ export const userSchema = z.object({
   userId: userIdShema,
 });
 
-export type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof userSchema> & { userId: UserId };

@@ -5,8 +5,8 @@ import {
   LandmarkId,
   User,
   UserId,
-  UsersStatusesMap,
-  UserStatus,
+  PlayerConnectionStatusesMap,
+  PlayerConnectionStatus,
 } from '@machikoro/game-server-contracts';
 import { Box, SxProps } from '@mui/material';
 import React, { useMemo } from 'react';
@@ -16,7 +16,7 @@ import { PlayerView } from './PlayerView';
 type PlayersViewProps = {
   sx?: SxProps;
   players: User[];
-  statusesMap: UsersStatusesMap;
+  statusesMap: PlayerConnectionStatusesMap;
   coinsMap: Record<UserId, number>;
   landmarksMap: Record<UserId, Record<LandmarkId, boolean>>;
   establishmentsMap: Record<UserId, Record<EstablishmentId, number>>;
@@ -50,7 +50,7 @@ export const PlayersView: React.FC<PlayersViewProps> = (props: PlayersViewProps)
           gameLandmarks={props.gameLandmarks}
           landmarks={props.landmarksMap[player.userId] ?? defaultLandmarks}
           player={player}
-          status={props.statusesMap[player.userId] ?? UserStatus.DISCONNECTED}
+          status={props.statusesMap[player.userId] ?? PlayerConnectionStatus.DISCONNECTED}
           onLandmarkClick={props.onLandmarkClick}
         />
       ))}

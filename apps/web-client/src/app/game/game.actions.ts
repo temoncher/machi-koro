@@ -1,6 +1,4 @@
 import {
-  CreateGameRequestBody,
-  CreateGameResponse,
   EstablishmentId,
   GameId,
   LandmarkId,
@@ -14,9 +12,6 @@ const gameActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/GAME/ENTERED_GAME_PAGE': payload<GameId>(),
   '[DOCUMENT] APP/GAME/SET_GAME': payload<Game | undefined>(),
-  '[COMMAND] APP/GAME/CREATE_GAME': payload<CreateGameRequestBody>(),
-  '[EVENT] APP/GAME/CREATE_GAME_RESOLVED': payload<CreateGameResponse>(),
-  '[EVENT] APP/GAME/CREATE_GAME_REJECTED': payload<string>(),
   '[COMMAND] APP/GAME/JOIN_GAME': payload<GameId>(),
   '[COMMAND] APP/GAME/ROLL_DICE': empty(),
   '[COMMAND] APP/GAME/PASS': empty(),
@@ -31,7 +26,6 @@ export const GameAction = createActionsNamespace(gameActionTypeToPayloadMap);
 export type GameAction = GetNamespaceActionType<typeof GameAction>;
 
 export const gameActions = {
-  createGameCommand: GameAction.createGameCommand,
   rollDiceCommand: GameAction.rollDiceCommand,
   passCommand: GameAction.passCommand,
   startGameCommand: GameAction.startGameCommand,
