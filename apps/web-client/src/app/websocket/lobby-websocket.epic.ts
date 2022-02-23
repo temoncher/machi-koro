@@ -26,27 +26,7 @@ const mapGameCreatedEventWsMessageEpic: TypedEpic<typeof LobbyAction.gameCreated
   map((event) => LobbyAction.gameCreatedEvent(event.payload)),
 );
 
-const mapUserJoinedEventWsMessageEpic: TypedEpic<typeof LobbyAction.userJoinedEvent> = (
-  actions$,
-) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_USER_JOINED'),
-  map((event) => LobbyAction.userJoinedEvent(event.payload)),
-);
-
-const mapUserLeftEventWsMessageEpic: TypedEpic<typeof LobbyAction.userLeftEvent> = (
-  actions$,
-) => actions$.pipe(
-  ofType(WebsocketAction.wsMessageReceivedEvent),
-  toPayload(),
-  ofWsEventType('LOBBY_USER_LEFT'),
-  map((event) => LobbyAction.userLeftEvent(event.payload)),
-);
-
 export const lobbyWebsocketEpic = typedCombineEpics<AnyAction>(
   mapHostChangedEventWsMessageEpic,
   mapGameCreatedEventWsMessageEpic,
-  mapUserJoinedEventWsMessageEpic,
-  mapUserLeftEventWsMessageEpic,
 );
