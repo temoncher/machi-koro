@@ -11,6 +11,7 @@ import { createActionsNamespace, GetNamespaceActionType } from '../utils/createA
 const gameActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/GAME/ENTERED_GAME_PAGE': payload<GameId>(),
+  '[EVENT] APP/GAME/ABANDON_GAME_BUTTON_CLICKED': empty(),
   '[DOCUMENT] APP/GAME/SET_GAME': payload<Game | undefined>(),
   '[COMMAND] APP/GAME/JOIN_GAME': payload<GameId>(),
   '[COMMAND] APP/GAME/ROLL_DICE': empty(),

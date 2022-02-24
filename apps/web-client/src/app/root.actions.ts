@@ -20,4 +20,4 @@ export type RootAction =
   | LoginAction
   | LobbyAction
   | RouterAction
-  | GetNamespaceActionType<typeof RegisterGuestAction>;
+  | RegisterGuestAction;

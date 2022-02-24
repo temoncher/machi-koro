@@ -94,7 +94,12 @@ export const createEndpoint = <Req extends (...args: any[]) => Promise<any>>() =
     toPayload(),
     switchMap((actionPayload) => from(request(...actionPayload)).pipe(
       map(requestResolvedEvent),
-      catchError((error) => of(requestRejectedEvent(error))),
+      catchError((error) => {
+        // eslint-disable-next-line no-console
+        console.error(`Failure for endpoint: ${name}`, error);
+
+        return of(requestRejectedEvent(error));
+      }),
     )),
   );
 

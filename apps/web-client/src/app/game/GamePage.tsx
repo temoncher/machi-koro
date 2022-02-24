@@ -2,6 +2,7 @@ import { GameContext, UserId } from '@machikoro/game-server-contracts';
 import { Box, Button, SxProps } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 import { useTypedSelector } from '../hooks';
 import { DiceCombination } from '../types/Dice';
@@ -9,6 +10,7 @@ import { DiceCombination } from '../types/Dice';
 import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
 import { DiceCombinationView } from './components/DiceCombinationView';
+import { GameAction } from './game.actions';
 import { useGameActions } from './useGameActions';
 
 const firstPlayerId = 'firstPlayer' as UserId;
@@ -163,7 +165,7 @@ type GamePageProps = {
 export const GamePage: React.FC<GamePageProps> = (props) => {
   const { t } = useTranslation();
   const game = useTypedSelector((state) => state.gameReducer.game);
-
+  const dispatch = useDispatch();
   const {
     rollDiceCommand,
     passCommand,
@@ -258,6 +260,15 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
         <Button variant="contained" onClick={rollDiceCommand}>{t('game.rollDiceButtonText')}</Button>
         <Button variant="contained" onClick={passCommand}>{t('game.passButtonText')}</Button>
         <Button variant="contained">{t('game.finishTurnButtonText')}</Button>
+        <Button
+          color="error"
+          variant="contained"
+          onClick={() => {
+            dispatch(GameAction.abandonGameButtonClickedEvent());
+          }}
+        >
+          {t('game.abandonGameButtonText')}
+        </Button>
       </Box>
     </Box>
   );

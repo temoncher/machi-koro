@@ -1,3 +1,4 @@
+import { GameId } from './game.contracts';
 import { UserId, User } from './user.model';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -16,5 +17,6 @@ export type Lobby = {
   hostId: UserId;
   capacity: number;
 
+  gameId?: GameId;
   users?: Record<UserId, User>;
 };

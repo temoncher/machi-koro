@@ -4,4 +4,5 @@ export * from './game.epic';
 export * from './game.reducer';
 export * from './game-en.translations';
 export * from './game-ru.translations';
-export * from './useGameActions';
+export * from './game.api.types';
+export * from './game.endpoints';

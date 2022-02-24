@@ -1,4 +1,9 @@
-import { Lobby, User, UserId } from '@machikoro/game-server-contracts';
+import {
+  Game,
+  Lobby,
+  LobbyId,
+  User,
+} from '@machikoro/game-server-contracts';
 import { Database, ref } from 'firebase/database';
 import { AnyAction } from 'redux';
 import { ListenEvent, object, stateChanges } from 'rxfire/database';
@@ -13,6 +18,7 @@ import { ofType, toPayload } from 'ts-action-operators';
 
 import { JoinLobbyAction, LobbyAction } from '../lobby';
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { isDefined } from '../utils/isDefined';
 
 type SyncLobbyStateDependencies = {
   firebaseDb: Database;
@@ -28,9 +34,12 @@ const syncLobbyState = (
     takeUntil(actions$.pipe(ofType(LobbyAction.currentUserLeftLobbyEvent))),
     map((lobbyChange) => {
       // TODO: perform validation
-      const lobby = lobbyChange.snapshot.val() as Lobby;
+      const lobby = lobbyChange.snapshot.val() as Omit<Lobby, 'lobbyId'>;
 
-      return LobbyAction.setLobbyDocument(lobby);
+      return LobbyAction.setLobbyDocument({
+        ...lobby,
+        lobbyId: lobbyChange.snapshot.key as LobbyId,
+      });
     }),
   )),
 );
@@ -110,10 +119,28 @@ const mapHostChangeToLobbyHostChangedEvent = (
     filter((lobbyChange) => lobbyChange.snapshot.key === 'hostId'),
     map((hostIdChange) => {
       // TODO: perform validation
-      const hostId = hostIdChange.snapshot.val() as UserId;
+      const hostId = hostIdChange.snapshot.val() as Lobby['hostId'];
 
       return LobbyAction.hostChangedEvent({ lobbyId, newHostId: hostId });
     }),
+  )),
+);
+
+type MapGameIdChangeToGameCreatedEventDependencies = {
+  firebaseDb: Database;
+};
+
+const mapGameIdChangeToGameCreatedEvent = (
+  deps: MapGameIdChangeToGameCreatedEventDependencies,
+): TypedEpic<typeof LobbyAction.gameCreatedEvent> => (actions$) => actions$.pipe(
+  ofType(JoinLobbyAction.joinLobbyResolvedEvent),
+  toPayload(),
+  switchMap((lobbyId) => object(ref(deps.firebaseDb, `lobbies/${lobbyId}/gameId`)).pipe(
+    // TODO: check if this takeUntil really unsubscribes from lobby state object
+    takeUntil(actions$.pipe(ofType(LobbyAction.currentUserLeftLobbyEvent))),
+    map((gameIdChange) => gameIdChange.snapshot.val() as Game['gameId']),
+    filter(isDefined),
+    map(LobbyAction.gameCreatedEvent),
   )),
 );
 
@@ -121,11 +148,13 @@ export type FirebaseLobbiesEpicDependencies =
   & SyncLobbyStateDependencies
   & MapUserRemovedChangeToLobbyUserLeftEventDependencies
   & MapUserAddedChangeToLobbyUserJoinedEventDependencies
-  & MapHostChangeToLobbyHostChangedEventDependencies;
+  & MapHostChangeToLobbyHostChangedEventDependencies
+  & MapGameIdChangeToGameCreatedEventDependencies;
 
 export const firebaseLobbiesEpic = (deps: FirebaseLobbiesEpicDependencies) => typedCombineEpics<AnyAction>(
   syncLobbyState(deps),
   mapUserAddedChangeToLobbyUserJoinedEvent(deps),
   mapUserRemovedChangeToLobbyUserLeftEvent(deps),
   mapHostChangeToLobbyHostChangedEvent(deps),
+  mapGameIdChangeToGameCreatedEvent(deps),
 );

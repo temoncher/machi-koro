@@ -13,7 +13,6 @@ const lobbyActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
   '[EVENT] APP/LOBBY/ENTERED_LOBBY_PAGE': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/LEFT_LOBBY_PAGE': payload<LobbyId>(),
-  '[EVENT] APP/LOBBY/LEAVE_LOBBY_BUTTON_CLICKED': empty(),
   '[EVENT] APP/LOBBY/CREATE_GAME_BUTTON_CLICKED': empty(),
   '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHostId: UserId; lobbyId: LobbyId }>(),
   '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),

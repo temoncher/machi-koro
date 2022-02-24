@@ -3,7 +3,7 @@
     "lobbies": {
       "$lobbyId": {
         ".read": "auth !== null",
-        ".write": "(!data.exists() && auth !== null && newData.child('hostId').isString()) || data.child('hostId').val() === auth.uid",
+        ".write": "(!data.exists() && newData.child('hostId').val() === auth.uid) || (data.exists() && data.child('hostId').val() === auth.uid)",
         "users": {
           "$userId": {
             ".validate": "newData.exists() && newData.child('userId').val() === auth.uid && newData.child('username').isString()",
@@ -15,17 +15,17 @@
     "games": {
       "$gameId": {
         ".read": "auth !== null",
-        ".write": "(!data.exists() && auth !== null && newData.child('hostId').isString()) || data.child('hostId').val() === auth.uid",
+        ".write": "(!data.exists() && newData.child('hostId').val() === auth.uid) || (data.exists() && data.child('hostId').val() === auth.uid)",
         "players": {
           "$playerId": {
-            ".validate": "newData.child('playerId').val() === auth.uid && newData.child('username').isString()",
-            ".write": "data.parent().exists() && auth.uid === $playerId"
+            ".validate": "(!data.exists() && newData.parent().parent().child('hostId').val() === auth.uid) || (newData.child('userId').val() === auth.uid && newData.child('username').isString())",
+            ".write": "data.parent().child('playersConnectionStatuses').child($playerId).val() !== 'ABANDONED' && data.parent().exists() && auth.uid === $playerId"
           }
         },
         "playersConnectionStatuses": {
           "$playerId": {
-            ".validate": "newData.val().matches(/^(CONNECTED|DISCONNECTED)$/)",
-            ".write": "data.parent().exists() && auth.uid === $playerId"
+            ".validate": "newData.val().matches(/^(CONNECTED|DISCONNECTED|ABANDONED)$/)",
+            ".write": "data.val() !== 'ABANDONED' && data.parent().exists() && auth.uid === $playerId"
           }
         }
       }

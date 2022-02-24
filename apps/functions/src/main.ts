@@ -1,4 +1,6 @@
-import { Lobby, LobbyId, User } from '@machikoro/game-server-contracts';
+import {
+  Game, Lobby, LobbyId, PlayerConnectionStatus, User,
+} from '@machikoro/game-server-contracts';
 import * as functions from 'firebase-functions';
 
 export const onLobbyUserRemove = functions
@@ -13,7 +15,7 @@ export const onLobbyUserRemove = functions
     const removedUser = removedUserSnapshot.val() as User;
 
     if (currentLobby.users === undefined) {
-      functions.logger.info(`Last user (${removedUser.username}:${removedUser.userId}) left lobby(${lobbyId}). Closing the lobby down...`);
+      functions.logger.info(`Last user (${removedUser.username}:${removedUser.userId}) left lobby(${lobbyId}). Closing the lobby...`);
       await lobbyRef.remove();
       functions.logger.info(`Lobby(${lobbyId}) is closed`);
 
@@ -36,5 +38,27 @@ export const onLobbyUserRemove = functions
 
         functions.logger.info(`Host for lobby(${lobbyId}) successfully migrated to (${removedUser.username}:${removedUser.userId}).`);
       }
+    }
+  });
+
+export const onGamePlayerStatusChange = functions
+  .database
+  .ref('/games/{gameId}/playersConnectionStatuses/{playerId}')
+  .onUpdate(async (playerConnectionStatusChange, context) => {
+    const gameId = context.params.gameId as LobbyId;
+    const newPlayersConnectionStatusesRef = playerConnectionStatusChange.after.ref.parent!;
+
+    const newPlayerConnectionStatusesSnapshot = await newPlayersConnectionStatusesRef.get();
+    const newPlayerConnectionStatuses = newPlayerConnectionStatusesSnapshot.val() as Game['playersConnectionStatuses'];
+
+    const areAllPlayersAbandoned = Object.values(newPlayerConnectionStatuses)
+      .every((status) => status === PlayerConnectionStatus.ABANDONED);
+
+    if (areAllPlayersAbandoned) {
+      const gameRef = newPlayersConnectionStatusesRef.parent!;
+
+      functions.logger.info(`All players abandoned game(${gameId}). Closing the game...`);
+      await gameRef.remove();
+      functions.logger.info(`Game(${gameId}) is closed`);
     }
   });

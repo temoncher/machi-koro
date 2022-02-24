@@ -2,7 +2,6 @@ import { map } from 'rxjs';
 import { ofType } from 'ts-action-operators';
 
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
-import { GetNamespaceActionType } from '../utils/createActionsNamespace';
 import { waitUntilAuthorized } from '../utils/waitUntilAuthorized';
 
 import { HomeAction } from './home.actions';
@@ -20,7 +19,7 @@ typeof CreateLobbyAction.createLobbyCommand
 
 export const homeEpic = typedCombineEpics<
 | HomeAction
-| GetNamespaceActionType<typeof CreateLobbyAction>
+| CreateLobbyAction
 >(
   createLobbyOnCreateLobbyButtonClickedEvent,
 );

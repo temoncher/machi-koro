@@ -56,6 +56,7 @@ export type Player = { userId: UserId };
 export enum PlayerConnectionStatus {
   CONNECTED = 'CONNECTED',
   DISCONNECTED = 'DISCONNECTED',
+  ABANDONED = 'ABANDONED',
 }
 
 export type PlayerConnectionStatusesMap = Record<UserId, PlayerConnectionStatus>;

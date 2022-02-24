@@ -21,18 +21,10 @@ type LobbyPageProps = {
 export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
   const { userId } = useTypedSelector((state) => state.loginReducer);
   const lobby = useTypedSelector((state) => state.lobbyReducer.lobby);
-  const { isLoading } = useTypedSelector((state) => state.requests.leaveLobbyReducer);
+  const { isLoading } = useTypedSelector((state) => state.requests.createGameReducer);
   const { t } = useTranslation();
 
   const dispatch = useDispatch();
-
-  const dispatchCreateGameButtonClickedEvent = () => {
-    dispatch(LobbyAction.createGameButtonClickedEvent());
-  };
-
-  const dispatchLeaveLobbyButtonClickedEvent = () => {
-    dispatch(LobbyAction.leaveLobbyButtonClickedEvent());
-  };
 
   return (
     <Box
@@ -59,17 +51,20 @@ export const LobbyPage: React.FC<LobbyPageProps> = (props) => {
         </Box>
 
         <Box sx={{ py: 2, '> :not(:last-child).MuiButton-root': { mr: 2 } }}>
-          <Button type="submit" variant="contained" onClick={dispatchCreateGameButtonClickedEvent}>
-            {t('lobby.startNewGameButtonText')}
-          </Button>
           <LoadingButton
+            type="submit"
             variant="contained"
             loading={isLoading}
-            loadingIndicator={t('lobby.leaveLobbyButtonTextLoading')}
-            onClick={dispatchLeaveLobbyButtonClickedEvent}
+            loadingIndicator={t('lobby.startNewGameButtonTextLoading')}
+            onClick={() => {
+              dispatch(LobbyAction.createGameButtonClickedEvent());
+            }}
           >
-            {t('lobby.leaveLobbyButtonText')}
+            {t('lobby.startNewGameButtonText')}
           </LoadingButton>
+          <Button href="../" variant="contained">
+            {t('lobby.leaveLobbyButtonText')}
+          </Button>
         </Box>
       </Box>
     </Box>

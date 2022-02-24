@@ -32,7 +32,6 @@ export const createFirebaseLobby = (firebaseDb: Database): CreateLobby => async 
   const createdLobbyRef = await push(ref(firebaseDb, 'lobbies'), {
     hostId,
     capacity,
-    users: {},
     createdAt: serverTimestamp(),
   });
 
@@ -43,6 +42,5 @@ export const createFirebaseLobby = (firebaseDb: Database): CreateLobby => async 
     lobbyId,
     hostId,
     capacity,
-    users: {},
   };
 };

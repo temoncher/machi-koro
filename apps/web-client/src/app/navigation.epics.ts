@@ -12,9 +12,9 @@ import {
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
-import { GameAction } from './game';
+import { AbandonGameAction, GameAction } from './game';
 import { CreateLobbyAction } from './home';
-import { CreateGameAction, JoinLobbyAction, LobbyAction } from './lobby';
+import { JoinLobbyAction, LobbyAction } from './lobby';
 import { RegisterGuestAction, LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
@@ -64,6 +64,13 @@ const redirectToHomePageOnJoinLobbyRejectedEventEpic: TypedEpic<typeof push> = (
   mapTo(push({ pathname: '/' })),
 );
 
+const redirectToHomePageOnGameEndEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
+  ofType(AbandonGameAction.abandonGameResolvedEvent),
+  // `mapTo` really accepts `any` payload, therefore
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  mapTo(push({ pathname: '/' })),
+);
+
 const redirectToLoginPageOnAuthorizeRejectedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
   ofType(LoginAction.authorizeRejectedEvent),
   // `mapTo` really accepts `any` payload, therefore
@@ -78,9 +85,9 @@ const redirectToLobbyPageOnCreateLobbyResolvedEventEpic: TypedEpic<typeof push> 
 );
 
 const redirectToGamePageOnGameCreatedEventEpic: TypedEpic<typeof push> = (actions$) => actions$.pipe(
-  ofType(CreateGameAction.createGameResolvedEvent),
+  ofType(LobbyAction.gameCreatedEvent),
   toPayload(),
-  map(({ gameId }) => push({ pathname: `/games/${gameId}` })),
+  map((gameId) => push({ pathname: `/games/${gameId}` })),
 );
 
 const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyAction.enteredLobbyPageEvent> = (actions$) => actions$.pipe(
@@ -143,6 +150,7 @@ const dispatchEnteredGamePageEventOnGamePageEnter: TypedEpic<typeof GameAction.e
 export const navigationEpic = typedCombineEpics<AnyAction>(
   redirectToHomePageOnRegisterGuestResolvedEventEpic,
   redirectToHomePageOnJoinLobbyRejectedEventEpic,
+  redirectToHomePageOnGameEndEpic,
   redirectToLoginPageOnAuthorizeRejectedEventEpic,
   redirectToLobbyPageOnCreateLobbyResolvedEventEpic,
   dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic,

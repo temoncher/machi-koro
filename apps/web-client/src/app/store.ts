@@ -19,13 +19,18 @@ import {
   switchMap,
 } from 'rxjs';
 
-import { createFirebaseGame } from './firebase/games-firebase.api';
+import {
+  abandonFirebaseGame,
+  createFirebaseGame,
+  joinFirebaseGame,
+} from './firebase/games-firebase.api';
 import {
   createFirebaseLobby,
   joinFirebaseLobby,
   leaveFirebaseLobby,
 } from './firebase/lobbies-firebase.api';
 import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
+import { abandonGameEpic, joinGameEpic } from './game';
 import { createLobbyEpic } from './home';
 import { joinLobbyEpic, leaveLobbyEpic, createGameEpic } from './lobby';
 import { registerGuestEpic } from './login';
@@ -87,6 +92,8 @@ export const initStore = (deps: InitStoreDependencies) => {
       joinLobbyEpic(joinFirebaseLobby(deps.firebaseDb)),
       leaveLobbyEpic(leaveFirebaseLobby(deps.firebaseDb)),
       createGameEpic(createFirebaseGame(deps.firebaseDb)),
+      joinGameEpic(joinFirebaseGame(deps.firebaseDb)),
+      abandonGameEpic(abandonFirebaseGame(deps.firebaseDb)),
     ),
   );
 

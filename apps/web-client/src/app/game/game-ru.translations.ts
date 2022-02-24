@@ -5,4 +5,5 @@ export const GAME_RU_TRANSLATIONS: typeof GAME_EN_TRANSLATIONS = {
   finishTurnButtonText: 'Закончить ход',
   rollDiceButtonText: 'Бросить кубик',
   startGameButtonText: 'Начать игру',
+  abandonGameButtonText: 'Покинуть игру',
 };

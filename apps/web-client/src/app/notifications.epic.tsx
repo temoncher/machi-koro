@@ -62,7 +62,8 @@ const showHostChangedNotification: TypedEpic<never> = (actions$, state$) => acti
       // eslint-disable-next-line react/jsx-one-expression-per-line
       toast.info(<p>Host changed! New host is <b>{newHost.username}</b>!</p>);
     } else {
-      throw new Error('Host not found');
+      // eslint-disable-next-line no-console
+      console.error('Host not found');
     }
   }),
   // `ignoreElements` really accepts `any` payload, therefore

@@ -1,4 +1,5 @@
 import { connectingEpics, ConnectingEpicsDependencies } from './connecting.epics';
+import { firebaseGamesEpic, FirebaseGamesEpicDependencies } from './firebase/games-firebase.epic';
 import { firebaseLobbiesEpic, FirebaseLobbiesEpicDependencies } from './firebase/lobbies-firebase.epic';
 import { gameEpic } from './game';
 import { homeEpic } from './home';
@@ -9,7 +10,8 @@ import { typedCombineEpics } from './types/TypedEpic';
 
 export type RootEpicDependencies =
   & ConnectingEpicsDependencies
-  & FirebaseLobbiesEpicDependencies;
+  & FirebaseLobbiesEpicDependencies
+  & FirebaseGamesEpicDependencies;
 
 export const rootEpic = (deps: RootEpicDependencies) => typedCombineEpics(
   homeEpic,
@@ -19,4 +21,5 @@ export const rootEpic = (deps: RootEpicDependencies) => typedCombineEpics(
   navigationEpic,
   notificationsEpic,
   firebaseLobbiesEpic(deps),
+  firebaseGamesEpic(deps),
 );
