@@ -25,6 +25,7 @@ declare module 'react-i18next' {
   }
 }
 
+// TODO: make storybook translatable?
 export const initializeI18n = async (
   LanguageDetector: Newable<LanguageDetectorModule>,
   initReactI18n: ThirdPartyModule,

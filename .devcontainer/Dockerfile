@@ -6,7 +6,9 @@ FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     # Install OpenJDK for firestore simulator
-    && apt-get -y install --no-install-recommends default-jdk
+    && apt-get -y install --no-install-recommends default-jdk \
+    # Install Graphviz for depcruiser visualisation
+    && apt-get -y install graphviz
 
 # [Optional] Uncomment if you want to install an additional version of node using nvm
 # ARG EXTRA_NODE_VERSION=10

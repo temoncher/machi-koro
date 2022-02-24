@@ -1,7 +1,7 @@
 import { FIRST_CHAR_USERNAME_REGEXP, USERNAME_REGEXP } from '@machikoro/game-server-contracts';
+import { LoadingButton } from '@mui/lab';
 import {
   Box,
-  Button,
   Paper,
   TextField,
   Typography,
@@ -9,8 +9,11 @@ import {
 import React, { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
-import { useLoginActions } from './useLoginActions';
+import { useTypedSelector } from '../hooks';
+
+import { RegisterGuestAction } from './registerGuest.endpoint';
 
 type GuestFormInputs = {
   username: string;
@@ -27,7 +30,8 @@ export const GuestLoginForm: React.FC = () => {
     defaultValues: { username: '' },
   });
 
-  const { registerGuestCommand } = useLoginActions();
+  const { isLoading } = useTypedSelector((state) => state.requests.registerGuestReducer);
+  const dispatch = useDispatch();
   const { t } = useTranslation();
 
   const validateUsername = useCallback((name: string) => {
@@ -47,7 +51,7 @@ export const GuestLoginForm: React.FC = () => {
   }, [t]);
 
   const login = ({ username }: GuestFormInputs) => {
-    registerGuestCommand(username);
+    dispatch(RegisterGuestAction.registerGuestCommand([username]));
   };
 
   return (
@@ -81,9 +85,15 @@ export const GuestLoginForm: React.FC = () => {
             />
           )}
         />
-        <Button type="submit" variant="contained" disabled={!!errors.username || !isDirty}>
-          {t('login.guestFormButton')}
-        </Button>
+        <LoadingButton
+          type="submit"
+          variant="contained"
+          loading={isLoading}
+          disabled={!!errors.username || !isDirty}
+          loadingIndicator={t('login.registerGuestButtonTextLoading')}
+        >
+          {t('login.registerGuestButtonText')}
+        </LoadingButton>
       </Box>
     </Paper>
   );

@@ -1,7 +1,34 @@
 {
-  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
   "rules": {
-    ".read": false,
-    ".write": false
+    "lobbies": {
+      "$lobbyId": {
+        ".read": "auth !== null",
+        ".write": "(!data.exists() && newData.child('hostId').val() === auth.uid) || (data.exists() && data.child('hostId').val() === auth.uid)",
+        "users": {
+          "$userId": {
+            ".validate": "newData.exists() && newData.child('userId').val() === auth.uid && newData.child('username').isString()",
+            ".write": "data.parent().exists() && auth.uid === $userId"
+          }
+        }
+      }
+    },
+    "games": {
+      "$gameId": {
+        ".read": "auth !== null",
+        ".write": "(!data.exists() && newData.child('hostId').val() === auth.uid) || (data.exists() && data.child('hostId').val() === auth.uid)",
+        "players": {
+          "$playerId": {
+            ".validate": "(!data.exists() && newData.parent().parent().child('hostId').val() === auth.uid) || (newData.child('userId').val() === auth.uid && newData.child('username').isString())",
+            ".write": "data.parent().child('playersConnectionStatuses').child($playerId).val() !== 'ABANDONED' && data.parent().exists() && auth.uid === $playerId"
+          }
+        },
+        "playersConnectionStatuses": {
+          "$playerId": {
+            ".validate": "newData.val().matches(/^(CONNECTED|DISCONNECTED|ABANDONED)$/)",
+            ".write": "data.val() !== 'ABANDONED' && data.parent().exists() && auth.uid === $playerId"
+          }
+        }
+      }
+    }
   }
 }

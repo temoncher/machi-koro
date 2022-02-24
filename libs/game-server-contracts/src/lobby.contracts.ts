@@ -1,6 +1,8 @@
-import { UserId } from './user.model';
+import { GameId } from './game.contracts';
+import { UserId, User } from './user.model';
 
-export type LobbyId = string;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type LobbyId = string & { readonly LOBBY_ID: unique symbol };
 
 export type CreateLobbyResponse = {
   lobbyId: LobbyId;
@@ -11,7 +13,10 @@ export type CreateLobbyRequestBody = {
 };
 
 export type Lobby = {
+  lobbyId: LobbyId;
   hostId: UserId;
-  users: UserId[];
   capacity: number;
+
+  gameId?: GameId;
+  users?: Record<UserId, User>;
 };

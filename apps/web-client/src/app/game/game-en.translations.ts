@@ -3,4 +3,5 @@ export const GAME_EN_TRANSLATIONS = {
   finishTurnButtonText: 'Finish turn',
   rollDiceButtonText: 'RollDice',
   startGameButtonText: 'Start game',
+  abandonGameButtonText: 'Abandon game',
 };

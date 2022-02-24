@@ -1,3 +1,4 @@
+import { User } from '@machikoro/game-server-contracts';
 import { AnyAction } from 'redux';
 import {
   filter,
@@ -12,7 +13,6 @@ import { LoginAction } from './login';
 import { NavigationAction } from './navigation.actions';
 import { RootAction } from './root.actions';
 import { typedCombineEpics, TypedEpic } from './types/TypedEpic';
-import { WebsocketAction } from './websocket';
 
 const dispatchAppStartedEventOnFirstRenderEpic: TypedEpic<typeof RootAction.appStartedEvent> = (actions$) => actions$.pipe(
   ofType(NavigationAction.locationChangeEvent),
@@ -23,15 +23,8 @@ const dispatchAppStartedEventOnFirstRenderEpic: TypedEpic<typeof RootAction.appS
   mapTo(RootAction.appStartedEvent()),
 );
 
-const initializeWebsocketOnAppStartEventEpic: TypedEpic<typeof WebsocketAction.initializeSocketCommand> = (actions$) => actions$.pipe(
-  ofType(RootAction.appStartedEvent),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  mapTo(WebsocketAction.initializeSocketCommand()),
-);
-
 type AuthorizeEpicDependencies = {
-  authState$: Observable<{ username: string; userId: string } | undefined>;
+  authState$: Observable<User | undefined>;
 };
 
 const syncAuthStateOnAppStartedEvent = (
@@ -44,11 +37,7 @@ const syncAuthStateOnAppStartedEvent = (
         return LoginAction.authorizeRejectedEvent('Signed out');
       }
 
-      return LoginAction.authorizeResolvedEvent({
-        type: 'guest',
-        userId: user.userId,
-        username: user.username,
-      });
+      return LoginAction.authorizeResolvedEvent(user);
     }),
   )),
 );
@@ -57,6 +46,5 @@ export type ConnectingEpicsDependencies = AuthorizeEpicDependencies;
 
 export const connectingEpics = (deps: ConnectingEpicsDependencies) => typedCombineEpics<AnyAction>(
   dispatchAppStartedEventOnFirstRenderEpic,
-  initializeWebsocketOnAppStartEventEpic,
   syncAuthStateOnAppStartedEvent(deps),
 );

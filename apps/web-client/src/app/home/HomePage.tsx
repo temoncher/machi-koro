@@ -1,24 +1,30 @@
+import { LoadingButton } from '@mui/lab';
 import {
   Box,
-  Button,
   SxProps,
   Typography,
 } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 import { useTypedSelector } from '../hooks';
-import { useLobbyActions } from '../lobby';
+
+import { HomeAction } from './home.actions';
 
 type HomePageProps = {
   sx?: SxProps;
 };
 
 export const HomePage: React.FC<HomePageProps> = (props) => {
-  const { createLobbyCommand } = useLobbyActions();
+  const dispatch = useDispatch();
   const { username } = useTypedSelector((state) => state.loginReducer);
-  const { isCreateLobbyLoading } = useTypedSelector((state) => state.lobbyReducer);
+  const { isLoading } = useTypedSelector((state) => state.requests.createLobbyReducer);
   const { t } = useTranslation();
+
+  const dispatchCreateLobbyButtonClickedEvent = () => {
+    dispatch(HomeAction.createLobbyButtonClickedEvent());
+  };
 
   return (
     <Box
@@ -31,12 +37,21 @@ export const HomePage: React.FC<HomePageProps> = (props) => {
       }}
     >
       <Box sx={{ maxWidth: 800, display: 'flex', flexDirection: 'column' }}>
-        {/* TODO: make only username bold */}
-        <Typography variant="h4">{t('home.greeting', { username })}</Typography>
+        <Typography variant="h4">
+          {/* TODO: figure out how to use string interpolation with bold wrapper */}
+          {t('home.greeting.start')}
+          <b>{username}</b>
+          {t('home.greeting.end')}
+        </Typography>
         <Typography sx={{ py: 2 }}>{t('home.welcomeText')}</Typography>
-        <Button variant="contained" disabled={isCreateLobbyLoading} onClick={createLobbyCommand}>
+        <LoadingButton
+          loading={isLoading}
+          variant="contained"
+          loadingIndicator={t('home.createNewLobbyButtonTextLoading')}
+          onClick={dispatchCreateLobbyButtonClickedEvent}
+        >
           {t('home.createNewLobbyButtonText')}
-        </Button>
+        </LoadingButton>
       </Box>
     </Box>
   );

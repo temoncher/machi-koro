@@ -1,13 +1,14 @@
 import { z } from 'zod';
 
-export type UserId = string;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type UserId = string & { readonly USER_ID: unique symbol };
 
 export const FIRST_CHAR_USERNAME_REGEXP = /^[A-Za-z]/;
 export const USERNAME_REGEXP = /^[A-Za-z-_\s]+$/;
 const MIN_LENGTH_USERNAME = 1;
 const MAX_LENGTH_USERNAME = 30;
 
-export const usernameSchema = z
+const usernameSchema = z
   .string()
   .min(MIN_LENGTH_USERNAME, {
     message: `'username' must be between ${String(
@@ -26,17 +27,11 @@ export const usernameSchema = z
     message: "'username' must contain only A-Z, a-z, -, _ characters",
   });
 
-export type Username = z.infer<typeof usernameSchema>;
-
-export const userTypeSchema = z.enum(['guest']);
-export type UserType = z.infer<typeof userTypeSchema>;
-
 const userIdShema = z.string();
 
 export const userSchema = z.object({
   username: usernameSchema,
-  type: userTypeSchema,
   userId: userIdShema,
 });
 
-export type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof userSchema> & { userId: UserId };

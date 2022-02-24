@@ -1,31 +1,40 @@
+import { UserId } from '@machikoro/game-server-contracts';
 import { AxiosInstance } from 'axios';
 import { routerMiddleware } from 'connected-react-router';
-import { signInAnonymously, Auth } from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-  Firestore,
-} from 'firebase/firestore';
+import { Auth } from 'firebase/auth';
+import { Database } from 'firebase/database';
+import { Firestore } from 'firebase/firestore';
 import { History } from 'history';
 import {
   createStore,
   compose,
   applyMiddleware,
+  AnyAction,
 } from 'redux';
-import { createEpicMiddleware } from 'redux-observable';
+import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import { authState } from 'rxfire/auth';
 import {
   of,
   from,
-  map,
   switchMap,
 } from 'rxjs';
-import * as SocketIOClient from 'socket.io-client';
 
+import {
+  abandonFirebaseGame,
+  createFirebaseGame,
+  joinFirebaseGame,
+} from './firebase/games-firebase.api';
+import {
+  createFirebaseLobby,
+  joinFirebaseLobby,
+  leaveFirebaseLobby,
+} from './firebase/lobbies-firebase.api';
+import { getFirebaseUserData, registerFirebaseGuest } from './firebase/users-firebase.api';
+import { abandonGameEpic, joinGameEpic } from './game';
+import { createLobbyEpic } from './home';
+import { joinLobbyEpic, leaveLobbyEpic, createGameEpic } from './lobby';
+import { registerGuestEpic } from './login';
 import { RootAction } from './root.actions';
-import { RootApi } from './root.api';
 import { rootEpic, RootEpicDependencies } from './root.epic';
 import { rootReducer } from './root.reducer';
 import { RootState } from './root.state';
@@ -43,15 +52,14 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 type InitStoreDependencies = {
   history: History;
   httpClient: AxiosInstance;
-  socket: SocketIOClient.Socket;
   storage: Storage;
   firebaseAuth: Auth;
+  firebaseDb: Database;
   firestore: Firestore;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
   const epicMiddleware = createEpicMiddleware<RootAction, RootAction, RootState, unknown>();
-  const rootApi = RootApi.init({ httpClient: deps.httpClient });
 
   const store = createStore(
     rootReducer(deps.history),
@@ -66,48 +74,28 @@ export const initStore = (deps: InitStoreDependencies) => {
   );
 
   const rootEpicDependencies: RootEpicDependencies = {
-    socket: deps.socket,
+    firebaseDb: deps.firebaseDb,
     authState$: authState(deps.firebaseAuth).pipe(
       switchMap((userState) => {
         if (!userState) return of(undefined);
 
-        const userDocumentRef = doc(deps.firestore, 'users', userState.uid);
-
-        return from(getDoc(userDocumentRef)).pipe(
-          map((userSnapshot) => {
-            if (!userSnapshot.exists()) return undefined;
-
-            // TODO: extract this method into service and peform validation
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-            const user = userSnapshot.data() as { uid: string; username: string };
-
-            return {
-              userId: user.uid,
-              username: user.username,
-            };
-          }),
-        );
+        return from(getFirebaseUserData(deps.firestore)(userState.uid as UserId));
       }),
     ),
-    registerGuest: async (username: string) => {
-      const anonymusCredentials = await signInAnonymously(deps.firebaseAuth);
-
-      await setDoc(doc(deps.firestore, 'users', anonymusCredentials.user.uid), {
-        uid: anonymusCredentials.user.uid,
-        username,
-        createdAt: serverTimestamp(),
-      });
-
-      return {
-        userId: anonymusCredentials.user.uid,
-        username,
-      };
-    },
-    createLobby: rootApi.lobbyApi.sendCreateLobbyRequest,
-    createGame: rootApi.gameApi.sendCreateGameRequest,
   };
 
-  epicMiddleware.run(rootEpic(rootEpicDependencies));
+  epicMiddleware.run(
+    combineEpics<AnyAction, AnyAction, RootState, unknown>(
+      rootEpic(rootEpicDependencies),
+      registerGuestEpic(registerFirebaseGuest(deps.firestore, deps.firebaseAuth)),
+      createLobbyEpic(createFirebaseLobby(deps.firebaseDb)),
+      joinLobbyEpic(joinFirebaseLobby(deps.firebaseDb)),
+      leaveLobbyEpic(leaveFirebaseLobby(deps.firebaseDb)),
+      createGameEpic(createFirebaseGame(deps.firebaseDb)),
+      joinGameEpic(joinFirebaseGame(deps.firebaseDb)),
+      abandonGameEpic(abandonFirebaseGame(deps.firebaseDb)),
+    ),
+  );
 
   return store;
 };

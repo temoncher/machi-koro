@@ -3,9 +3,8 @@ import { empty } from 'ts-action';
 
 import { GameAction } from './game';
 import { LobbyAction } from './lobby';
-import { LoginAction } from './login';
+import { RegisterGuestAction, LoginAction } from './login';
 import { createActionsNamespace, GetNamespaceActionType } from './utils/createActionsNamespace';
-import { WebsocketAction } from './websocket';
 
 const rootActionTypeToPayloadMap = {
   /* eslint-disable @typescript-eslint/naming-convention */
@@ -21,4 +20,4 @@ export type RootAction =
   | LoginAction
   | LobbyAction
   | RouterAction
-  | WebsocketAction;
+  | RegisterGuestAction;

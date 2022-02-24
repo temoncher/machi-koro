@@ -1,45 +1,38 @@
-import { CreateGameRequestBody, CreateGameResponse } from '@machikoro/game-server-contracts';
-import {
-  catchError,
-  from,
-  map,
-  of,
-  switchMap,
-} from 'rxjs';
+import { map, withLatestFrom } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { waitUntilAuthorized } from '../utils/waitUntilAuthorized';
 
 import { GameAction } from './game.actions';
+import { AbandonGameAction, JoinGameAction } from './game.endpoints';
 
-type CreateGameEpicDependencies = {
-  createGame: (requestBody: CreateGameRequestBody) => Promise<CreateGameResponse>;
-};
-
-const createGameEpic = (
-  deps: CreateGameEpicDependencies,
-): TypedEpic<typeof GameAction.createGameResolvedEvent | typeof GameAction.createGameRejectedEvent> => (actions$) => actions$.pipe(
-  ofType(GameAction.createGameCommand),
-  toPayload(),
-  switchMap(({ lobbyId }) => from(deps.createGame({ lobbyId })).pipe(
-    map(GameAction.createGameResolvedEvent),
-    catchError((error) => {
-      const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
-
-      return of(GameAction.createGameRejectedEvent(errorMessage));
-    }),
-  )),
-);
-
-const joinGameOnGamePageEnteredEventEpic: TypedEpic<typeof GameAction.joinGameCommand> = (actions$) => actions$.pipe(
+const joinGameOnGamePageEnteredEventEpic: TypedEpic<typeof JoinGameAction.joinGameCommand> = (actions$, state$) => actions$.pipe(
   ofType(GameAction.enteredGamePageEvent),
   toPayload(),
-  map(GameAction.joinGameCommand),
+  waitUntilAuthorized(state$),
+  map(([gameId, user]) => JoinGameAction.joinGameCommand([user, gameId])),
 );
 
-export type GameEpicDependencies = CreateGameEpicDependencies;
+const abandonGameOnAbandonGameClickEventEpic: TypedEpic<typeof AbandonGameAction.abandonGameCommand> = (actions$, state$) => actions$.pipe(
+  ofType(GameAction.abandonGameButtonClickedEvent),
+  waitUntilAuthorized(state$),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  map(([action, user]) => user),
+  withLatestFrom(state$),
+  map(([user, state]) => {
+    // TODO: error handling
+    const { gameId } = state.gameReducer.game!;
 
-export const gameEpic = (deps: GameEpicDependencies) => typedCombineEpics<GameAction>(
-  createGameEpic(deps),
+    return AbandonGameAction.abandonGameCommand([user, gameId]);
+  }),
+);
+
+export const gameEpic = typedCombineEpics<
+| GameAction
+| JoinGameAction
+| AbandonGameAction
+>(
   joinGameOnGamePageEnteredEventEpic,
+  abandonGameOnAbandonGameClickEventEpic,
 );

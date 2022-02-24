@@ -14,7 +14,6 @@ import { Provider } from 'react-redux';
 import { App, initializeI18n, initStore } from './app';
 import { getAuthorizationHeader } from './app/utils/getAuthorizationHeader';
 import { initHttpClient } from './app/utils/http-client';
-import { initSocketConnection } from './app/utils/socket';
 import { environment } from './environments/environment';
 
 import './styles.css';
@@ -44,12 +43,11 @@ const main = () => {
 
   const history = createBrowserHistory();
   const httpClient = initHttpClient(`${SERVER_HOST}/api`, getAuthorizationHeader);
-  const socket = initSocketConnection(SERVER_HOST, getAuthorizationHeader);
   const store = initStore({
-    socket,
     history,
     httpClient,
     firebaseAuth,
+    firebaseDb,
     firestore,
     // eslint-disable-next-line no-restricted-globals
     storage: window.localStorage,

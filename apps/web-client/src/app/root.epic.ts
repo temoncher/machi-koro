@@ -1,33 +1,25 @@
 import { connectingEpics, ConnectingEpicsDependencies } from './connecting.epics';
-import { gameEpic, GameEpicDependencies } from './game';
-import { lobbyEpic, LobbyEpicDependencies } from './lobby';
-import { loginEpic, LoginEpicDependencies } from './login';
+import { firebaseGamesEpic, FirebaseGamesEpicDependencies } from './firebase/games-firebase.epic';
+import { firebaseLobbiesEpic, FirebaseLobbiesEpicDependencies } from './firebase/lobbies-firebase.epic';
+import { gameEpic } from './game';
+import { homeEpic } from './home';
+import { lobbyEpic } from './lobby';
 import { navigationEpic } from './navigation.epics';
 import { notificationsEpic } from './notifications.epic';
 import { typedCombineEpics } from './types/TypedEpic';
-import {
-  lobbyWebsocketEpic,
-  gameWebsocketEpic,
-  websocketEpic,
-  WebsocketEpicDependencies,
-} from './websocket';
 
 export type RootEpicDependencies =
-  & GameEpicDependencies
-  & LobbyEpicDependencies
-  & LoginEpicDependencies
-  & LoginEpicDependencies
   & ConnectingEpicsDependencies
-  & WebsocketEpicDependencies;
+  & FirebaseLobbiesEpicDependencies
+  & FirebaseGamesEpicDependencies;
 
 export const rootEpic = (deps: RootEpicDependencies) => typedCombineEpics(
-  gameEpic(deps),
-  lobbyEpic(deps),
-  loginEpic(deps),
+  homeEpic,
+  gameEpic,
+  lobbyEpic,
   connectingEpics(deps),
   navigationEpic,
   notificationsEpic,
-  websocketEpic(deps),
-  gameWebsocketEpic,
-  lobbyWebsocketEpic,
+  firebaseLobbiesEpic(deps),
+  firebaseGamesEpic(deps),
 );

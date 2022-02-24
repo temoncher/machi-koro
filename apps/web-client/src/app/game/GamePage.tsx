@@ -1,15 +1,22 @@
-import { GameContext } from '@machikoro/game-server-contracts';
+import { GameContext, UserId } from '@machikoro/game-server-contracts';
 import { Box, Button, SxProps } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 import { useTypedSelector } from '../hooks';
 import { DiceCombination } from '../types/Dice';
 
-import { DiceCombinationView } from './components/DiceCombinationView';
 import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
+import { DiceCombinationView } from './components/DiceCombinationView';
+import { GameAction } from './game.actions';
 import { useGameActions } from './useGameActions';
+
+const firstPlayerId = 'firstPlayer' as UserId;
+const secondPlayerId = 'secondPlayer' as UserId;
+const thirdPlayerId = 'thirdPlayer' as UserId;
+const fourthPlayerId = 'fourthPlayer' as UserId;
 
 const mockGameContext: GameContext = {
   gameEstablishments: {
@@ -64,43 +71,43 @@ const mockGameContext: GameContext = {
     livestockFarm: 5,
     cafe: 2,
   },
-  activePlayerId: 'firstPlayer',
+  activePlayerId: firstPlayerId,
   players: [
     {
-      userId: 'firstPlayer',
+      userId: firstPlayerId,
     },
     {
-      userId: 'secondPlayer',
+      userId: secondPlayerId,
     },
     {
-      userId: 'thirdPlayer',
+      userId: thirdPlayerId,
     },
     {
-      userId: 'fourthPlayer',
+      userId: fourthPlayerId,
     },
   ],
   establishments: {
-    firstPlayer: {},
-    secondPlayer: {},
-    thirdPlayer: {},
-    fourthPlayer: {},
+    [firstPlayerId]: {},
+    [secondPlayerId]: {},
+    [thirdPlayerId]: {},
+    [fourthPlayerId]: {},
   },
   coins: {
-    firstPlayer: 54,
-    secondPlayer: 3,
-    thirdPlayer: 3,
-    fourthPlayer: 20,
+    [firstPlayerId]: 54,
+    [secondPlayerId]: 3,
+    [thirdPlayerId]: 3,
+    [fourthPlayerId]: 20,
   },
   landmarks: {
-    firstPlayer: {
+    [firstPlayerId]: {
       trainStation: false,
       shoppingMall: false,
       amusementPark: false,
       radioTower: false,
     },
-    secondPlayer: {},
-    thirdPlayer: {},
-    fourthPlayer: {
+    [secondPlayerId]: {},
+    [thirdPlayerId]: {},
+    [fourthPlayerId]: {
       trainStation: false,
       shoppingMall: false,
       amusementPark: false,
@@ -146,7 +153,7 @@ const mockGameContext: GameContext = {
     },
   },
   rollDiceResult: 3,
-  winnerId: '',
+  winnerId: undefined,
 };
 
 const mockRolledDiceCombination: DiceCombination = [3, undefined];
@@ -158,7 +165,7 @@ type GamePageProps = {
 export const GamePage: React.FC<GamePageProps> = (props) => {
   const { t } = useTranslation();
   const game = useTypedSelector((state) => state.gameReducer.game);
-
+  const dispatch = useDispatch();
   const {
     rollDiceCommand,
     passCommand,
@@ -228,12 +235,11 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
           landmarksMap={mockGameContext.landmarks}
           // TODO: rework this part
           players={mockGameContext.players.map(({ userId }) => ({
-            type: 'guest',
             userId,
             username: userId,
           }))}
           // TODO: rework this part
-          statusesMap={game?.usersStatusesMap ?? {}}
+          statusesMap={game?.playersConnectionStatuses ?? {}}
           onLandmarkClick={buildLandmarkCommand}
         />
       </Box>
@@ -254,6 +260,15 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
         <Button variant="contained" onClick={rollDiceCommand}>{t('game.rollDiceButtonText')}</Button>
         <Button variant="contained" onClick={passCommand}>{t('game.passButtonText')}</Button>
         <Button variant="contained">{t('game.finishTurnButtonText')}</Button>
+        <Button
+          color="error"
+          variant="contained"
+          onClick={() => {
+            dispatch(GameAction.abandonGameButtonClickedEvent());
+          }}
+        >
+          {t('game.abandonGameButtonText')}
+        </Button>
       </Box>
     </Box>
   );

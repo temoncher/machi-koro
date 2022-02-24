@@ -1,73 +1,49 @@
-import { CreateLobbyRequestBody, CreateLobbyResponse } from '@machikoro/game-server-contracts';
-import {
-  catchError,
-  from,
-  map,
-  mapTo,
-  of,
-  switchMap,
-  withLatestFrom,
-} from 'rxjs';
+import { map, withLatestFrom } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
+import { waitUntilAuthorized } from '../utils/waitUntilAuthorized';
 
 import { LobbyAction } from './lobby.actions';
+import { CreateGameAction, LeaveLobbyAction, JoinLobbyAction } from './lobby.endpoints';
 
-type CreateLobbyEpicDependencies = {
-  createLobby: (requestBody: CreateLobbyRequestBody) => Promise<CreateLobbyResponse>;
-};
-
-const createLobbyEpic = (
-  deps: CreateLobbyEpicDependencies,
-): TypedEpic<typeof LobbyAction.createLobbyResolvedEvent | typeof LobbyAction.createLobbyRejectedEvent> => (
-  actions$,
-  state$,
-) => actions$.pipe(
-  ofType(LobbyAction.createLobbyCommand),
-  withLatestFrom(state$),
-  // TODO: add error handling (if userId is undefined)?
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  map(([action, state]) => state.loginReducer.userId as string),
-  switchMap((hostId) => from(deps.createLobby({ hostId })).pipe(
-    map(LobbyAction.createLobbyResolvedEvent),
-    catchError((error) => {
-      const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
-
-      return of(LobbyAction.createLobbyRejectedEvent(errorMessage));
-    }),
-  )),
-);
-
-const showCreateLobbyLoaderOnCreateLobbyCommandEpic: TypedEpic<typeof LobbyAction.setIsCreateLobbyLoadingDocument> = (
-  actions$,
-) => actions$.pipe(
-  ofType(LobbyAction.createLobbyCommand),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  mapTo(LobbyAction.setIsCreateLobbyLoadingDocument(true)),
-);
-
-const hideCreateLobbyLoaderOnCreateLobbyResultEventEpic: TypedEpic<typeof LobbyAction.setIsCreateLobbyLoadingDocument> = (
-  actions$,
-) => actions$.pipe(
-  ofType(LobbyAction.createLobbyResolvedEvent, LobbyAction.createLobbyRejectedEvent),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  mapTo(LobbyAction.setIsCreateLobbyLoadingDocument(false)),
-);
-
-const joinLobbyOnLobbyPageEnteredEventEpic: TypedEpic<typeof LobbyAction.joinLobbyCommand> = (actions$) => actions$.pipe(
+const joinLobbyOnLobbyPageEnteredEventEpic: TypedEpic<typeof JoinLobbyAction.joinLobbyCommand> = (actions$, state$) => actions$.pipe(
   ofType(LobbyAction.enteredLobbyPageEvent),
   toPayload(),
-  map(LobbyAction.joinLobbyCommand),
+  waitUntilAuthorized(state$),
+  map(([lobbyId, { userId, username }]) => JoinLobbyAction.joinLobbyCommand([{ userId, username }, lobbyId])),
 );
 
-export type LobbyEpicDependencies = CreateLobbyEpicDependencies;
+const dispatchLeaveLobbyCommandOnLeftLobbyPageEvent: TypedEpic<
+typeof LeaveLobbyAction.leaveLobbyCommand
+> = (actions$, state$) => actions$.pipe(
+  ofType(LobbyAction.leftLobbyPageEvent),
+  toPayload(),
+  waitUntilAuthorized(state$),
+  map(([lobbyId, { userId }]) => LeaveLobbyAction.leaveLobbyCommand([userId, lobbyId])),
+);
 
-export const lobbyEpic = (deps: LobbyEpicDependencies) => typedCombineEpics<LobbyAction>(
-  createLobbyEpic(deps),
-  showCreateLobbyLoaderOnCreateLobbyCommandEpic,
-  hideCreateLobbyLoaderOnCreateLobbyResultEventEpic,
+const createGameOnCreateGameButtonClickedEvent: TypedEpic<typeof CreateGameAction.createGameCommand> = (actions$, state$) => actions$.pipe(
+  ofType(LobbyAction.createGameButtonClickedEvent),
+  waitUntilAuthorized(state$),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  map(([action, { userId }]) => userId),
+  withLatestFrom(state$),
+  map(([currentUserId, state]) => {
+    // TODO: error handling
+    const lobby = state.lobbyReducer.lobby!;
+
+    return CreateGameAction.createGameCommand([lobby, currentUserId]);
+  }),
+);
+
+export const lobbyEpic = typedCombineEpics<
+| LobbyAction
+| JoinLobbyAction
+| LeaveLobbyAction
+| CreateGameAction
+>(
   joinLobbyOnLobbyPageEnteredEventEpic,
+  createGameOnCreateGameButtonClickedEvent,
+  dispatchLeaveLobbyCommandOnLeftLobbyPageEvent,
 );

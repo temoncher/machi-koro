@@ -2,16 +2,33 @@ import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
 import { Reducer, combineReducers } from 'redux';
 
-import { gameReducer } from './game';
-import { lobbyReducer } from './lobby';
-import { loginReducer } from './login';
+import {
+  gameReducer,
+  joinGameReducer,
+  abandonGameReducer,
+} from './game';
+import { createLobbyReducer } from './home';
+import {
+  joinLobbyReducer,
+  leaveLobbyReducer,
+  lobbyReducer,
+  createGameReducer,
+} from './lobby';
+import { registerGuestReducer, loginReducer } from './login';
 import { RootState } from './root.state';
-import { websocketReducer } from './websocket';
 
 export const rootReducer = (history: History): Reducer<RootState> => combineReducers({
   loginReducer,
   lobbyReducer,
   gameReducer,
-  websocketReducer,
   router: connectRouter(history),
+  requests: combineReducers({
+    registerGuestReducer,
+    createLobbyReducer,
+    joinLobbyReducer,
+    leaveLobbyReducer,
+    createGameReducer,
+    joinGameReducer,
+    abandonGameReducer,
+  }),
 });

@@ -73,6 +73,7 @@
         "import/extensions": 0,
 
         "no-console": 2,
+        "no-void": 0, // conflicts with recommended fix for @typescript-eslint/no-floating-promises
         "max-len": [1, 140],
 
         "complexity": [2, 6],
