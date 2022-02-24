@@ -4,6 +4,7 @@ import {
 import * as functions from 'firebase-functions';
 
 export const onLobbyUserRemove = functions
+  .region('europe-west1')
   .database
   .ref('/lobbies/{lobbyId}/users/{userId}')
   .onDelete(async (removedUserSnapshot, context) => {
@@ -42,6 +43,7 @@ export const onLobbyUserRemove = functions
   });
 
 export const onGamePlayerStatusChange = functions
+  .region('europe-west1')
   .database
   .ref('/games/{gameId}/playersConnectionStatuses/{playerId}')
   .onUpdate(async (playerConnectionStatusChange, context) => {
