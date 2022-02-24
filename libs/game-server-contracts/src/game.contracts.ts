@@ -1,8 +1,4 @@
-import { z } from 'zod';
-
 import { UserId, User } from './user.model';
-
-const MAX_LENGTH_LOBBY_ID = 36;
 
 export type CommonEstablishmentDomain = 'majorEstablishment' | 'industry' | 'shopsFactoriesAndMarket' | 'restaurant';
 
@@ -294,18 +290,4 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     imageSrc: 'http://localhost:3333/static/establishment-images/convenience-store.png',
     descriptionText: "Receive 2 coins from the bank for every 'wheat' card you have if it’s your turn.",
   },
-};
-
-export const createGameRequestBodySchema = z.object({
-  lobbyId: z
-    .string()
-    .max(MAX_LENGTH_LOBBY_ID, {
-      message: `'lobbyId' should be at most ${String(MAX_LENGTH_LOBBY_ID)} characters long`,
-    }),
-});
-
-export type CreateGameRequestBody = z.infer<typeof createGameRequestBodySchema>;
-
-export type CreateGameResponse = {
-  gameId: GameId;
 };

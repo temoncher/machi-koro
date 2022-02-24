@@ -64,8 +64,7 @@
     "rxjs": "^7.4.0",
     "ts-action": "^11.0.0",
     "ts-action-operators": "^9.1.2",
-    "ts-pattern": "^3.3.4",
-    "zod": "^3.7.1"
+    "ts-pattern": "^3.3.4"
   },
   "devDependencies": {
     "@babel/core": "7.12.13",

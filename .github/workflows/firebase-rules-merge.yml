@@ -10,6 +10,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
-      - run: yarn add -g firebase-tools
+      - run: yarn add firebase-tools -g
       - name: Deploy firebase rules
-        run: yarn firebase deploy --only database,firestore,storage -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION" --token "${{ secrets.FIREBASE_TOKEN_MACHI_KORO_DEV }}"
+        run: firebase deploy --only database,firestore,storage -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION" --token "${{ secrets.FIREBASE_TOKEN_MACHI_KORO_DEV }}"
