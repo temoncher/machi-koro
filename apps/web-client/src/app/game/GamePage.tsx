@@ -1,162 +1,16 @@
-import { GameContext, UserId } from '@machikoro/game-server-contracts';
 import { Box, Button, SxProps } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 import { useTypedSelector } from '../hooks';
-import { DiceCombination } from '../types/Dice';
 
 import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
 import { DiceCombinationView } from './components/DiceCombinationView';
 import { GameAction } from './game.actions';
+import { mockGameContext, mockRolledDiceCombination } from './mockGamePageData';
 import { useGameActions } from './useGameActions';
-
-const firstPlayerId = 'firstPlayer' as UserId;
-const secondPlayerId = 'secondPlayer' as UserId;
-const thirdPlayerId = 'thirdPlayer' as UserId;
-const fourthPlayerId = 'fourthPlayer' as UserId;
-
-const mockGameContext: GameContext = {
-  gameEstablishments: {
-    wheatField: {
-      establishmentId: 'wheatField',
-      domain: 'industry',
-      tag: 'wheat',
-      name: 'Wheat field',
-      cost: 1,
-      activation: [1],
-      tagSrc: 'http://localhost:3333/static/icons/wheat.png',
-      imageSrc: 'http://localhost:3333/static/establishment-images/flower-garden.png',
-      descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
-    },
-    bakery: {
-      establishmentId: 'bakery',
-      domain: 'shopsFactoriesAndMarket',
-      tag: 'box',
-      name: 'Bakery',
-      tagSrc: 'http://localhost:3333/static/icons/factory.png',
-      imageSrc: 'http://localhost:3333/static/establishment-images/bakery.png',
-      activation: [2, 3],
-      descriptionText: 'Get 1 coin from the bank on you turn only.',
-      cost: 1,
-    },
-    livestockFarm: {
-      establishmentId: 'livestockFarm',
-      domain: 'industry',
-      tag: 'livestock',
-      name: 'Livestock Farm',
-      cost: 1,
-      activation: [2],
-      tagSrc: 'http://localhost:3333/static/icons/cow.png',
-      imageSrc: 'http://localhost:3333/static/establishment-images/ranch.png',
-      descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
-    },
-    cafe: {
-      establishmentId: 'cafe',
-      domain: 'restaurant',
-      tag: 'cup',
-      name: 'Cafe',
-      cost: 2,
-      activation: [3],
-      tagSrc: 'http://localhost:3333/static/icons/cup.png',
-      imageSrc: 'http://localhost:3333/static/establishment-images/cafe.png',
-      descriptionText: 'Receive 1 coin from any player who rolls this number.',
-    },
-  },
-  shop: {
-    bakery: 10,
-    wheat: 13,
-    livestockFarm: 5,
-    cafe: 2,
-  },
-  activePlayerId: firstPlayerId,
-  players: [
-    {
-      userId: firstPlayerId,
-    },
-    {
-      userId: secondPlayerId,
-    },
-    {
-      userId: thirdPlayerId,
-    },
-    {
-      userId: fourthPlayerId,
-    },
-  ],
-  establishments: {
-    [firstPlayerId]: {},
-    [secondPlayerId]: {},
-    [thirdPlayerId]: {},
-    [fourthPlayerId]: {},
-  },
-  coins: {
-    [firstPlayerId]: 54,
-    [secondPlayerId]: 3,
-    [thirdPlayerId]: 3,
-    [fourthPlayerId]: 20,
-  },
-  landmarks: {
-    [firstPlayerId]: {
-      trainStation: false,
-      shoppingMall: false,
-      amusementPark: false,
-      radioTower: false,
-    },
-    [secondPlayerId]: {},
-    [thirdPlayerId]: {},
-    [fourthPlayerId]: {
-      trainStation: false,
-      shoppingMall: false,
-      amusementPark: false,
-      radioTower: false,
-    },
-  },
-  gameLandmarks: {
-    trainStation: {
-      landmarkId: 'trainStation',
-      domain: 'landmark',
-      name: 'Train Station',
-      cost: 4,
-      tagSrc: 'http://localhost:3333/static/icons/landmark-icon.png',
-      imageSrc: 'http://localhost:3333/static/landmark-images/train-station.png',
-      descriptionText: 'Roll 2 dice at the same time.',
-    },
-    shoppingMall: {
-      landmarkId: 'shoppingMall',
-      domain: 'landmark',
-      name: 'Shopping Mall',
-      cost: 10,
-      tagSrc: 'http://localhost:3333/static/icons/landmark-icon.png',
-      imageSrc: 'http://localhost:3333/static/landmark-images/shopping-mall.png',
-      descriptionText: 'Increase the number of coins you get for your Café and Restaurant by 1.',
-    },
-    amusementPark: {
-      landmarkId: 'amusementPark',
-      domain: 'landmark',
-      name: 'Amusement Park',
-      cost: 16,
-      tagSrc: 'http://localhost:3333/static/icons/landmark-icon.png',
-      imageSrc: 'http://localhost:3333/static/landmark-images/amusement-park.png',
-      descriptionText: 'Take another turn if you roll doubles.',
-    },
-    radioTower: {
-      landmarkId: 'radioTower',
-      domain: 'landmark',
-      name: 'Radio tower',
-      cost: 22,
-      tagSrc: 'http://localhost:3333/static/icons/landmark-icon.png',
-      imageSrc: 'http://localhost:3333/static/landmark-images/radio-tower.png',
-      descriptionText: 'You may re-roll your dice once each turn.',
-    },
-  },
-  rollDiceResult: 3,
-  winnerId: undefined,
-};
-
-const mockRolledDiceCombination: DiceCombination = [3, undefined];
 
 type GamePageProps = {
   sx?: SxProps;
@@ -234,7 +88,7 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
           gameLandmarks={mockGameContext.gameLandmarks}
           landmarksMap={mockGameContext.landmarks}
           // TODO: rework this part
-          players={mockGameContext.players.map(({ userId }) => ({
+          players={mockGameContext.playersIds.map((userId) => ({
             userId,
             username: userId,
           }))}
