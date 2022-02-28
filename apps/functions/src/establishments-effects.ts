@@ -8,17 +8,9 @@ export const updateCoinsForAllPlayersWith: ApplyEffects = (
   income,
 ) => (context) => {
   const updatedCoins = RecordUtils.mapWithIndex((playerId, coins) => {
-    const currentUserEstablishment = context.establishments[playerId as UserId];
+    const currentEstablishmentQuantity = context.establishments[playerId as UserId]?.[establishmentId];
 
-    if (!currentUserEstablishment) {
-      return coins;
-    }
-
-    const currentEstablishmentQuantity = currentUserEstablishment[establishmentId];
-
-    if (!currentEstablishmentQuantity) {
-      return coins;
-    }
+    if (!currentEstablishmentQuantity) return coins;
 
     return coins + income * currentEstablishmentQuantity;
   }, context.coins);
@@ -31,15 +23,11 @@ export const updateCoinsForActivePlayerWith: ApplyEffects = (
   income,
 ) => (context) => {
   const updatedCoins = RecordUtils.mapWithIndex((playerId, coins) => {
-    if (playerId !== context.activePlayerId) {
-      return coins;
-    }
+    if (playerId !== context.activePlayerId) return coins;
 
     const currentEstablishmentQuantity = context.establishments[playerId as UserId]?.[establishmentId];
 
-    if (!currentEstablishmentQuantity) {
-      return coins;
-    }
+    if (!currentEstablishmentQuantity) return coins;
 
     return coins + income * currentEstablishmentQuantity;
   }, context.coins);
@@ -57,31 +45,23 @@ export const updateCoinsForActivePlayerWithIndustryEstablishment: ApplyEffects =
   );
 
   const updatedCoins = RecordUtils.mapWithIndex((playerId, coins) => {
-    if (playerId !== context.activePlayerId) {
-      return coins;
-    }
+    if (playerId !== context.activePlayerId) return coins;
 
     const currentPlayerEstablishments = context.establishments[playerId as UserId];
 
-    if (!currentPlayerEstablishments) {
-      return coins;
-    }
+    if (!currentPlayerEstablishments) return coins;
 
     const currentEstablishmentQuantity = currentPlayerEstablishments[establishmentId];
 
-    if (!currentEstablishmentQuantity) {
-      return coins;
-    }
+    if (!currentEstablishmentQuantity) return coins;
 
     const establishmentsCount = activatedEstablishments.reduce(
       (establishmentsCountSoFar, establishment) => {
         const currentQuantity = currentPlayerEstablishments[establishment.establishmentId];
 
-        if (currentQuantity !== undefined) {
-          return establishmentsCountSoFar + currentQuantity;
-        }
+        if (currentQuantity === undefined) return establishmentsCountSoFar;
 
-        return establishmentsCountSoFar;
+        return establishmentsCountSoFar + currentQuantity;
       },
       0,
     );
@@ -101,17 +81,13 @@ export const updateCoinsForAllPlayersAtTheExpenseOfActivePlayer: ApplyEffects = 
   const playersInOrderOfDebtCollection = [...playersAfterActivePlayer, ...playersBeforeActivePlayer];
   const activePlayerCoins = context.coins[context.activePlayerId];
 
-  if (!activePlayerCoins) {
-    return context;
-  }
+  if (!activePlayerCoins) return context;
 
   const updatedCoins = playersInOrderOfDebtCollection.reduce(
     (coinsSoFar, currentPlayerId) => {
       const currentPlayerCoins = context.coins[currentPlayerId];
 
-      if (currentPlayerCoins === undefined) {
-        return coinsSoFar;
-      }
+      if (currentPlayerCoins === undefined) return coinsSoFar;
 
       const currentEstablishmentQuantity = context.establishments[currentPlayerId]?.[establishmentId];
 

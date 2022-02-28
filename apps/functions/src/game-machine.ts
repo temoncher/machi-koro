@@ -108,22 +108,24 @@ const buildEstablishment = assign<GameContext, GameMachineMessage>((context, mes
   const currentPlayerEstablishments = context.establishments[context.activePlayerId];
   const currentGameEstablishment = allGameEstablishments[establishmentToBuild];
 
-  if (!currentPlayerEstablishments || !currentGameEstablishment) {
-    return context;
-  }
+  if (!currentPlayerEstablishments || !currentGameEstablishment) return context;
 
   const playersWithUpdatedEstablishments = RecordUtils.mapWithIndex((playerId, establishments) => {
-    if (playerId !== message.userId) {
-      return establishments;
-    }
+    if (playerId !== message.userId) return establishments;
 
     const currentEstablishmentQuantity = currentPlayerEstablishments[message.payload];
 
     if (currentEstablishmentQuantity === undefined) {
-      return { ...currentPlayerEstablishments, [establishmentToBuild]: 1 };
+      return {
+        ...currentPlayerEstablishments,
+        [establishmentToBuild]: 1,
+      };
     }
 
-    return { ...currentPlayerEstablishments, [establishmentToBuild]: currentEstablishmentQuantity + 1 };
+    return {
+      ...currentPlayerEstablishments,
+      [establishmentToBuild]: currentEstablishmentQuantity + 1,
+    };
   }, context.establishments);
 
   const updatedCoins = RecordUtils.modifyAt(message.userId, (coins) => coins - currentGameEstablishment.cost, context.coins);
@@ -148,9 +150,7 @@ const chooseNextPlayer = assign<GameContext, GameMachineMessage>({
     const nextPlayerIndex = (activePlayerIndex + 1) % context.playersIds.length;
     const nextPlayerId = context.playersIds[nextPlayerIndex];
 
-    if (!nextPlayerId) {
-      return context.activePlayerId;
-    }
+    if (!nextPlayerId) return context.activePlayerId;
 
     return nextPlayerId;
   },
