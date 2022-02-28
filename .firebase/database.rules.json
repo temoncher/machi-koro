@@ -28,6 +28,10 @@
             ".write": "data.val() !== 'ABANDONED' && data.parent().exists() && auth.uid === $playerId"
           }
         },
+        "context": {
+          ".read": "auth !== null",
+          ".write": false
+        },
         "log": {
           ".read": "auth !== null",
           ".write": false
