@@ -10,9 +10,25 @@ import {
 } from '@machikoro/game-server-contracts';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
+import { interpret } from 'xstate';
+
+import { createGameMachine } from './game-machine';
 
 const app = admin.initializeApp();
 const database = admin.database(app);
+
+const setupGameMachine = (game: Game) => {
+  const gameMachine = createGameMachine(Object.keys(game.players) as UserId[]);
+  const gameLog = game.log ?? [];
+
+  const interpretedGameMachine = interpret(gameMachine).start();
+
+  gameLog.forEach((message) => {
+    interpretedGameMachine.send(message);
+  });
+
+  return interpretedGameMachine;
+};
 
 export const postGameMessage = functions
   .region('europe-west1')
@@ -20,14 +36,44 @@ export const postGameMessage = functions
   .onCall(async (requestData, context) => {
     const userId = context.auth?.uid as UserId;
     const gameData = requestData as { gameId: GameId; message: Omit<GameMachineMessage, 'userId'> };
-    const gameLogRef = database.ref(`games/${gameData.gameId}/log`);
+    const gameRef = database.ref(`games/${gameData.gameId}`);
 
-    await gameLogRef.push({
+    const currentGameSnapshot = await gameRef.get();
+    const currentGame = currentGameSnapshot.val() as Game;
+
+    const gameMachine = setupGameMachine(currentGame);
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const message = {
       ...gameData.message,
       userId,
-    });
+      // TODO: figure out a way to avoid this cast
+    } as GameMachineMessage;
 
-    functions.logger.info(`Successfully posted message (${gameData.message.type}) from user(${userId}) to game(${gameData.gameId})`);
+    const newState = gameMachine.send(message);
+
+    if (newState.changed) {
+      const currentGameLog = currentGame.log ?? [];
+
+      const { winnerId, ...newContext } = newState.context;
+
+      await gameRef.update({
+        log: [...currentGameLog, message],
+        context: {
+          ...newContext,
+          winnerId: winnerId ?? null,
+        },
+      });
+
+      functions.logger.info(`Successfully posted message(${gameData.message.type}) from user(${userId}) to game(${gameData.gameId})`);
+
+      return newState.context;
+    }
+
+    throw new functions.https.HttpsError(
+      'cancelled',
+      `Error occured while posting a message(${gameData.message.type}) from user(${userId}) to game(${gameData.gameId})`,
+    );
   });
 
 export const onLobbyUserRemove = functions

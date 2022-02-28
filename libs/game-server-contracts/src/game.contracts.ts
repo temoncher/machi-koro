@@ -75,7 +75,9 @@ export type Game = {
   hostId: UserId;
   players: Record<UserId, User>;
   playersConnectionStatuses: PlayerConnectionStatusesMap;
-  log: GameMachineMessage[];
+
+  log?: GameMachineMessage[];
+  context?: GameContext;
 };
 
 export type GameContext = {

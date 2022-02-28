@@ -1,5 +1,6 @@
 import {
   Game,
+  GameContext,
   GameId,
   GameMachineMessage,
   PlayerConnectionStatus,
@@ -69,4 +70,4 @@ export const abandonFirebaseGame = (firebaseDb: Database): AbandonGame => async 
 export const postGameMessage = (
   firebaseFunctions: Functions,
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-) => httpsCallable<{ gameId: string; message: Omit<GameMachineMessage, 'userId'> }, void>(firebaseFunctions, 'postGameMessage');
+) => httpsCallable<{ gameId: string; message: Omit<GameMachineMessage, 'userId'> }, GameContext>(firebaseFunctions, 'postGameMessage');

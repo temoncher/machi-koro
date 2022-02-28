@@ -4,9 +4,10 @@ import { Functions } from 'firebase/functions';
 import { AnyAction } from 'redux';
 import { object } from 'rxfire/database';
 import {
+  catchError,
   from,
-  ignoreElements,
   map,
+  of,
   switchMap,
   takeUntil,
   withLatestFrom,
@@ -16,15 +17,14 @@ import { ofType, toPayload } from 'ts-action-operators';
 import { JoinGameAction, GameAction, AbandonGameAction } from '../game';
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
+import { FirebaseAction } from './firebase.actions';
 import { postGameMessage } from './games-firebase.api';
 
 type SyncGameStateDependencies = {
   firebaseDb: Database;
 };
 
-const syncGameState = (
-  deps: SyncGameStateDependencies,
-): TypedEpic<typeof GameAction.setGameDocument> => (actions$) => actions$.pipe(
+const syncGameState = (deps: SyncGameStateDependencies): TypedEpic<typeof GameAction.setGameDocument> => (actions$) => actions$.pipe(
   ofType(JoinGameAction.joinGameResolvedEvent),
   toPayload(),
   switchMap((gameId) => object(ref(deps.firebaseDb, `games/${gameId}`)).pipe(
@@ -50,18 +50,21 @@ type MapAppActionsToGameMachineActionsDependencies = {
   firebaseFunctions: Functions;
 };
 
-const mapAppActionsToGameMachineActions = (
-  deps: MapAppActionsToGameMachineActionsDependencies,
-): TypedEpic<never> => (actions$, state$) => actions$.pipe(
+const mapAppActionsToGameMachineActions = (deps: MapAppActionsToGameMachineActionsDependencies): TypedEpic<
+| typeof FirebaseAction.postMessageResolvedEvent
+| typeof FirebaseAction.postMessageRejectedEvent
+> => (actions$, state$) => actions$.pipe(
   ofType(GameAction.rollDiceCommand),
   withLatestFrom(state$),
   switchMap(([action, state]) => {
     const gameMachineMessageType = appActionTypeToGameMachineMessageTypeMap[action.type];
     const { gameId } = state.gameReducer.game!;
 
-    return from(postGameMessage(deps.firebaseFunctions)({ gameId, message: { type: gameMachineMessageType } }));
+    return from(postGameMessage(deps.firebaseFunctions)({ gameId, message: { type: gameMachineMessageType } })).pipe(
+      map((result) => FirebaseAction.postMessageResolvedEvent(result.data)),
+      catchError((error) => of(FirebaseAction.postMessageRejectedEvent(error))),
+    );
   }),
-  ignoreElements(),
 );
 
 export type FirebaseGamesEpicDependencies =
