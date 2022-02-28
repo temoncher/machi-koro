@@ -150,7 +150,7 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
         }}
       >
         {Object.entries(props.establishments).map(
-          ([establishmentId, count], cardIndex) => renderCard(establishmentId, count, cardIndex),
+          ([establishmentId, count], cardIndex) => renderCard(establishmentId as EstablishmentId, count, cardIndex),
         )}
       </Box>
     </Box>

@@ -20,19 +20,14 @@ const mockPlayerIds = {
   fourthPlayer: 'fourthPlayer' as UserId,
 } as const;
 
-const mockedPlayers = [
-  { userId: mockPlayerIds.firstPlayer },
-  { userId: mockPlayerIds.secondPlayer },
-  { userId: mockPlayerIds.thirdPlayer },
-  { userId: mockPlayerIds.fourthPlayer },
-];
+const mockPlayers = Object.values(mockPlayerIds);
 
 describe('Establishments effects', () => {
   describe('updateCoinsForAllPlayersWith', () => {
     test('should update coins for multiple players with the current establishment', () => {
       // arrange
       const previousContext: GameContext = {
-        players: mockedPlayers,
+        playersIds: mockPlayers,
         landmarks: {
           [mockPlayerIds.firstPlayer]: {},
           [mockPlayerIds.secondPlayer]: {},
@@ -87,7 +82,7 @@ describe('Establishments effects', () => {
     test('should update coins for the first player and not update coins for the second player', () => {
       // arrange
       const previousContext: GameContext = {
-        players: mockedPlayers,
+        playersIds: mockPlayers,
         landmarks: {
           [mockPlayerIds.firstPlayer]: {},
           [mockPlayerIds.secondPlayer]: {},
@@ -140,7 +135,7 @@ describe('Establishments effects', () => {
     test('should update coins for the first player and not update coins for the second player', () => {
       // arrange
       const previousContext: GameContext = {
-        players: mockedPlayers,
+        playersIds: mockPlayers,
         landmarks: {
           [mockPlayerIds.firstPlayer]: {},
           [mockPlayerIds.secondPlayer]: {},
@@ -199,7 +194,7 @@ describe('Establishments effects', () => {
     test("must update the second player's coins by removing the first player's coins", () => {
       // arrange
       const previousContext: GameContext = {
-        players: mockedPlayers,
+        playersIds: mockPlayers,
         landmarks: {
           [mockPlayerIds.firstPlayer]: {},
           [mockPlayerIds.secondPlayer]: {},

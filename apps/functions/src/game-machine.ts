@@ -5,6 +5,7 @@ import {
   EstablishmentId,
   establishmentsIds,
   GameContext,
+  GameMachineMessage,
   Landmark,
   LandmarkId,
   UserId,
@@ -13,36 +14,6 @@ import { createMachine, assign } from 'xstate';
 
 import { establishmentsEffectsMap } from './establishments';
 import { RecordUtils } from './record.utils';
-
-type RollDiceMessage = {
-  type: 'ROLL_DICE';
-  userId: UserId;
-};
-type StartGame = {
-  type: 'START_GAME';
-  usersIds: UserId[];
-};
-type Pass = {
-  type: 'PASS';
-  userId: UserId;
-};
-type BuildEstablishment = {
-  type: 'BUILD_ESTABLISHMENT';
-  userId: UserId;
-  establishmentToBuild: EstablishmentId;
-};
-type BuildLandmark = {
-  type: 'BUILD_LANDMARK';
-  userId: UserId;
-  landmarkToBuild: LandmarkId;
-};
-
-type GameMachineMessage =
-  | RollDiceMessage
-  | StartGame
-  | Pass
-  | BuildEstablishment
-  | BuildLandmark;
 
 const canRollDice = (
   context: GameContext,
@@ -101,13 +72,13 @@ const buildLandmark = assign<GameContext, GameMachineMessage>((context, message)
   }
 
   const activePlayerLandmarks = context.landmarks[context.activePlayerId];
-  const currentGameLandmark = allGameLandmarks[message.landmarkToBuild];
+  const currentGameLandmark = allGameLandmarks[message.payload];
 
   if (!activePlayerLandmarks || !currentGameLandmark) {
     return context;
   }
 
-  const playerWithUpdatedLandmarks = RecordUtils.modifyAt(message.landmarkToBuild, () => true, activePlayerLandmarks);
+  const playerWithUpdatedLandmarks = RecordUtils.modifyAt(message.payload, () => true, activePlayerLandmarks);
   const playersWithUpdatedLandmarks = RecordUtils.modifyAt(message.userId, () => playerWithUpdatedLandmarks, context.landmarks);
 
   const updatedCoins = RecordUtils.modifyAt(message.userId, (coins) => coins - currentGameLandmark.cost, context.coins);
@@ -124,7 +95,7 @@ const buildEstablishment = assign<GameContext, GameMachineMessage>((context, mes
     return context;
   }
 
-  const { establishmentToBuild } = message;
+  const establishmentToBuild = message.payload;
   const currentPlayerEstablishments = context.establishments[context.activePlayerId];
   const currentGameEstablishment = allGameEstablishments[establishmentToBuild];
 
@@ -137,7 +108,7 @@ const buildEstablishment = assign<GameContext, GameMachineMessage>((context, mes
       return establishments;
     }
 
-    const currentEstablishmentQuantity = currentPlayerEstablishments[message.establishmentToBuild];
+    const currentEstablishmentQuantity = currentPlayerEstablishments[message.payload];
 
     if (currentEstablishmentQuantity === undefined) {
       return { ...currentPlayerEstablishments, [establishmentToBuild]: 1 };
@@ -149,7 +120,7 @@ const buildEstablishment = assign<GameContext, GameMachineMessage>((context, mes
   const updatedCoins = RecordUtils.modifyAt(message.userId, (coins) => coins - currentGameEstablishment.cost, context.coins);
 
   const updatedEstablishmentsQuantity = RecordUtils.modifyAt(
-    message.establishmentToBuild,
+    message.payload,
     (quantity) => quantity - 1,
     context.shop,
   );
@@ -217,7 +188,7 @@ const canBuildLandmark = (context: GameContext, message: GameMachineMessage) => 
 
   const activePlayerCoins = context.coins[context.activePlayerId];
   const activePlayerLandmarks = context.landmarks[context.activePlayerId];
-  const currentGameLandmark = allGameLandmarks[message.landmarkToBuild];
+  const currentGameLandmark = allGameLandmarks[message.payload];
 
   if (!activePlayerLandmarks || !activePlayerCoins || !currentGameLandmark) {
     return false;
@@ -233,7 +204,7 @@ const canNotBuildLandmark = (context: GameContext, message: GameMachineMessage) 
 
   const activePlayerCoins = context.coins[context.activePlayerId];
   const activePlayerLandmarks = context.landmarks[context.activePlayerId];
-  const currentGameLandmark = allGameLandmarks[message.landmarkToBuild];
+  const currentGameLandmark = allGameLandmarks[message.payload];
 
   if (context.activePlayerId !== message.userId || !currentGameLandmark || !activePlayerLandmarks || !activePlayerCoins) {
     return true;
@@ -265,8 +236,8 @@ const canBuildEstablishment = (context: GameContext, message: GameMachineMessage
 
   const activePlayerEstablishments = context.establishments[context.activePlayerId];
   const activePlayerCoins = context.coins[context.activePlayerId];
-  const currentGameEstablishment = allGameEstablishments[message.establishmentToBuild];
-  const establishmentQuantity = context.shop[message.establishmentToBuild];
+  const currentGameEstablishment = allGameEstablishments[message.payload];
+  const establishmentQuantity = context.shop[message.payload];
 
   if (!activePlayerEstablishments || !activePlayerCoins || !currentGameEstablishment || !establishmentQuantity) {
     return false;
@@ -283,8 +254,8 @@ const canNotBuildEstablishment = (context: GameContext, message: GameMachineMess
 
   const activePlayerEstablishments = context.establishments[context.activePlayerId];
   const activePlayerCoins = context.coins[context.activePlayerId];
-  const currentGameEstablishment = allGameEstablishments[message.establishmentToBuild];
-  const establishmentQuantity = context.shop[message.establishmentToBuild];
+  const currentGameEstablishment = allGameEstablishments[message.payload];
+  const establishmentQuantity = context.shop[message.payload];
 
   if (context.activePlayerId !== message.userId
     || !currentGameEstablishment
@@ -301,9 +272,7 @@ const endGame = assign<GameContext, GameMachineMessage>({ winnerId: (context) =>
 
 export const createGameMachine = (playersIds: UserId[]) => {
   const getInitialContext = (): GameContext => {
-    const underConstructionLandmarks = Object.fromEntries(
-      Object.keys(allGameLandmarks).map((landmarkId) => [landmarkId, false]),
-    ) as Record<LandmarkId, boolean>;
+    const underConstructionLandmarks = RecordUtils.map(() => false, allGameLandmarks);
     const shop = RecordUtils.map(
       (establishment) => (establishment.domain === 'majorEstablishment' ? 5 : 6),
       allGameEstablishments,

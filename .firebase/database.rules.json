@@ -27,6 +27,10 @@
             ".validate": "newData.val().matches(/^(CONNECTED|DISCONNECTED|ABANDONED)$/)",
             ".write": "data.val() !== 'ABANDONED' && data.parent().exists() && auth.uid === $playerId"
           }
+        },
+        "log": {
+          ".read": "auth !== null",
+          ".write": false
         }
       }
     }

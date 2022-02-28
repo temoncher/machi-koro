@@ -45,11 +45,37 @@ export enum PlayerConnectionStatus {
 
 export type PlayerConnectionStatusesMap = Record<UserId, PlayerConnectionStatus>;
 
+type RollDiceMessage = {
+  type: 'ROLL_DICE';
+  userId: UserId;
+};
+type Pass = {
+  type: 'PASS';
+  userId: UserId;
+};
+type BuildEstablishment = {
+  type: 'BUILD_ESTABLISHMENT';
+  userId: UserId;
+  payload: EstablishmentId;
+};
+type BuildLandmark = {
+  type: 'BUILD_LANDMARK';
+  userId: UserId;
+  payload: LandmarkId;
+};
+
+export type GameMachineMessage =
+  | RollDiceMessage
+  | Pass
+  | BuildEstablishment
+  | BuildLandmark;
+
 export type Game = {
   gameId: GameId;
   hostId: UserId;
   players: Record<UserId, User>;
   playersConnectionStatuses: PlayerConnectionStatusesMap;
+  log: GameMachineMessage[];
 };
 
 export type GameContext = {

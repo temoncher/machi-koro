@@ -1,4 +1,9 @@
-import { Game, GameId, PlayerConnectionStatus } from '@machikoro/game-server-contracts';
+import {
+  Game,
+  GameId,
+  GameMachineMessage,
+  PlayerConnectionStatus,
+} from '@machikoro/game-server-contracts';
 import {
   push,
   ref,
@@ -7,6 +12,7 @@ import {
   serverTimestamp,
   Database,
 } from 'firebase/database';
+import { httpsCallable, Functions } from 'firebase/functions';
 
 import { AbandonGame } from '../game';
 import { CreateGame } from '../lobby';
@@ -21,6 +27,7 @@ export const createFirebaseGame = (firebaseDb: Database): CreateGame => async (l
     hostId,
     players: lobby.users!,
     playersConnectionStatuses,
+    log: [],
   };
 
   const createdGameRef = await push(ref(firebaseDb, 'games'), {
@@ -58,3 +65,8 @@ export const abandonFirebaseGame = (firebaseDb: Database): AbandonGame => async 
 
   return gameId;
 };
+
+export const postGameMessage = (
+  firebaseFunctions: Functions,
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+) => httpsCallable<{ gameId: string; message: Omit<GameMachineMessage, 'userId'> }, void>(firebaseFunctions, 'postGameMessage');

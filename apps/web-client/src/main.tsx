@@ -12,24 +12,18 @@ import { initReactI18next } from 'react-i18next';
 import { Provider } from 'react-redux';
 
 import { App, initializeI18n, initStore } from './app';
-import { getAuthorizationHeader } from './app/utils/getAuthorizationHeader';
-import { initHttpClient } from './app/utils/http-client';
 import { environment } from './environments/environment';
 
 import './styles.css';
 
 const main = () => {
-  const SERVER_PORT = 3333;
-  // eslint-disable-next-line no-restricted-globals
-  const SERVER_HOST = `http://${window.location.hostname}:${SERVER_PORT}`;
-
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initializeI18n(LanguageDetector, initReactI18next);
 
   const firebaseApp = initializeApp(environment.firebaseConfig);
   const firebaseAuth = getAuth(firebaseApp);
   const firebaseDb = getDatabase(firebaseApp);
-  const firebaseFunctions = getFunctions(firebaseApp);
+  const firebaseFunctions = getFunctions(firebaseApp, 'europe-west1');
   const firestore = getFirestore(firebaseApp);
   const firestorage = getStorage(firebaseApp);
 
@@ -42,10 +36,9 @@ const main = () => {
   }
 
   const history = createBrowserHistory();
-  const httpClient = initHttpClient(`${SERVER_HOST}/api`, getAuthorizationHeader);
   const store = initStore({
     history,
-    httpClient,
+    firebaseFunctions,
     firebaseAuth,
     firebaseDb,
     firestore,

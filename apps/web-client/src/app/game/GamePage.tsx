@@ -21,9 +21,7 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
   const game = useTypedSelector((state) => state.gameReducer.game);
   const dispatch = useDispatch();
   const {
-    rollDiceCommand,
     passCommand,
-    startGameCommand,
     buildEstablishmentCommand,
     buildLandmarkCommand,
   } = useGameActions();
@@ -110,8 +108,14 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
           },
         }}
       >
-        <Button variant="contained" onClick={startGameCommand}>{t('game.startGameButtonText')}</Button>
-        <Button variant="contained" onClick={rollDiceCommand}>{t('game.rollDiceButtonText')}</Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            dispatch(GameAction.rollDiceCommand());
+          }}
+        >
+          {t('game.rollDiceButtonText')}
+        </Button>
         <Button variant="contained" onClick={passCommand}>{t('game.passButtonText')}</Button>
         <Button variant="contained">{t('game.finishTurnButtonText')}</Button>
         <Button

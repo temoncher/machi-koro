@@ -1,7 +1,34 @@
 import {
-  Game, Lobby, LobbyId, PlayerConnectionStatus, User,
+  Game,
+  GameId,
+  GameMachineMessage,
+  Lobby,
+  LobbyId,
+  PlayerConnectionStatus,
+  User,
+  UserId,
 } from '@machikoro/game-server-contracts';
+import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
+
+const app = admin.initializeApp();
+const database = admin.database(app);
+
+export const postGameMessage = functions
+  .region('europe-west1')
+  .https
+  .onCall(async (requestData, context) => {
+    const userId = context.auth?.uid as UserId;
+    const gameData = requestData as { gameId: GameId; message: Omit<GameMachineMessage, 'userId'> };
+    const gameLogRef = database.ref(`games/${gameData.gameId}/log`);
+
+    await gameLogRef.push({
+      ...gameData.message,
+      userId,
+    });
+
+    functions.logger.info(`Successfully posted message (${gameData.message.type}) from user(${userId}) to game(${gameData.gameId})`);
+  });
 
 export const onLobbyUserRemove = functions
   .region('europe-west1')

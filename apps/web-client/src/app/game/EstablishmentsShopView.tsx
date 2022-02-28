@@ -26,7 +26,7 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
     }}
   >
     {Object.entries(props.shop).map(([establishmentId, quantity]) => {
-      const establishment = props.establishments[establishmentId];
+      const establishment = props.establishments[establishmentId as EstablishmentId];
 
       if (!establishment) return null;
 
@@ -36,7 +36,7 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
           cardInfo={establishment}
           quantity={quantity}
           onClick={() => {
-            props.onEstablishmentClick(establishmentId);
+            props.onEstablishmentClick(establishmentId as EstablishmentId);
           }}
         />
       );
