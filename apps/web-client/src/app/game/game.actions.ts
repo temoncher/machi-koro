@@ -24,9 +24,3 @@ const gameActionTypeToPayloadMap = {
 export const GameAction = createActionsNamespace(gameActionTypeToPayloadMap);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type GameAction = GetNamespaceActionType<typeof GameAction>;
-
-export const gameActions = {
-  passCommand: GameAction.passCommand,
-  buildEstablishmentCommand: GameAction.buildEstablishmentCommand,
-  buildLandmarkCommand: GameAction.buildLandmarkCommand,
-};

@@ -9,7 +9,6 @@ import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
 import { DiceCombinationView } from './components/DiceCombinationView';
 import { GameAction } from './game.actions';
-import { useGameActions } from './useGameActions';
 
 type GamePageProps = {
   sx?: SxProps;
@@ -19,11 +18,6 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
   const { t } = useTranslation();
   const game = useTypedSelector((state) => state.gameReducer.game);
   const dispatch = useDispatch();
-  const {
-    passCommand,
-    buildEstablishmentCommand,
-    buildLandmarkCommand,
-  } = useGameActions();
 
   // TODO: translate
   if (!game) return <>Loading...</>;
@@ -76,7 +70,9 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
             sx={{ flexGrow: 1 }}
             establishments={game.context.gameEstablishments}
             shop={game.context.shop}
-            onEstablishmentClick={buildEstablishmentCommand}
+            onEstablishmentClick={(establishmentId) => {
+              dispatch(GameAction.buildEstablishmentCommand(establishmentId));
+            }}
           />
           <DiceCombinationView sx={{ flexGrow: 0 }} rolledDiceCombination={game.context.rolledDiceCombination} />
         </Box>
@@ -88,14 +84,14 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
           gameEstablishments={game.context.gameEstablishments}
           gameLandmarks={game.context.gameLandmarks}
           landmarksMap={game.context.landmarks}
-          // TODO: rework this part
           players={game.context.playersIds.map((userId) => ({
             userId,
             username: userId,
           }))}
-          // TODO: rework this part
-          statusesMap={game.playersConnectionStatuses ?? {}}
-          onLandmarkClick={buildLandmarkCommand}
+          statusesMap={game.playersConnectionStatuses}
+          onLandmarkClick={(landmarkId) => {
+            dispatch(GameAction.buildLandmarkCommand(landmarkId));
+          }}
         />
       </Box>
 
@@ -119,8 +115,14 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
         >
           {t('game.rollDiceButtonText')}
         </Button>
-        <Button variant="contained" onClick={passCommand}>{t('game.passButtonText')}</Button>
-        <Button variant="contained">{t('game.finishTurnButtonText')}</Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            dispatch(GameAction.passCommand());
+          }}
+        >
+          {t('game.passButtonText')}
+        </Button>
         <Button
           color="error"
           variant="contained"

@@ -48,6 +48,9 @@ const syncGameState = (deps: SyncGameStateDependencies): TypedEpic<typeof GameAc
 
 const appActionTypeToGameMachineMessageTypeMap = {
   [GameAction.rollDiceCommand.type]: 'ROLL_DICE',
+  [GameAction.passCommand.type]: 'PASS',
+  [GameAction.buildEstablishmentCommand.type]: 'BUILD_ESTABLISHMENT',
+  [GameAction.buildLandmarkCommand.type]: 'BUILD_LANDMARK',
 } as const;
 
 type MapAppActionsToGameMachineActionsDependencies = {
@@ -58,7 +61,12 @@ const mapAppActionsToGameMachineActions = (deps: MapAppActionsToGameMachineActio
 | typeof FirebaseAction.postMessageResolvedEvent
 | typeof FirebaseAction.postMessageRejectedEvent
 > => (actions$, state$) => actions$.pipe(
-  ofType(GameAction.rollDiceCommand),
+  ofType(
+    GameAction.rollDiceCommand,
+    GameAction.passCommand,
+    GameAction.buildEstablishmentCommand,
+    GameAction.buildLandmarkCommand,
+  ),
   withLatestFrom(state$),
   switchMap(([action, state]) => {
     const gameMachineMessageType = appActionTypeToGameMachineMessageTypeMap[action.type];
@@ -69,7 +77,11 @@ const mapAppActionsToGameMachineActions = (deps: MapAppActionsToGameMachineActio
       'postGameMessage',
     );
 
-    return from(postGameMessage({ gameId, message: { type: gameMachineMessageType } })).pipe(
+    const message = 'payload' in action
+      ? { type: gameMachineMessageType, payload: action.payload }
+      : { type: gameMachineMessageType };
+
+    return from(postGameMessage({ gameId, message })).pipe(
       map((result) => FirebaseAction.postMessageResolvedEvent(result.data)),
       catchError((error) => of(FirebaseAction.postMessageRejectedEvent(error))),
     );
