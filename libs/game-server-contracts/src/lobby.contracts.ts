@@ -12,6 +12,11 @@ export type CreateLobbyRequestBody = {
   hostId: UserId;
 };
 
+export enum ReadyState {
+  READY = 'READY',
+  NOT_READY = 'NOT_READY',
+}
+
 export type Lobby = {
   lobbyId: LobbyId;
   hostId: UserId;
@@ -19,4 +24,5 @@ export type Lobby = {
 
   gameId?: GameId;
   users?: Record<UserId, User>;
+  readyStates?: Record<UserId, ReadyState>;
 };

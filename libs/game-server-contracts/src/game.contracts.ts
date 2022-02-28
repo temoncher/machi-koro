@@ -72,13 +72,23 @@ export type GameMachineMessage =
 
 export type Game = {
   gameId: GameId;
-  hostId: UserId;
   players: Record<UserId, User>;
   playersConnectionStatuses: PlayerConnectionStatusesMap;
+  context: GameContext;
 
   log?: GameMachineMessage[];
-  context?: GameContext;
 };
+
+export enum Dice {
+  ONE = 1,
+  TWO = 2,
+  THREE = 3,
+  FOUR = 4,
+  FIVE = 5,
+  SIX = 6,
+}
+
+export type DiceCombination = [Dice, Dice | undefined];
 
 export type GameContext = {
   shop: Record<EstablishmentId, number>;
@@ -87,10 +97,11 @@ export type GameContext = {
   establishments: Record<UserId, Record<EstablishmentId, number>>;
   coins: Record<UserId, number>;
   landmarks: Record<UserId, Record<LandmarkId, boolean>>;
-  rollDiceResult: number;
   gameLandmarks: Record<LandmarkId, Landmark>;
   gameEstablishments: Record<EstablishmentId, Establishment>;
+
   winnerId: UserId | undefined;
+  rolledDiceCombination: DiceCombination | undefined;
 };
 
 export type ApplyEffects = (

@@ -1,6 +1,7 @@
 import {
   allGameEstablishments,
   allGameLandmarks,
+  DiceCombination,
   Establishment,
   EstablishmentId,
   establishmentsIds,
@@ -15,18 +16,24 @@ import { createMachine, assign } from 'xstate';
 import { establishmentsEffectsMap } from './establishments';
 import { RecordUtils } from './record.utils';
 
+const getDiceCombinationSum = (combination: DiceCombination | undefined) => {
+  const [firstDice = 0, secondDice = 0] = combination ?? [];
+
+  return firstDice + secondDice;
+};
+
 const canRollDice = (
   context: GameContext,
   message: GameMachineMessage,
 ) => message.type === 'ROLL_DICE' && context.activePlayerId === message.userId;
 
 const rollDice = assign<GameContext, GameMachineMessage>({
-  rollDiceResult: (context, message) => {
+  rolledDiceCombination: (context, message) => {
     if (message.type !== 'ROLL_DICE') {
-      return context.rollDiceResult;
+      return context.rolledDiceCombination;
     }
 
-    return Math.floor((Math.random() * 6) + 1);
+    return [Math.floor((Math.random() * 6) + 1), undefined];
   },
 });
 
@@ -52,7 +59,9 @@ const applyEstablishmentEffects = assign<GameContext, GameMachineMessage>((conte
   }
 
   const establishmentsToApplyEffectsOf = Object.values(context.gameEstablishments).filter(
-    (establishment) => establishment.activation.some((count) => count === context.rollDiceResult),
+    (establishment) => establishment
+      .activation
+      .some((activationSum) => activationSum === getDiceCombinationSum(context.rolledDiceCombination)),
   );
 
   return [...establishmentsToApplyEffectsOf]
@@ -295,8 +304,7 @@ export const createGameMachine = (playersIds: UserId[]) => {
       gameEstablishments: allGameEstablishments,
       gameLandmarks: allGameLandmarks,
       winnerId: undefined,
-      // TODO?: maybe make this field optional
-      rollDiceResult: 0,
+      rolledDiceCombination: undefined,
     };
   };
 

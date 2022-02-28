@@ -8,7 +8,6 @@ import {
   mapTo,
   Observable,
   switchMap,
-  withLatestFrom,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
@@ -105,20 +104,6 @@ const dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic: TypedEpic<typeof LobbyA
   map((lobbyId) => LobbyAction.enteredLobbyPageEvent(lobbyId as LobbyId)),
 );
 
-const redirectToHomePageOnCurrentUserLeftLobbyEvent: TypedEpic<typeof push> = (actions$, state$) => actions$.pipe(
-  ofType(LobbyAction.currentUserLeftLobbyEvent),
-  toPayload(),
-  withLatestFrom(state$),
-  filter(([lobbyId, state]) => {
-    const [, currentRootPath, potentialLobbyId] = state.router.location.pathname.split('/');
-
-    return currentRootPath === 'lobbies' && potentialLobbyId === lobbyId;
-  }),
-  // `mapTo` really accepts `any` payload, therefore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  mapTo(push({ pathname: '/' })),
-);
-
 const dispatchLeftLobbyPageEventOnLobbyPageLeave: TypedEpic<typeof LobbyAction.leftLobbyPageEvent> = (actions$) => actions$.pipe(
   leftPage('lobbies'),
   map(({ previousPayload }) => {
@@ -155,7 +140,6 @@ export const navigationEpic = typedCombineEpics<AnyAction>(
   redirectToLobbyPageOnCreateLobbyResolvedEventEpic,
   dispatchEnteredLobbyPageEventOnLobbyPageEnterEpic,
   redirectToGamePageOnGameCreatedEventEpic,
-  redirectToHomePageOnCurrentUserLeftLobbyEvent,
   dispatchEnteredGamePageEventOnGamePageEnter,
   dispatchLeftLobbyPageEventOnLobbyPageLeave,
 );

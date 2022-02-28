@@ -1,16 +1,12 @@
 import {
   Game,
-  GameContext,
-  GameId,
-  GameMachineMessage,
+  LobbyId,
   PlayerConnectionStatus,
 } from '@machikoro/game-server-contracts';
 import {
-  push,
   ref,
   set,
   onDisconnect,
-  serverTimestamp,
   Database,
 } from 'firebase/database';
 import { httpsCallable, Functions } from 'firebase/functions';
@@ -18,35 +14,12 @@ import { httpsCallable, Functions } from 'firebase/functions';
 import { AbandonGame } from '../game';
 import { CreateGame } from '../lobby';
 
-export const createFirebaseGame = (firebaseDb: Database): CreateGame => async (lobby, hostId) => {
-  // TODO?: probably should be inside cloud function
-  const playersConnectionStatuses = Object.fromEntries(
-    Object.keys(lobby.users!).map((userId) => [userId, PlayerConnectionStatus.DISCONNECTED]),
-  );
+export const createFirebaseGame = (
+  firebaseFunctions: Functions,
+): CreateGame => async (fromLobby) => {
+  const { data: createdGame } = await httpsCallable<{ fromLobby: LobbyId }, Game>(firebaseFunctions, 'createGame')({ fromLobby });
 
-  const gameToCreate: Omit<Game, 'gameId'> = {
-    hostId,
-    players: lobby.users!,
-    playersConnectionStatuses,
-    log: [],
-  };
-
-  const createdGameRef = await push(ref(firebaseDb, 'games'), {
-    ...gameToCreate,
-    createdAt: serverTimestamp(),
-  });
-
-  // This cast is safe because only root database has a `null` key
-  const gameId = createdGameRef.key! as GameId;
-
-  const lobbyGameIdRef = ref(firebaseDb, `lobbies/${lobby.lobbyId}/gameId`);
-
-  await set(lobbyGameIdRef, gameId);
-
-  return {
-    ...gameToCreate,
-    gameId,
-  };
+  return createdGame;
 };
 
 export const joinFirebaseGame = (firebaseDb: Database): AbandonGame => async (user, gameId) => {
@@ -66,8 +39,3 @@ export const abandonFirebaseGame = (firebaseDb: Database): AbandonGame => async 
 
   return gameId;
 };
-
-export const postGameMessage = (
-  firebaseFunctions: Functions,
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-) => httpsCallable<{ gameId: string; message: Omit<GameMachineMessage, 'userId'> }, GameContext>(firebaseFunctions, 'postGameMessage');

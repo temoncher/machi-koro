@@ -92,7 +92,7 @@ export const initStore = (deps: InitStoreDependencies) => {
       createLobbyEpic(createFirebaseLobby(deps.firebaseDb)),
       joinLobbyEpic(joinFirebaseLobby(deps.firebaseDb)),
       leaveLobbyEpic(leaveFirebaseLobby(deps.firebaseDb)),
-      createGameEpic(createFirebaseGame(deps.firebaseDb)),
+      createGameEpic(createFirebaseGame(deps.firebaseFunctions)),
       joinGameEpic(joinFirebaseGame(deps.firebaseDb)),
       abandonGameEpic(abandonFirebaseGame(deps.firebaseDb)),
     ),

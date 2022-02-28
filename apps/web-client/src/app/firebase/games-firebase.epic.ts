@@ -1,6 +1,11 @@
-import { Game, GameId } from '@machikoro/game-server-contracts';
-import { Database, ref } from 'firebase/database';
-import { Functions } from 'firebase/functions';
+import {
+  Game,
+  GameContext,
+  GameId,
+  GameMachineMessage,
+} from '@machikoro/game-server-contracts';
+import { ref, Database } from 'firebase/database';
+import { httpsCallable, Functions } from 'firebase/functions';
 import { AnyAction } from 'redux';
 import { object } from 'rxfire/database';
 import {
@@ -18,7 +23,6 @@ import { JoinGameAction, GameAction, AbandonGameAction } from '../game';
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { FirebaseAction } from './firebase.actions';
-import { postGameMessage } from './games-firebase.api';
 
 type SyncGameStateDependencies = {
   firebaseDb: Database;
@@ -60,7 +64,12 @@ const mapAppActionsToGameMachineActions = (deps: MapAppActionsToGameMachineActio
     const gameMachineMessageType = appActionTypeToGameMachineMessageTypeMap[action.type];
     const { gameId } = state.gameReducer.game!;
 
-    return from(postGameMessage(deps.firebaseFunctions)({ gameId, message: { type: gameMachineMessageType } })).pipe(
+    const postGameMessage = httpsCallable<{ gameId: string; message: Omit<GameMachineMessage, 'userId'> }, GameContext>(
+      deps.firebaseFunctions,
+      'postGameMessage',
+    );
+
+    return from(postGameMessage({ gameId, message: { type: gameMachineMessageType } })).pipe(
       map((result) => FirebaseAction.postMessageResolvedEvent(result.data)),
       catchError((error) => of(FirebaseAction.postMessageRejectedEvent(error))),
     );

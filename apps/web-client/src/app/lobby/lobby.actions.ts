@@ -16,7 +16,6 @@ const lobbyActionTypeToPayloadMap = {
   '[EVENT] APP/LOBBY/CREATE_GAME_BUTTON_CLICKED': empty(),
   '[EVENT] APP/LOBBY/HOST_CHANGED': payload<{ newHostId: UserId; lobbyId: LobbyId }>(),
   '[DOCUMENT] APP/LOBBY/SET_LOBBY': payload<Lobby | undefined>(),
-  '[EVENT] APP/LOBBY/CURRENT_USER_LEFT_LOBBY': payload<LobbyId>(),
   '[EVENT] APP/LOBBY/GAME_CREATED': payload<GameId>(),
   '[EVENT] APP/LOBBY/USER_JOINED': payload<{ user: User; lobbyId: LobbyId }>(),
   '[EVENT] APP/LOBBY/USER_LEFT': payload<{ user: User; lobbyId: LobbyId }>(),

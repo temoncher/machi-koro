@@ -9,7 +9,6 @@ import { EstablishmentsShopView } from './EstablishmentsShopView';
 import { PlayersView } from './PlayersView';
 import { DiceCombinationView } from './components/DiceCombinationView';
 import { GameAction } from './game.actions';
-import { mockGameContext, mockRolledDiceCombination } from './mockGamePageData';
 import { useGameActions } from './useGameActions';
 
 type GamePageProps = {
@@ -25,6 +24,9 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
     buildEstablishmentCommand,
     buildLandmarkCommand,
   } = useGameActions();
+
+  // TODO: translate
+  if (!game) return <>Loading...</>;
 
   return (
     <Box
@@ -71,27 +73,27 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
         >
           <EstablishmentsShopView
             sx={{ flexGrow: 1 }}
-            establishments={mockGameContext.gameEstablishments}
-            shop={mockGameContext.shop}
+            establishments={game.context.gameEstablishments}
+            shop={game.context.shop}
             onEstablishmentClick={buildEstablishmentCommand}
           />
-          <DiceCombinationView sx={{ flexGrow: 0 }} rolledDiceCombination={mockRolledDiceCombination} />
+          <DiceCombinationView sx={{ flexGrow: 0 }} rolledDiceCombination={game.context.rolledDiceCombination} />
         </Box>
 
         <PlayersView
           sx={{ flexGrow: 0 }}
-          coinsMap={mockGameContext.coins}
-          establishmentsMap={mockGameContext.establishments}
-          gameEstablishments={mockGameContext.gameEstablishments}
-          gameLandmarks={mockGameContext.gameLandmarks}
-          landmarksMap={mockGameContext.landmarks}
+          coinsMap={game.context.coins}
+          establishmentsMap={game.context.establishments}
+          gameEstablishments={game.context.gameEstablishments}
+          gameLandmarks={game.context.gameLandmarks}
+          landmarksMap={game.context.landmarks}
           // TODO: rework this part
-          players={mockGameContext.playersIds.map((userId) => ({
+          players={game.context.playersIds.map((userId) => ({
             userId,
             username: userId,
           }))}
           // TODO: rework this part
-          statusesMap={game?.playersConnectionStatuses ?? {}}
+          statusesMap={game.playersConnectionStatuses ?? {}}
           onLandmarkClick={buildLandmarkCommand}
         />
       </Box>
