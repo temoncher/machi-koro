@@ -14,10 +14,10 @@ export type LandmarkDomain = 'landmark';
 
 export type CommonEstablishmentFields = {
   name: string;
-  tagSrc: string;
-  imageSrc: string;
   descriptionText: string;
   cost: number;
+  // Currently not all the establishments have an image
+  imageSrc: string | null;
 };
 
 export type Landmark = CommonEstablishmentFields & {

@@ -69,7 +69,7 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
 
     return (
       <Box
-        key={establishmentId}
+        key={`PlayerView_${establishmentId}`}
         sx={{
           '--number': cardIndex,
           position: 'absolute',
@@ -82,12 +82,10 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
         }}
       >
         <CommonEstablishmentView
-          key={establishmentId}
           cardInfo={currentEstablishments}
           quantity={count}
         />
         <CommonEstablishmentView
-          key={establishmentId}
           sx={{
             bottom: 0,
             right: '110%',
@@ -133,6 +131,7 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
       >
         {Object.values(props.gameLandmarks).map((landmark) => (
           <MinimizedLandmarkView
+            key={`PlayerView_${props.player.userId}_${landmark.landmarkId}`}
             cardInfo={landmark}
             underConstruction={!props.landmarks[landmark.landmarkId]}
             onClick={() => {

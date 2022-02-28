@@ -2,12 +2,12 @@ import { Landmark } from '@machikoro/game-server-contracts';
 import { Box, SxProps, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { UrlUtils } from '../../utils/url.utils';
-
 import { CardNameWithEmblem } from './CardNameWithEmblem';
 import { CoinView } from './CoinView';
 import { UnderConstructionBackdrop } from './UnderConstructionBackdrop';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
+import defaultImageSrc from './images/MachiCoro_Bakery_TP_256px.png';
+import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 
 const maxTitleLength = 16;
 const maxDescritionLength = 45;
@@ -23,7 +23,6 @@ type LandmarkViewProps = {
 export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
   const {
     name,
-    tagSrc,
     imageSrc,
     cost,
     descriptionText,
@@ -67,7 +66,6 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
             filter: 'grayscale(100%)',
           },
         ]}
-        style={{ backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}` }}
       >
         <Box
           sx={{
@@ -79,7 +77,7 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
           <CardNameWithEmblem
             sx={{ fontSize: Math.min(20, 20 * (maxTitleLength / name.length)) }}
             color={cardColor}
-            tagSrc={tagSrc}
+            tagSrc={tagToEmblemSrcMap.landmark}
           >
             {name}
           </CardNameWithEmblem>
@@ -98,7 +96,7 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={imageSrc}
+            src={imageSrc ?? defaultImageSrc}
           />
         </Box>
 

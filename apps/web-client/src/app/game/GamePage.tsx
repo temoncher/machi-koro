@@ -35,6 +35,7 @@ export const GamePage: React.FC<GamePageProps> = (props) => {
         p: 2,
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
         bgcolor: (theme) => theme.palette.grey[100],
         ...props.sx,
       }}

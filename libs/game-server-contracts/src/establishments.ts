@@ -1,23 +1,9 @@
 import {
   LandmarkId,
   Landmark,
-  CommonEstablishmentType,
   Establishment,
   EstablishmentId,
-  LandmarkDomain,
 } from './game.contracts';
-
-export const tagToUrlMap: Record<CommonEstablishmentType | LandmarkDomain, string> = {
-  wheat: 'http://localhost:3333/static/icons/wheat.png',
-  livestock: 'http://localhost:3333/static/icons/cow.png',
-  box: 'http://localhost:3333/static/icons/shop.png',
-  cup: 'http://localhost:3333/static/icons/cup.png',
-  gear: 'http://localhost:3333/static/icons/gear.png',
-  enterprise: 'http://localhost:3333/static/icons/factory.png',
-  apple: 'http://localhost:3333/static/icons/fruit.png',
-  establishment: 'http://localhost:3333/static/icons/major.png',
-  landmark: 'http://localhost:3333/static/icons/landmark-icon.png',
-};
 
 export const landmarksIds = {
   trainStation: 'trainStation' as LandmarkId,
@@ -32,8 +18,7 @@ export const allGameLandmarks: Record<LandmarkId, Landmark> = {
     domain: 'landmark' as const,
     name: 'Train Station',
     cost: 4,
-    tagSrc: tagToUrlMap.landmark,
-    imageSrc: 'http://localhost:3333/static/landmark-images/train-station.png',
+    imageSrc: null,
     descriptionText: 'Roll 2 dice at the same time.',
   },
   [landmarksIds.shoppingMall]: {
@@ -41,8 +26,7 @@ export const allGameLandmarks: Record<LandmarkId, Landmark> = {
     domain: 'landmark' as const,
     name: 'Shopping Mall',
     cost: 10,
-    tagSrc: tagToUrlMap.landmark,
-    imageSrc: 'http://localhost:3333/static/landmark-images/shopping-mall.png',
+    imageSrc: null,
     descriptionText: 'Increase the number of coins you get for your Café and Restaurant by 1.',
   },
   [landmarksIds.amusementPark]: {
@@ -50,8 +34,7 @@ export const allGameLandmarks: Record<LandmarkId, Landmark> = {
     domain: 'landmark' as const,
     name: 'Amusement Park',
     cost: 16,
-    tagSrc: tagToUrlMap.landmark,
-    imageSrc: 'http://localhost:3333/static/landmark-images/amusement-park.png',
+    imageSrc: null,
     descriptionText: 'Take another turn if you roll doubles.',
   },
   [landmarksIds.radioTower]: {
@@ -59,8 +42,7 @@ export const allGameLandmarks: Record<LandmarkId, Landmark> = {
     domain: 'landmark' as const,
     name: 'Radio tower',
     cost: 22,
-    tagSrc: tagToUrlMap.landmark,
-    imageSrc: 'http://localhost:3333/static/landmark-images/radio-tower.png',
+    imageSrc: null,
     descriptionText: 'You may re-roll your dice once each turn.',
   },
 };
@@ -91,8 +73,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Wheat field',
     cost: 1,
     activation: [1],
-    tagSrc: tagToUrlMap.wheat,
-    imageSrc: 'http://localhost:3333/static/establishment-images/flower-garden.png',
+    imageSrc: null,
     descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
   },
   [establishmentsIds.livestockFarm]: {
@@ -102,8 +83,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Livestock Farm',
     cost: 1,
     activation: [2],
-    tagSrc: tagToUrlMap.livestock,
-    imageSrc: 'http://localhost:3333/static/establishment-images/ranch.png',
+    imageSrc: null,
     descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
   },
   [establishmentsIds.bakery]: {
@@ -113,8 +93,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Bakery',
     cost: 1,
     activation: [2, 3],
-    tagSrc: tagToUrlMap.box,
-    imageSrc: 'http://localhost:3333/static/establishment-images/bakery.png',
+    imageSrc: null,
     descriptionText: 'Receive 1 coin from the bank if it’s your turn.',
   },
   [establishmentsIds.cafe]: {
@@ -124,8 +103,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Cafe',
     cost: 2,
     activation: [3],
-    tagSrc: tagToUrlMap.cup,
-    imageSrc: 'http://localhost:3333/static/establishment-images/cafe.png',
+    imageSrc: null,
     descriptionText: 'Receive 1 coin from any player who rolls this number.',
   },
   [establishmentsIds.convenienceStore]: {
@@ -135,8 +113,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Convenience Store',
     cost: 2,
     activation: [4],
-    tagSrc: tagToUrlMap.box,
-    imageSrc: 'http://localhost:3333/static/establishment-images/shop.png',
+    imageSrc: null,
     descriptionText: 'Receive 3 coins from the bank if it’s your turn.',
   },
   [establishmentsIds.forest]: {
@@ -146,8 +123,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Forest',
     cost: 3,
     activation: [5],
-    tagSrc: tagToUrlMap.gear,
-    imageSrc: 'http://localhost:3333/static/establishment-images/forest.png',
+    imageSrc: null,
     descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
   },
   [establishmentsIds.stadium]: {
@@ -157,8 +133,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Stadium',
     cost: 6,
     activation: [6],
-    tagSrc: tagToUrlMap.establishment,
-    imageSrc: 'http://localhost:3333/static/major-establishment-images/stadium.png',
+    imageSrc: null,
     descriptionText: 'Receive 2 coins from each player if it’s your turn.',
   },
   [establishmentsIds.tvStation]: {
@@ -168,8 +143,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'TV Station',
     cost: 7,
     activation: [6],
-    tagSrc: tagToUrlMap.establishment,
-    imageSrc: 'http://localhost:3333/static/major-establishment-images/publisher.png',
+    imageSrc: null,
     descriptionText: 'Receive 5 coins from one player of your choice if it’s your turn.',
   },
   [establishmentsIds.businessComplex]: {
@@ -179,8 +153,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Business Complex',
     cost: 8,
     activation: [6],
-    tagSrc: tagToUrlMap.establishment,
-    imageSrc: 'http://localhost:3333/static/major-establishment-images/buisness-center.png',
+    imageSrc: null,
     descriptionText: 'You may exchange one non-major establishment card with any other player if it’s your turn.',
   },
   [establishmentsIds.cheeseFactory]: {
@@ -190,8 +163,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Cheese Factory',
     cost: 5,
     activation: [7],
-    tagSrc: tagToUrlMap.enterprise,
-    imageSrc: 'http://localhost:3333/static/establishment-images/cheese-factory.png',
+    imageSrc: null,
     descriptionText: 'Receive 3 coins from the bank for every Livestock Farm you have if it’s your turn.',
   },
   [establishmentsIds.furnitureFactory]: {
@@ -201,8 +173,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Furniture Factory',
     cost: 3,
     activation: [8],
-    tagSrc: tagToUrlMap.enterprise,
-    imageSrc: 'http://localhost:3333/static/establishment-images/furniture-factory.png',
+    imageSrc: null,
     descriptionText: 'Receive 3 coins from the bank for every Forest you have if it’s your turn.',
   },
   [establishmentsIds.mine]: {
@@ -212,8 +183,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Mine',
     cost: 6,
     activation: [9],
-    tagSrc: tagToUrlMap.gear,
-    imageSrc: 'http://localhost:3333/static/establishment-images/mine.png',
+    imageSrc: null,
     descriptionText: 'Receive 5 coins from the bank regardless of whose turn it is.',
   },
   [establishmentsIds.restaurant]: {
@@ -223,8 +193,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Restaurant',
     cost: 3,
     activation: [9, 10],
-    tagSrc: tagToUrlMap.cup,
-    imageSrc: 'http://localhost:3333/static/establishment-images/restaurant.png',
+    imageSrc: null,
     descriptionText: 'Receive 2 coins from any player who rolls these numbers.',
   },
   [establishmentsIds.appleOrchard]: {
@@ -234,8 +203,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Apple Orchard',
     cost: 3,
     activation: [10],
-    tagSrc: tagToUrlMap.wheat,
-    imageSrc: 'http://localhost:3333/static/establishment-images/apple-orchard.png',
+    imageSrc: null,
     descriptionText: 'Receive 3 coins from the bank regardless of whose turn it is.',
   },
   [establishmentsIds.produceMarket]: {
@@ -245,8 +213,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Produce Market',
     cost: 2,
     activation: [11, 12],
-    tagSrc: tagToUrlMap.apple,
-    imageSrc: 'http://localhost:3333/static/establishment-images/convenience-store.png',
+    imageSrc: null,
     descriptionText: "Receive 2 coins from the bank for every 'wheat' card you have if it’s your turn.",
   },
 };

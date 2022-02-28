@@ -33,6 +33,7 @@ export const HomePage: React.FC<HomePageProps> = (props) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        overflow: 'hidden',
         ...props.sx,
       }}
     >

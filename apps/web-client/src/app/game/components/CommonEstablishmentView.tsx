@@ -2,10 +2,10 @@ import { Establishment } from '@machikoro/game-server-contracts';
 import { Box, SxProps, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { UrlUtils } from '../../utils/url.utils';
-
 import { CoinView } from './CoinView';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
+import defaultImageSrc from './images/MachiCoro_Bakery_TP_256px.png';
+import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 
 type CardIconViewProps = {
   sx?: SxProps;
@@ -29,13 +29,13 @@ const CardIconView: React.FC<CardIconViewProps> = (props) => (
   </Box>
 );
 
-type CardNameWithTagProps = {
+type CardNameWithEmblemProps = {
   sx?: SxProps;
   color: typeof cardTypeToColorMap[keyof typeof cardTypeToColorMap];
   tagSrc: string;
 };
 
-const CardNameWithEmblem: React.FC<CardNameWithTagProps> = (props) => (
+const CardNameWithEmblem: React.FC<CardNameWithEmblemProps> = (props) => (
   <Typography
     sx={{
       pb: 1,
@@ -76,11 +76,11 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
   const {
     activation,
     name,
-    tagSrc,
     imageSrc,
     cost,
     descriptionText,
     domain,
+    tag,
   } = props.cardInfo;
 
   const activationDiceRange = useMemo((): string => activation.join('-'), [activation]);
@@ -116,7 +116,6 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
           borderRadius: 2,
           bgcolor: (theme) => theme.palette[cardColor].light,
         }}
-        style={{ backgroundImage: `url(${UrlUtils.getBackgroundImageCard(cardColor)}` }}
       >
         <Box sx={{ position: 'relative ' }}>
           {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
@@ -142,7 +141,13 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
             alignItems: 'center',
           }}
         >
-          <CardNameWithEmblem sx={{ fontSize: Math.min(20, 20 * (maxTitleLength / name.length)) }} color={cardColor} tagSrc={tagSrc}>
+          <CardNameWithEmblem
+            sx={{
+              fontSize: Math.min(20, 20 * (maxTitleLength / name.length)),
+            }}
+            color={cardColor}
+            tagSrc={tagToEmblemSrcMap[tag]}
+          >
             {name}
           </CardNameWithEmblem>
         </Box>
@@ -160,7 +165,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={imageSrc}
+            src={imageSrc ?? defaultImageSrc}
           />
         </Box>
 

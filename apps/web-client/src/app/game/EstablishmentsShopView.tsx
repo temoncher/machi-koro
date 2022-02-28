@@ -17,11 +17,11 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
       p: 2,
       minWidth: 240,
       display: 'flex',
+      flexWrap: 'wrap',
       borderRadius: 2,
+      gap: 2,
+      overflow: 'auto',
       bgcolor: (theme) => theme.palette.primary.light,
-      '> *': {
-        mr: 2,
-      },
       ...props.sx,
     }}
   >
@@ -32,7 +32,7 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
 
       return (
         <CommonEstablishmentView
-          key={establishment.name}
+          key={`Shop_${establishment.name}`}
           cardInfo={establishment}
           quantity={quantity}
           onClick={() => {

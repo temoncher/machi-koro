@@ -1,4 +1,4 @@
-import { allGameEstablishments } from '@machikoro/game-server-contracts';
+import { allGameEstablishments, establishmentsIds } from '@machikoro/game-server-contracts';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { CommonEstablishmentView } from './CommonEstablishmentView';
@@ -13,7 +13,7 @@ export default storyConfig;
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 const Template: ComponentStory<typeof CommonEstablishmentView> = (args) => <CommonEstablishmentView {...args} />;
 
-const cardInfo = allGameEstablishments.wheatField;
+const cardInfo = allGameEstablishments[establishmentsIds.wheatField];
 
 export const NoQuantity = Template.bind({});
 

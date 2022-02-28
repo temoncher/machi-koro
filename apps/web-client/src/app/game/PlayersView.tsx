@@ -43,7 +43,7 @@ export const PlayersView: React.FC<PlayersViewProps> = (props: PlayersViewProps)
     >
       {props.players.map((player) => (
         <PlayerView
-          key={player.userId}
+          key={`Players_${player.userId}`}
           coins={props.coinsMap[player.userId] ?? 0}
           establishments={props.establishmentsMap[player.userId] ?? {}}
           gameEstablishments={props.gameEstablishments}
