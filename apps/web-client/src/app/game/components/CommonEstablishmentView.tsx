@@ -1,10 +1,10 @@
 import { Establishment } from '@machikoro/game-server-contracts';
 import { Box, SxProps, Typography } from '@mui/material';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { CoinView } from './CoinView';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
-import defaultImageSrc from './images/MachiCoro_Bakery_TP_256px.png';
+import notFoundSrc from './images/not-found.png';
 import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 
 type CardIconViewProps = {
@@ -83,8 +83,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
     tag,
   } = props.cardInfo;
 
-  const activationDiceRange = useMemo((): string => activation.join('-'), [activation]);
-  const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
+  const cardColor = cardTypeToColorMap[domain];
 
   return (
     <Box
@@ -127,7 +126,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
             lineHeight={0.8}
             color={(theme) => theme.palette.common.white}
           >
-            {activationDiceRange}
+            {activation.join('-')}
           </Typography>
         </Box>
 
@@ -165,7 +164,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={imageSrc ?? defaultImageSrc}
+            src={imageSrc ?? notFoundSrc}
           />
         </Box>
 

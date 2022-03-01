@@ -71,9 +71,8 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
       <Box
         key={`PlayerView_${establishmentId}`}
         sx={{
-          '--number': cardIndex,
           position: 'absolute',
-          top: 'calc(20px * var(--number))',
+          top: 20 * cardIndex,
           zIndex: 20,
           // eslint-disable-next-line @typescript-eslint/naming-convention
           '&:hover .show-on-parent-hover': {

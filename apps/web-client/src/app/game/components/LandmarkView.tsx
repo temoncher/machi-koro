@@ -6,7 +6,7 @@ import { CardNameWithEmblem } from './CardNameWithEmblem';
 import { CoinView } from './CoinView';
 import { UnderConstructionBackdrop } from './UnderConstructionBackdrop';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
-import defaultImageSrc from './images/MachiCoro_Bakery_TP_256px.png';
+import notFoundSrc from './images/not-found.png';
 import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 
 const maxTitleLength = 16;
@@ -96,7 +96,7 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={imageSrc ?? defaultImageSrc}
+            src={imageSrc ?? notFoundSrc}
           />
         </Box>
 

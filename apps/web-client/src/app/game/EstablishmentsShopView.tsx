@@ -11,6 +11,17 @@ type EstablishmentsShopViewProps = {
   onEstablishmentClick: (establishmentId: EstablishmentId) => void;
 };
 
+const compareByActivation = (firstEstablishment: Establishment | undefined, secondEstablishment: Establishment | undefined) => {
+  const firstEstablishmentActivation = firstEstablishment?.activation[0] ?? 0;
+  const secondEstablishmentActivation = secondEstablishment?.activation[0] ?? 0;
+
+  if (firstEstablishmentActivation > secondEstablishmentActivation) return 1;
+
+  if (firstEstablishmentActivation < secondEstablishmentActivation) return -1;
+
+  return 0;
+};
+
 export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (props) => (
   <Box
     sx={{
@@ -25,21 +36,22 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
       ...props.sx,
     }}
   >
-    {Object.entries(props.shop).map(([establishmentId, quantity]) => {
-      const establishment = props.establishments[establishmentId as EstablishmentId];
+    {Object.entries(props.shop)
+      .map(([establishmentId, quantity]) => [props.establishments[establishmentId as EstablishmentId], quantity] as const)
+      .sort(([firstEstablishment], [secondEstablishment]) => compareByActivation(firstEstablishment, secondEstablishment))
+      .map(([establishment, quantity]) => {
+        if (!establishment) return null;
 
-      if (!establishment) return null;
-
-      return (
-        <CommonEstablishmentView
-          key={`Shop_${establishment.name}`}
-          cardInfo={establishment}
-          quantity={quantity}
-          onClick={() => {
-            props.onEstablishmentClick(establishmentId as EstablishmentId);
-          }}
-        />
-      );
-    })}
+        return (
+          <CommonEstablishmentView
+            key={`Shop_${establishment.name}`}
+            cardInfo={establishment}
+            quantity={quantity}
+            onClick={() => {
+              props.onEstablishmentClick(establishment.establishmentId);
+            }}
+          />
+        );
+      })}
   </Box>
 );
