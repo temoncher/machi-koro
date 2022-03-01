@@ -90,13 +90,13 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
       component="article"
       sx={{
         position: 'relative',
+        overflow: 'hidden',
         minWidth: 200,
         width: 200,
         maxWidth: 200,
         minHeight: 300,
         height: 300,
         maxHeight: 300,
-        overflow: 'hidden',
         ...props.sx,
       }}
       className={props.className}
@@ -106,6 +106,8 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
       <Box
         sx={{
           p: 1.5,
+          position: 'relative',
+          overflow: 'hidden',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -113,10 +115,67 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
           alignItems: 'stretch',
           backgroundSize: 'cover',
           borderRadius: 2,
-          bgcolor: (theme) => theme.palette[cardColor].light,
+          bgcolor: (theme) => theme.palette.backgroundBlue.main,
         }}
       >
-        <Box sx={{ position: 'relative ' }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            overflow: 'hidden',
+            lineHeight: 0,
+            '> svg': {
+              position: 'relative',
+              display: 'block',
+              widht: '100%',
+              height: 64,
+            },
+            '.light-fill': {
+              fill: (theme) => theme.palette[cardColor].light,
+            },
+            '.main-fill': {
+              fill: (theme) => theme.palette[cardColor].main,
+            },
+          }}
+        >
+          <svg width="100%" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+            <path className="light-fill" d="M0 0 L300 0 L300 120 C250 80 50 80 0 120 L0 0" />
+            <path className="main-fill" d="M0 0 L300 0 L300 100 C250 70 50 70 0 100 L0 0" />
+          </svg>
+        </Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            overflow: 'hidden',
+            lineHeight: 0,
+            transform: 'rotate(180deg)',
+            '> svg': {
+              position: 'relative',
+              display: 'block',
+              widht: '100%',
+              height: 92,
+            },
+            '.light-fill': {
+              fill: (theme) => theme.palette[cardColor].light,
+            },
+            '.main-fill': {
+              fill: (theme) => theme.palette[cardColor].main,
+            },
+          }}
+        >
+          {/* TODO: do the cool curves */}
+          <svg width="100%" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+            <path className="light-fill" d="M0 0 L300 0 L300 120 L0 120 L0 0" />
+            <path className="main-fill" d="M0 0 L300 0 L300 100 L0 100 L0 0" />
+          </svg>
+        </Box>
+
+        <Box sx={{ position: 'relative' }}>
           {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
           <Typography
             pb={3}
@@ -159,6 +218,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
             maxHeight: '45%',
             display: 'flex',
             justifyContent: 'center',
+            zIndex: 2,
           }}
         >
           <img
