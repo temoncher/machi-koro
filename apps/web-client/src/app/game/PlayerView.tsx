@@ -61,7 +61,6 @@ type EstablishmentCardWithHoverProps = {
   sx?: SxProps;
   establishment: Establishment;
   count: number;
-  cardIndex: number;
 };
 
 const EstablishmentCardWithHover: React.FC<EstablishmentCardWithHoverProps> = (props): JSX.Element | null => (
@@ -197,7 +196,6 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
               }}
               establishment={establishment}
               count={count}
-              cardIndex={cardIndex}
             />
           );
         },

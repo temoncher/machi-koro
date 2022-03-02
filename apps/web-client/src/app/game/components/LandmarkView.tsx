@@ -36,13 +36,13 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
       component="article"
       sx={{
         position: 'relative',
+        overflow: 'hidden',
         minWidth: 200,
         width: 200,
         maxWidth: 200,
         minHeight: 300,
         height: 300,
         maxHeight: 300,
-        overflow: 'hidden',
         ...props.sx,
       }}
       className={props.className}
@@ -53,6 +53,8 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
         sx={[
           {
             p: 1.5,
+            position: 'relative',
+            overflow: 'hidden',
             width: '100%',
             height: '100%',
             display: 'flex',
@@ -60,13 +62,43 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
             alignItems: 'stretch',
             backgroundSize: 'cover',
             borderRadius: 2,
-            bgcolor: (theme) => theme.palette[cardColor].light,
+            bgcolor: (theme) => theme.palette.backgroundBlue.main,
           },
           !!props.underConstruction && {
             filter: 'grayscale(100%)',
           },
         ]}
       >
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            overflow: 'hidden',
+            lineHeight: 0,
+            transform: 'rotate(180deg)',
+            '> svg': {
+              position: 'relative',
+              display: 'block',
+              widht: '100%',
+              height: 80,
+            },
+            '.light-fill': {
+              fill: (theme) => theme.palette[cardColor].light,
+            },
+            '.main-fill': {
+              fill: (theme) => theme.palette[cardColor].main,
+            },
+          }}
+        >
+          {/* TODO: do the cool curves */}
+          <svg width="100%" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+            <path className="light-fill" d="M0 0 L300 0 L300 120 L0 120 L0 0" />
+            <path className="main-fill" d="M0 0 L300 0 L300 105 L0 105 L0 0" />
+          </svg>
+        </Box>
+
         <Box
           sx={{
             height: '20%',
@@ -133,7 +165,7 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
                 minHeight: 32,
                 height: 32,
               }}
-              type="gold"
+              type="bronze"
             >
               {cost}
             </CoinView>
