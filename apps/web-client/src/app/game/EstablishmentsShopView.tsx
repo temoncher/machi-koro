@@ -2,7 +2,7 @@ import { Establishment, EstablishmentId } from '@machikoro/game-server-contracts
 import { Box, SxProps } from '@mui/material';
 import React from 'react';
 
-import { CommonEstablishmentView } from './components/CommonEstablishmentView';
+import { EstablishmentView } from './components/EstablishmentView';
 
 type EstablishmentsShopViewProps = {
   sx?: SxProps;
@@ -43,7 +43,7 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
         if (!establishment) return null;
 
         return (
-          <CommonEstablishmentView
+          <EstablishmentView
             key={`Shop_${establishment.name}`}
             establishment={establishment}
             quantity={quantity}

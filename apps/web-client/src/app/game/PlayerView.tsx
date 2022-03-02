@@ -10,7 +10,7 @@ import { Box, Typography, SxProps } from '@mui/material';
 import React from 'react';
 
 import { CoinView } from './components/CoinView';
-import { CommonEstablishmentView } from './components/CommonEstablishmentView';
+import { EstablishmentView } from './components/EstablishmentView';
 import { MinimizedLandmarkView } from './components/MinimizedLandmarkView';
 
 type PlayerViewHeaderProps = {
@@ -68,11 +68,11 @@ const CardWithHover: React.FC<CardWithHoverProps> = (props): JSX.Element | null 
       },
     }}
   >
-    <CommonEstablishmentView
+    <EstablishmentView
       establishment={props.establishment}
       quantity={props.count}
     />
-    <CommonEstablishmentView
+    <EstablishmentView
       sx={{
         bottom: 0,
         right: '110%',

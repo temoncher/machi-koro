@@ -22,7 +22,7 @@ const cardInfo = {
 export const Default = Template.bind({});
 
 Default.args = {
-  quantity: 10,
+  quantity: 1,
   establishment: cardInfo,
 };
 

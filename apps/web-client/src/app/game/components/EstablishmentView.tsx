@@ -50,7 +50,7 @@ type CommonEstablishmentViewProps = {
   onClick?: () => void;
 };
 
-export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => {
+export const EstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => {
   const {
     activation,
     name,
