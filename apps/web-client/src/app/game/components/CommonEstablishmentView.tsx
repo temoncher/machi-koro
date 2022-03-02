@@ -2,32 +2,11 @@ import { Establishment } from '@machikoro/game-server-contracts';
 import { Box, SxProps, Typography } from '@mui/material';
 import React from 'react';
 
+import { CardIconView } from './CardIconView';
 import { CoinView } from './CoinView';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
 import notFoundSrc from './images/not-found.png';
 import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
-
-type CardIconViewProps = {
-  sx?: SxProps;
-};
-
-const CardIconView: React.FC<CardIconViewProps> = (props) => (
-  <Box
-    sx={{
-      width: 24,
-      height: 32,
-      textAlign: 'center',
-      borderWidth: 4,
-      borderRadius: 1,
-      borderStyle: 'solid',
-      borderColor: (theme) => theme.palette.grey[400],
-      bgcolor: (theme) => theme.palette.grey[200],
-      ...props.sx,
-    }}
-  >
-    {props.children}
-  </Box>
-);
 
 type CardNameWithEmblemProps = {
   sx?: SxProps;
@@ -66,7 +45,7 @@ const maxDescritionLength = 45;
 type CommonEstablishmentViewProps = {
   sx?: SxProps;
   className?: string;
-  cardInfo: Establishment;
+  establishment: Establishment;
   quantity?: number;
   onClick?: () => void;
 };
@@ -80,7 +59,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
     descriptionText,
     domain,
     tag,
-  } = props.cardInfo;
+  } = props.establishment;
 
   const cardColor = cardTypeToColorMap[domain];
 
@@ -175,7 +154,6 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
         </Box>
 
         <Box sx={{ position: 'relative' }}>
-          {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
           <Typography
             pb={3}
             fontFamily="lithos"
@@ -229,13 +207,13 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
 
         <Box
           sx={{
+            position: 'relative',
             minHeight: '25%',
             height: '25%',
             maxHeight: '25%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            position: 'relative',
           }}
         >
           <Typography
@@ -265,6 +243,8 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
               {cost}
             </CoinView>
           )}
+
+          {props.quantity && (<CardIconView sx={{ position: 'absolute', bottom: 0, right: 0 }}>{props.quantity}</CardIconView>)}
         </Box>
       </Box>
     </Box>

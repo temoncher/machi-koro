@@ -45,7 +45,7 @@ export const EstablishmentsShopView: React.FC<EstablishmentsShopViewProps> = (pr
         return (
           <CommonEstablishmentView
             key={`Shop_${establishment.name}`}
-            cardInfo={establishment}
+            establishment={establishment}
             quantity={quantity}
             onClick={() => {
               props.onEstablishmentClick(establishment.establishmentId);

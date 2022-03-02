@@ -69,7 +69,7 @@ const CardWithHover: React.FC<CardWithHoverProps> = (props): JSX.Element | null 
     }}
   >
     <CommonEstablishmentView
-      cardInfo={props.establishment}
+      establishment={props.establishment}
       quantity={props.count}
     />
     <CommonEstablishmentView
@@ -80,7 +80,7 @@ const CardWithHover: React.FC<CardWithHoverProps> = (props): JSX.Element | null 
         position: 'absolute',
       }}
       className="show-on-parent-hover"
-      cardInfo={props.establishment}
+      establishment={props.establishment}
       quantity={props.count}
     />
   </Box>

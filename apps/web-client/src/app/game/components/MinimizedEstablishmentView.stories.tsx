@@ -1,17 +1,17 @@
 import { allGameEstablishments, establishmentsIds } from '@machikoro/game-server-contracts';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { CommonEstablishmentView } from './CommonEstablishmentView';
+import { MinimizedEstablishmentView } from './MinimizedEstablishmentView';
 
-const storyConfig: ComponentMeta<typeof CommonEstablishmentView> = {
-  title: 'Game/CommonEstablishmentView',
-  component: CommonEstablishmentView,
+const storyConfig: ComponentMeta<typeof MinimizedEstablishmentView> = {
+  title: 'Game/MinimizedEstablishmentView',
+  component: MinimizedEstablishmentView,
 };
 
 export default storyConfig;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof CommonEstablishmentView> = (args) => <CommonEstablishmentView {...args} />;
+const Template: ComponentStory<typeof MinimizedEstablishmentView> = (args) => <MinimizedEstablishmentView {...args} />;
 
 const wheatField = allGameEstablishments[establishmentsIds.wheatField]!;
 const cardInfo = {
@@ -29,6 +29,7 @@ Default.args = {
 export const NoQuantity = Template.bind({});
 
 NoQuantity.args = {
+  quantity: undefined,
   establishment: cardInfo,
 };
 
