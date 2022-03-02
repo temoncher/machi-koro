@@ -1,9 +1,9 @@
 import { UserId } from '@machikoro/game-server-contracts';
-import { AxiosInstance } from 'axios';
 import { routerMiddleware } from 'connected-react-router';
 import { Auth } from 'firebase/auth';
 import { Database } from 'firebase/database';
 import { Firestore } from 'firebase/firestore';
+import { Functions } from 'firebase/functions';
 import { History } from 'history';
 import {
   createStore,
@@ -51,11 +51,11 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 type InitStoreDependencies = {
   history: History;
-  httpClient: AxiosInstance;
   storage: Storage;
   firebaseAuth: Auth;
   firebaseDb: Database;
   firestore: Firestore;
+  firebaseFunctions: Functions;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
@@ -75,6 +75,7 @@ export const initStore = (deps: InitStoreDependencies) => {
 
   const rootEpicDependencies: RootEpicDependencies = {
     firebaseDb: deps.firebaseDb,
+    firebaseFunctions: deps.firebaseFunctions,
     authState$: authState(deps.firebaseAuth).pipe(
       switchMap((userState) => {
         if (!userState) return of(undefined);
@@ -91,7 +92,7 @@ export const initStore = (deps: InitStoreDependencies) => {
       createLobbyEpic(createFirebaseLobby(deps.firebaseDb)),
       joinLobbyEpic(joinFirebaseLobby(deps.firebaseDb)),
       leaveLobbyEpic(leaveFirebaseLobby(deps.firebaseDb)),
-      createGameEpic(createFirebaseGame(deps.firebaseDb)),
+      createGameEpic(createFirebaseGame(deps.firebaseFunctions)),
       joinGameEpic(joinFirebaseGame(deps.firebaseDb)),
       abandonGameEpic(abandonFirebaseGame(deps.firebaseDb)),
     ),

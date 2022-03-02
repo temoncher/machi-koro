@@ -5,7 +5,6 @@ import {
   set,
   remove,
   child,
-  serverTimestamp,
   onDisconnect,
   Database,
 } from 'firebase/database';
@@ -32,7 +31,6 @@ export const createFirebaseLobby = (firebaseDb: Database): CreateLobby => async 
   const createdLobbyRef = await push(ref(firebaseDb, 'lobbies'), {
     hostId,
     capacity,
-    createdAt: serverTimestamp(),
   });
 
   // This cast is safe because only root database has a `null` key

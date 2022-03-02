@@ -1,7 +1,6 @@
+import { Dice, DiceCombination } from '@machikoro/game-server-contracts';
 import { Box, SxProps } from '@mui/material';
 import React, { useMemo } from 'react';
-
-import { DiceCombination, Dice } from '../../types/Dice';
 
 import './DiceCombinationView.css';
 

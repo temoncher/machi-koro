@@ -16,7 +16,6 @@ const gameActionTypeToPayloadMap = {
   '[COMMAND] APP/GAME/JOIN_GAME': payload<GameId>(),
   '[COMMAND] APP/GAME/ROLL_DICE': empty(),
   '[COMMAND] APP/GAME/PASS': empty(),
-  '[COMMAND] APP/GAME/START_GAME': empty(),
   '[COMMAND] APP/GAME/BUILD_ESTABLISHMENT': payload<EstablishmentId>(),
   '[COMMAND] APP/GAME/BUILD_LANDMARK': payload<LandmarkId>(),
   /* eslint-enable @typescript-eslint/naming-convention */
@@ -25,11 +24,3 @@ const gameActionTypeToPayloadMap = {
 export const GameAction = createActionsNamespace(gameActionTypeToPayloadMap);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type GameAction = GetNamespaceActionType<typeof GameAction>;
-
-export const gameActions = {
-  rollDiceCommand: GameAction.rollDiceCommand,
-  passCommand: GameAction.passCommand,
-  startGameCommand: GameAction.startGameCommand,
-  buildEstablishmentCommand: GameAction.buildEstablishmentCommand,
-  buildLandmarkCommand: GameAction.buildLandmarkCommand,
-};

@@ -54,6 +54,7 @@ export const App: React.FC = () => {
           maxHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
         <Header sx={{ flexGrow: 0 }} />

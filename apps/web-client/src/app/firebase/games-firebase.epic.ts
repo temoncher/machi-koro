@@ -1,24 +1,34 @@
-import { Game, GameId } from '@machikoro/game-server-contracts';
-import { Database, ref } from 'firebase/database';
+import {
+  Game,
+  GameContext,
+  GameId,
+  GameMachineMessage,
+} from '@machikoro/game-server-contracts';
+import { ref, Database } from 'firebase/database';
+import { httpsCallable, Functions } from 'firebase/functions';
 import { AnyAction } from 'redux';
 import { object } from 'rxfire/database';
 import {
+  catchError,
+  from,
   map,
+  of,
   switchMap,
   takeUntil,
+  withLatestFrom,
 } from 'rxjs';
 import { ofType, toPayload } from 'ts-action-operators';
 
 import { JoinGameAction, GameAction, AbandonGameAction } from '../game';
 import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
+import { FirebaseAction } from './firebase.actions';
+
 type SyncGameStateDependencies = {
   firebaseDb: Database;
 };
 
-const syncGameState = (
-  deps: SyncGameStateDependencies,
-): TypedEpic<typeof GameAction.setGameDocument> => (actions$) => actions$.pipe(
+const syncGameState = (deps: SyncGameStateDependencies): TypedEpic<typeof GameAction.setGameDocument> => (actions$) => actions$.pipe(
   ofType(JoinGameAction.joinGameResolvedEvent),
   toPayload(),
   switchMap((gameId) => object(ref(deps.firebaseDb, `games/${gameId}`)).pipe(
@@ -36,9 +46,53 @@ const syncGameState = (
   )),
 );
 
+const appActionTypeToGameMachineMessageTypeMap = {
+  [GameAction.rollDiceCommand.type]: 'ROLL_DICE',
+  [GameAction.passCommand.type]: 'PASS',
+  [GameAction.buildEstablishmentCommand.type]: 'BUILD_ESTABLISHMENT',
+  [GameAction.buildLandmarkCommand.type]: 'BUILD_LANDMARK',
+} as const;
+
+type MapAppActionsToGameMachineActionsDependencies = {
+  firebaseFunctions: Functions;
+};
+
+const mapAppActionsToGameMachineActions = (deps: MapAppActionsToGameMachineActionsDependencies): TypedEpic<
+| typeof FirebaseAction.postMessageResolvedEvent
+| typeof FirebaseAction.postMessageRejectedEvent
+> => (actions$, state$) => actions$.pipe(
+  ofType(
+    GameAction.rollDiceCommand,
+    GameAction.passCommand,
+    GameAction.buildEstablishmentCommand,
+    GameAction.buildLandmarkCommand,
+  ),
+  withLatestFrom(state$),
+  switchMap(([action, state]) => {
+    const gameMachineMessageType = appActionTypeToGameMachineMessageTypeMap[action.type];
+    const { gameId } = state.gameReducer.game!;
+
+    const postGameMessage = httpsCallable<{ gameId: string; message: Omit<GameMachineMessage, 'userId'> }, GameContext>(
+      deps.firebaseFunctions,
+      'postGameMessage',
+    );
+
+    const message = 'payload' in action
+      ? { type: gameMachineMessageType, payload: action.payload }
+      : { type: gameMachineMessageType };
+
+    return from(postGameMessage({ gameId, message })).pipe(
+      map((result) => FirebaseAction.postMessageResolvedEvent(result.data)),
+      catchError((error) => of(FirebaseAction.postMessageRejectedEvent(error))),
+    );
+  }),
+);
+
 export type FirebaseGamesEpicDependencies =
-  & SyncGameStateDependencies;
+  & SyncGameStateDependencies
+  & MapAppActionsToGameMachineActionsDependencies;
 
 export const firebaseGamesEpic = (deps: FirebaseGamesEpicDependencies) => typedCombineEpics<AnyAction>(
   syncGameState(deps),
+  mapAppActionsToGameMachineActions(deps),
 );

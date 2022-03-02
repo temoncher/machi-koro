@@ -4,7 +4,6 @@ import {
   doc,
   getDoc,
   setDoc,
-  serverTimestamp,
   Firestore,
 } from 'firebase/firestore';
 
@@ -17,7 +16,6 @@ export const registerFirebaseGuest = (firestore: Firestore, firebaseAuth: Auth):
   await setDoc(doc(firestore, 'users', anonymusCredentials.user.uid), {
     userId: anonymusCredentials.user.uid,
     username,
-    createdAt: serverTimestamp(),
   });
 
   return {

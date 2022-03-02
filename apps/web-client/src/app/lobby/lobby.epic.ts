@@ -25,15 +25,13 @@ typeof LeaveLobbyAction.leaveLobbyCommand
 
 const createGameOnCreateGameButtonClickedEvent: TypedEpic<typeof CreateGameAction.createGameCommand> = (actions$, state$) => actions$.pipe(
   ofType(LobbyAction.createGameButtonClickedEvent),
-  waitUntilAuthorized(state$),
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  map(([action, { userId }]) => userId),
   withLatestFrom(state$),
-  map(([currentUserId, state]) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  map(([action, state]) => {
     // TODO: error handling
-    const lobby = state.lobbyReducer.lobby!;
+    const { lobbyId } = state.lobbyReducer.lobby!;
 
-    return CreateGameAction.createGameCommand([lobby, currentUserId]);
+    return CreateGameAction.createGameCommand([lobbyId]);
   }),
 );
 

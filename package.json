@@ -65,7 +65,7 @@
     "ts-action": "^11.0.0",
     "ts-action-operators": "^9.1.2",
     "ts-pattern": "^3.3.4",
-    "zod": "^3.7.1"
+    "xstate": "^4.30.2"
   },
   "devDependencies": {
     "@babel/core": "7.12.13",

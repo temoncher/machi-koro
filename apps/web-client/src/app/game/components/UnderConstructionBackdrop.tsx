@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 
-import { UrlUtils } from '../../utils/url.utils';
+// TODO: replace this one with something else
+import underConstructionSrc from './images/under-construction.png';
 
 export const UnderConstructionBackdrop: React.FC = () => (
   <Box
@@ -23,7 +24,7 @@ export const UnderConstructionBackdrop: React.FC = () => (
         width: '70%',
         minWidth: '70%',
       }}
-      src={UrlUtils.getStaticImage('under-construction')}
+      src={underConstructionSrc}
     />
   </Box>
 );

@@ -1,0 +1,15 @@
+name: Deploy Firebase rules on merge
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      # TODO: merge all the deploys into single workflow
+      - run: yarn install --frozen-lockfile
+      - name: Deploy firebase rules
+        run: yarn firebase deploy --only database,firestore,storage -m "Workflow $GITHUB_WORKFLOW, action $GITHUB_ACTION" --token "${{ secrets.FIREBASE_TOKEN_MACHI_KORO_DEV }}"

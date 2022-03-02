@@ -5,6 +5,8 @@ import { CardNameWithEmblem } from './CardNameWithEmblem';
 import { CoinView } from './CoinView';
 import { UnderConstructionBackdrop } from './UnderConstructionBackdrop';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
+import defaultImageSrc from './images/MachiCoro_Bakery_TP_256px.png';
+import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 
 type MinimizedLandmarkViewProps = {
   sx?: SxProps;
@@ -54,7 +56,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
             width: 12,
           }}
           color={cardColor}
-          tagSrc={props.cardInfo.tagSrc}
+          tagSrc={tagToEmblemSrcMap.landmark}
         >
           {initials}
         </CardNameWithEmblem>
@@ -72,7 +74,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={props.cardInfo.imageSrc}
+            src={props.cardInfo.imageSrc ?? defaultImageSrc}
           />
         </Box>
 
