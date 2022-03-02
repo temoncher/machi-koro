@@ -15,9 +15,9 @@ const maxDescritionLength = 45;
 type LandmarkViewProps = {
   sx?: SxProps;
   className?: string;
-  onClick?: () => void;
-  cardInfo: Landmark;
   underConstruction: boolean;
+  landmark: Landmark;
+  onClick?: () => void;
 };
 
 export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
@@ -27,7 +27,7 @@ export const LandmarkView: React.FC<LandmarkViewProps> = (props) => {
     cost,
     descriptionText,
     domain,
-  } = props.cardInfo;
+  } = props.landmark;
 
   const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
 

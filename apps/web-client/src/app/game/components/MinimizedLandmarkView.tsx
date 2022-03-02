@@ -36,7 +36,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
       <Box
         sx={[
           {
-            p: 1,
+            p: 0.75,
             width: '100%',
             height: '100%',
             borderRadius: 1,
@@ -50,10 +50,13 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
         ]}
       >
         <CardNameWithEmblem
+          sx={{
+            fontSize: '1.25rem',
+          }}
           emblemSx={{
-            mr: 0.25,
-            height: 12,
-            width: 12,
+            mr: 0.5,
+            height: 20,
+            width: 20,
           }}
           color={cardColor}
           tagSrc={tagToEmblemSrcMap.landmark}
@@ -63,10 +66,10 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
 
         <Box
           sx={{
-            p: 1,
-            minHeight: '70%',
-            height: '70%',
-            maxHeight: '70%',
+            py: 0.75,
+            minHeight: '60%',
+            height: '60%',
+            maxHeight: '60%',
             display: 'flex',
             justifyContent: 'center',
           }}
@@ -87,11 +90,12 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
         >
           <CoinView
             sx={{
-              minWidth: 16,
-              width: 16,
-              minHeight: 16,
-              height: 16,
-              fontSize: 8,
+              minWidth: 20,
+              width: 20,
+              minHeight: 20,
+              height: 20,
+              fontSize: '0.75rem',
+              borderWidth: 2,
             }}
             type="bronze"
           >
