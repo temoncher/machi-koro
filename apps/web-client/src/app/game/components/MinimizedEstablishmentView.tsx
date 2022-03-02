@@ -41,7 +41,7 @@ export const MinimizedEstablishmentView: React.FC<MinimizedEstablishmentViewProp
           borderRadius: 1,
           display: 'flex',
           flexDirection: 'column',
-          bgcolor: (theme) => theme.palette.backgroundBlue.main,
+          bgcolor: (theme) => theme.palette[cardColor].light,
         }}
       >
         <CardNameWithEmblem
