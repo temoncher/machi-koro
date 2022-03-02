@@ -83,7 +83,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'Livestock Farm',
     cost: 1,
     activation: [2],
-    imagePath: 'static/farm_256.png',
+    imagePath: 'static/livestock-farm_256.png',
     descriptionText: 'Receive 1 coin from the bank regardless of whose turn it is.',
   },
   [establishmentsIds.bakery]: {
@@ -143,7 +143,7 @@ export const allGameEstablishments: Record<EstablishmentId, Establishment> = {
     name: 'TV Station',
     cost: 7,
     activation: [6],
-    imagePath: 'static/telecentre_256.png',
+    imagePath: 'static/tv-station_256.png',
     descriptionText: 'Receive 5 coins from one player of your choice if it’s your turn.',
   },
   [establishmentsIds.businessComplex]: {

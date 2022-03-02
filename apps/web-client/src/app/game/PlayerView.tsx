@@ -129,7 +129,7 @@ export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) =>
       {Object.values(props.gameLandmarks).map((landmark) => (
         <MinimizedLandmarkView
           key={`PlayerView_${props.player.userId}_${landmark.landmarkId}`}
-          cardInfo={landmark}
+          landmark={landmark}
           underConstruction={!props.landmarks[landmark.landmarkId]}
           onClick={() => {
             props.onLandmarkClick(landmark.landmarkId);

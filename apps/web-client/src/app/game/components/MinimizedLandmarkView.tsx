@@ -11,13 +11,13 @@ import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 type MinimizedLandmarkViewProps = {
   sx?: SxProps;
   underConstruction: boolean;
-  cardInfo: Landmark;
+  landmark: Landmark;
   onClick?: () => void;
 };
 
 export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (props) => {
-  const cardColor = cardTypeToColorMap[props.cardInfo.domain];
-  const initials = props.cardInfo.name.split(' ').map((word) => word[0]?.toLocaleLowerCase()).join('');
+  const cardColor = cardTypeToColorMap[props.landmark.domain];
+  const initials = props.landmark.name.split(' ').map((word) => word[0]?.toLocaleLowerCase()).join('');
 
   return (
     <Box
@@ -74,7 +74,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={props.cardInfo.imageSrc ?? notFoundSrc}
+            src={props.landmark.imageSrc ?? notFoundSrc}
           />
         </Box>
 
@@ -95,7 +95,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
             }}
             type="bronze"
           >
-            {props.cardInfo.cost}
+            {props.landmark.cost}
           </CoinView>
         </Box>
       </Box>

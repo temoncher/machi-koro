@@ -38,7 +38,6 @@ type CardNameWithEmblemProps = {
 const CardNameWithEmblem: React.FC<CardNameWithEmblemProps> = (props) => (
   <Typography
     sx={{
-      pb: 1,
       '&::before': {
         mr: 1,
         display: 'inline-block',
@@ -158,7 +157,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
               position: 'relative',
               display: 'block',
               widht: '100%',
-              height: 92,
+              height: 80,
             },
             '.light-fill': {
               fill: (theme) => theme.palette[cardColor].light,
