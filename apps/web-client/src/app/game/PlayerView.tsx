@@ -50,6 +50,42 @@ const PlayerViewHeader: React.FC<PlayerViewHeaderProps> = (props) => (
   </Box>
 );
 
+type CardWithHoverProps = {
+  establishment: Establishment;
+  count: number;
+  cardIndex: number;
+};
+
+const CardWithHover: React.FC<CardWithHoverProps> = (props): JSX.Element | null => (
+  <Box
+    sx={{
+      position: 'absolute',
+      top: 20 * props.cardIndex,
+      zIndex: 20,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '&:hover .show-on-parent-hover': {
+        display: 'block',
+      },
+    }}
+  >
+    <CommonEstablishmentView
+      cardInfo={props.establishment}
+      quantity={props.count}
+    />
+    <CommonEstablishmentView
+      sx={{
+        bottom: 0,
+        right: '110%',
+        display: 'none',
+        position: 'absolute',
+      }}
+      className="show-on-parent-hover"
+      cardInfo={props.establishment}
+      quantity={props.count}
+    />
+  </Box>
+);
+
 type PlayerViewProps = {
   player: User;
   coins: number;
@@ -61,96 +97,70 @@ type PlayerViewProps = {
   onLandmarkClick: (landmarkId: LandmarkId) => void;
 };
 
-export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) => {
-  const renderCard = (establishmentId: EstablishmentId, count: number, cardIndex: number): JSX.Element | null => {
-    const currentEstablishments = props.gameEstablishments[establishmentId];
+export const PlayerView: React.FC<PlayerViewProps> = (props: PlayerViewProps) => (
+  <Box
+    sx={{
+      p: 2,
+      // TODO: deal with long player names
+      minWidth: 200,
+      width: 200,
+      maxWidth: 200,
+      display: 'flex',
+      flexDirection: 'column',
+      borderRadius: 2,
+      bgcolor: (theme) => theme.palette.warning.light,
+    }}
+  >
+    <PlayerViewHeader
+      sx={{ mb: 1 }}
+      status={props.status}
+      username={props.player.username}
+      coins={props.coins}
+    />
 
-    if (!currentEstablishments) return null;
-
-    return (
-      <Box
-        key={`PlayerView_${establishmentId}`}
-        sx={{
-          position: 'absolute',
-          top: 20 * cardIndex,
-          zIndex: 20,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          '&:hover .show-on-parent-hover': {
-            display: 'block',
-          },
-        }}
-      >
-        <CommonEstablishmentView
-          cardInfo={currentEstablishments}
-          quantity={count}
-        />
-        <CommonEstablishmentView
-          sx={{
-            bottom: 0,
-            right: '110%',
-            display: 'none',
-            position: 'absolute',
-          }}
-          className="show-on-parent-hover"
-          cardInfo={currentEstablishments}
-          quantity={count}
-        />
-      </Box>
-    );
-  };
-
-  return (
     <Box
       sx={{
-        p: 2,
-        // TODO: deal with long player names
-        minWidth: 200,
-        width: 200,
-        maxWidth: 200,
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 2,
-        bgcolor: (theme) => theme.palette.warning.light,
+        mt: 1,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        rowGap: 2,
       }}
     >
-      <PlayerViewHeader
-        sx={{ mb: 1 }}
-        status={props.status}
-        username={props.player.username}
-        coins={props.coins}
-      />
-
-      <Box
-        sx={{
-          mt: 1,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          rowGap: 2,
-        }}
-      >
-        {Object.values(props.gameLandmarks).map((landmark) => (
-          <MinimizedLandmarkView
-            key={`PlayerView_${props.player.userId}_${landmark.landmarkId}`}
-            cardInfo={landmark}
-            underConstruction={!props.landmarks[landmark.landmarkId]}
-            onClick={() => {
-              props.onLandmarkClick(landmark.landmarkId);
-            }}
-          />
-        ))}
-      </Box>
-
-      <Box
-        sx={{
-          height: '100%',
-          minHeight: 180 + 20 * (Object.values(props.establishments).length - 1),
-          display: 'flex',
-        }}
-      >
-        {Object.entries(props.establishments).map(
-          ([establishmentId, count], cardIndex) => renderCard(establishmentId as EstablishmentId, count, cardIndex),
-        )}
-      </Box>
+      {Object.values(props.gameLandmarks).map((landmark) => (
+        <MinimizedLandmarkView
+          key={`PlayerView_${props.player.userId}_${landmark.landmarkId}`}
+          cardInfo={landmark}
+          underConstruction={!props.landmarks[landmark.landmarkId]}
+          onClick={() => {
+            props.onLandmarkClick(landmark.landmarkId);
+          }}
+        />
+      ))}
     </Box>
-  );
-};
+
+    <Box
+      sx={{
+        height: '100%',
+        minHeight: 180 + 20 * (Object.values(props.establishments).length - 1),
+        display: 'flex',
+      }}
+    >
+      {Object.entries(props.establishments).map(
+        ([establishmentId, count], cardIndex) => {
+          const establishment = props.gameEstablishments[establishmentId as EstablishmentId];
+
+          if (!establishment) return null;
+
+          return (
+            <CardWithHover
+              key={`PlayerView_${establishment.establishmentId}`}
+              establishment={establishment}
+              count={count}
+              cardIndex={cardIndex}
+            />
+          );
+        },
+      )}
+    </Box>
+  </Box>
+);
