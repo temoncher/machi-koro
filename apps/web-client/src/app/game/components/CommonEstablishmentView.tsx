@@ -171,7 +171,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
           {/* TODO: do the cool curves */}
           <svg width="100%" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" preserveAspectRatio="none">
             <path className="light-fill" d="M0 0 L300 0 L300 120 L0 120 L0 0" />
-            <path className="main-fill" d="M0 0 L300 0 L300 100 L0 100 L0 0" />
+            <path className="main-fill" d="M0 0 L300 0 L300 105 L0 105 L0 0" />
           </svg>
         </Box>
 
