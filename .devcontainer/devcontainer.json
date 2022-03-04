@@ -21,7 +21,9 @@
     "firsttris.vscode-jest-runner",
     "dbaeumer.vscode-eslint",
     "eamodio.gitlens",
-    "toba.vsfire"
+    "toba.vsfire",
+    "wix.glean",
+    "statelyai.stately-vscode"
   ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.

@@ -1,23 +1,23 @@
-import { Landmark } from '@machikoro/game-server-contracts';
+import { Establishment } from '@machikoro/game-server-contracts';
 import { Box, SxProps } from '@mui/material';
 
+import { CardIconView } from './CardIconView';
 import { CardNameWithEmblem } from './CardNameWithEmblem';
 import { CoinView } from './CoinView';
-import { UnderConstructionBackdrop } from './UnderConstructionBackdrop';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
 import notFoundSrc from './images/not-found.png';
 import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
 
-type MinimizedLandmarkViewProps = {
+type MinimizedEstablishmentViewProps = {
   sx?: SxProps;
-  underConstruction: boolean;
-  landmark: Landmark;
+  establishment: Establishment;
+  quantity?: number;
   onClick?: () => void;
 };
 
-export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (props) => {
-  const cardColor = cardTypeToColorMap[props.landmark.domain];
-  const initials = props.landmark.name.split(' ').map((word) => word[0]?.toLocaleLowerCase()).join('');
+export const MinimizedEstablishmentView: React.FC<MinimizedEstablishmentViewProps> = (props) => {
+  const cardColor = cardTypeToColorMap[props.establishment.domain];
+  const initials = props.establishment.name.split(' ').map((word) => word[0]?.toLocaleLowerCase()).join('');
 
   return (
     <Box
@@ -34,20 +34,15 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
       }}
     >
       <Box
-        sx={[
-          {
-            p: 0.75,
-            width: '100%',
-            height: '100%',
-            borderRadius: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            bgcolor: (theme) => theme.palette[cardColor].light,
-          },
-          !!props.underConstruction && {
-            filter: 'grayscale(100%)',
-          },
-        ]}
+        sx={{
+          p: 0.75,
+          width: '100%',
+          height: '100%',
+          borderRadius: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          bgcolor: (theme) => theme.palette[cardColor].light,
+        }}
       >
         <CardNameWithEmblem
           sx={{
@@ -59,7 +54,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
             width: 20,
           }}
           color={cardColor}
-          tagSrc={tagToEmblemSrcMap.landmark}
+          tagSrc={tagToEmblemSrcMap[props.establishment.tag]}
         >
           {initials}
         </CardNameWithEmblem>
@@ -77,7 +72,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={props.landmark.imageSrc ?? notFoundSrc}
+            src={props.establishment.imageSrc ?? notFoundSrc}
           />
         </Box>
 
@@ -85,7 +80,7 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
           sx={{
             flexGrow: 1,
             display: 'flex',
-            alignItems: 'flex-end',
+            justifyContent: 'space-between',
           }}
         >
           <CoinView
@@ -97,13 +92,26 @@ export const MinimizedLandmarkView: React.FC<MinimizedLandmarkViewProps> = (prop
               fontSize: '0.75rem',
               borderWidth: 2,
             }}
-            type="bronze"
+            type="gold"
           >
-            {props.landmark.cost}
+            {props.establishment.cost}
           </CoinView>
+          {props.quantity && (
+            <CardIconView
+              sx={{
+                minWidth: 15,
+                width: 15,
+                minHeight: 20,
+                height: 20,
+                fontSize: '0.75rem',
+                borderWidth: 2,
+              }}
+            >
+              {props.quantity}
+            </CardIconView>
+          )}
         </Box>
       </Box>
-      {props.underConstruction && (<UnderConstructionBackdrop />)}
     </Box>
   );
 };

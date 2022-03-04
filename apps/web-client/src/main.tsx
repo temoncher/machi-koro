@@ -42,6 +42,7 @@ const main = () => {
     firebaseAuth,
     firebaseDb,
     firestore,
+    firestorage,
     // eslint-disable-next-line no-restricted-globals
     storage: window.localStorage,
   });

@@ -22,7 +22,6 @@ export const parameters = {
     },
   },
   backgrounds: {
-    default: 'twitter',
     values: [
       {
         name: 'twitter',

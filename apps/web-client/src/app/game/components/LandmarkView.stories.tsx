@@ -19,12 +19,12 @@ export const Constructed = Template.bind({});
 
 Constructed.args = {
   underConstruction: false,
-  cardInfo,
+  landmark: cardInfo,
 };
 
 export const UnderConstruction = Template.bind({});
 
 UnderConstruction.args = {
   underConstruction: true,
-  cardInfo,
+  landmark: cardInfo,
 };

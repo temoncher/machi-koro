@@ -4,6 +4,7 @@ import { Auth } from 'firebase/auth';
 import { Database } from 'firebase/database';
 import { Firestore } from 'firebase/firestore';
 import { Functions } from 'firebase/functions';
+import { FirebaseStorage } from 'firebase/storage';
 import { History } from 'history';
 import {
   createStore,
@@ -56,6 +57,7 @@ type InitStoreDependencies = {
   firebaseDb: Database;
   firestore: Firestore;
   firebaseFunctions: Functions;
+  firestorage: FirebaseStorage;
 };
 
 export const initStore = (deps: InitStoreDependencies) => {
@@ -76,6 +78,7 @@ export const initStore = (deps: InitStoreDependencies) => {
   const rootEpicDependencies: RootEpicDependencies = {
     firebaseDb: deps.firebaseDb,
     firebaseFunctions: deps.firebaseFunctions,
+    firestorage: deps.firestorage,
     authState$: authState(deps.firebaseAuth).pipe(
       switchMap((userState) => {
         if (!userState) return of(undefined);

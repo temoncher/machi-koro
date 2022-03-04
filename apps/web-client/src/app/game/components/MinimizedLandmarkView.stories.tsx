@@ -13,18 +13,18 @@ export default storyConfig;
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 const Template: ComponentStory<typeof MinimizedLandmarkView> = (args) => <MinimizedLandmarkView {...args} />;
 
-const cardInfo = allGameLandmarks[landmarksIds.trainStation];
+const trainStation = allGameLandmarks[landmarksIds.trainStation];
 
 export const Constructed = Template.bind({});
 
 Constructed.args = {
   underConstruction: false,
-  cardInfo,
+  landmark: trainStation,
 };
 
 export const UnderConstruction = Template.bind({});
 
 UnderConstruction.args = {
   underConstruction: true,
-  cardInfo,
+  landmark: trainStation,
 };

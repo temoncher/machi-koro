@@ -1,15 +1,21 @@
 import {
+  Establishment,
+  EstablishmentId,
   Game,
   GameContext,
   GameId,
   GameMachineMessage,
+  Landmark,
+  LandmarkId,
 } from '@machikoro/game-server-contracts';
 import { ref, Database } from 'firebase/database';
 import { httpsCallable, Functions } from 'firebase/functions';
+import { ref as storageRef, FirebaseStorage, getDownloadURL } from 'firebase/storage';
 import { AnyAction } from 'redux';
 import { object } from 'rxfire/database';
 import {
   catchError,
+  forkJoin,
   from,
   map,
   of,
@@ -24,8 +30,56 @@ import { typedCombineEpics, TypedEpic } from '../types/TypedEpic';
 
 import { FirebaseAction } from './firebase.actions';
 
+const getImageSrc = (
+  firestorage: FirebaseStorage,
+) => async (imagePath: string) => getDownloadURL(storageRef(firestorage, imagePath)).catch((reason) => {
+  // eslint-disable-next-line no-console
+  console.error(`Failed to load image for ${imagePath}`, reason);
+
+  return undefined;
+});
+
+const populateEstablishmentsImages = (
+  firestorage: FirebaseStorage,
+) => async (establishments: Record<EstablishmentId, Establishment>) => {
+  const establishmentsWithImages = await Promise.all(Object.values(establishments).map(async (establishment) => {
+    if (!establishment.imagePath) return [establishment.establishmentId, establishment] as const;
+
+    const imageSrc = await getImageSrc(firestorage)(establishment.imagePath);
+
+    const establishmentWithImage: Establishment = {
+      ...establishment,
+      imageSrc,
+    };
+
+    return [establishment.establishmentId, establishmentWithImage] as const;
+  }));
+
+  return Object.fromEntries(establishmentsWithImages) as Record<EstablishmentId, Establishment>;
+};
+
+const populateLandmarksImages = (
+  firestorage: FirebaseStorage,
+) => async (landmarks: Record<LandmarkId, Landmark>) => {
+  const landmarksWithImagesPromises = await Promise.all(Object.values(landmarks).map(async (landmark) => {
+    if (!landmark.imagePath) return [landmark.landmarkId, landmark] as const;
+
+    const imageSrc = await getImageSrc(firestorage)(landmark.imagePath);
+
+    const landmarkWithImage: Landmark = {
+      ...landmark,
+      imageSrc,
+    };
+
+    return [landmark.landmarkId, landmarkWithImage] as const;
+  }));
+
+  return Object.fromEntries(landmarksWithImagesPromises) as Record<LandmarkId, Landmark>;
+};
+
 type SyncGameStateDependencies = {
   firebaseDb: Database;
+  firestorage: FirebaseStorage;
 };
 
 const syncGameState = (deps: SyncGameStateDependencies): TypedEpic<typeof GameAction.setGameDocument> => (actions$) => actions$.pipe(
@@ -34,15 +88,33 @@ const syncGameState = (deps: SyncGameStateDependencies): TypedEpic<typeof GameAc
   switchMap((gameId) => object(ref(deps.firebaseDb, `games/${gameId}`)).pipe(
     // TODO: check if this takeUntil really unsubscribes from lobby state object
     takeUntil(actions$.pipe(ofType(AbandonGameAction.abandonGameResolvedEvent))),
+    // TODO: perform validation
     map((gameChange) => {
-      // TODO: perform validation
-      const game = gameChange.snapshot.val() as Omit<Game, 'gameId'>;
+      const gameWithoutId = gameChange.snapshot.val() as Omit<Game, 'gameId'>;
 
-      return GameAction.setGameDocument({
-        ...game,
+      return {
+        ...gameWithoutId,
         gameId: gameChange.snapshot.key as GameId,
-      });
+      };
     }),
+    switchMap((game) => forkJoin([
+      from(populateEstablishmentsImages(deps.firestorage)(game.context.gameEstablishments)),
+      from(populateLandmarksImages(deps.firestorage)(game.context.gameLandmarks)),
+    ]).pipe(
+      map(([establishmentsWithImages, landmarksWithImages]) => {
+        const gameWithImages: Game = {
+          ...game,
+          context: {
+            ...game.context,
+            gameEstablishments: establishmentsWithImages,
+            gameLandmarks: landmarksWithImages,
+          },
+        };
+
+        return gameWithImages;
+      }),
+    )),
+    map(GameAction.setGameDocument),
   )),
 );
 

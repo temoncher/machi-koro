@@ -6,6 +6,7 @@ declare module '@mui/material/styles' {
     brandPurple: Palette['primary'];
     brandRed: Palette['primary'];
     brandBlue: Palette['primary'];
+    backgroundBlue: Pick<Palette['primary'], 'main'>;
     brandGreen: Palette['primary'];
     brandYellow: Palette['primary'];
   }
@@ -13,6 +14,7 @@ declare module '@mui/material/styles' {
     brandPurple: PaletteOptions['primary'];
     brandRed: PaletteOptions['primary'];
     brandBlue: PaletteOptions['primary'];
+    backgroundBlue: PaletteOptions['primary'];
     brandGreen: PaletteOptions['primary'];
     brandYellow: PaletteOptions['primary'];
   }
@@ -37,6 +39,9 @@ export const theme = createTheme({
       light: '#7baed4',
       main: '#136ba5',
       dark: '#0965a3',
+    },
+    backgroundBlue: {
+      main: '#CFE7FA',
     },
     brandGreen: {
       light: '#9ab36c',

@@ -17,7 +17,8 @@ export type CommonEstablishmentFields = {
   descriptionText: string;
   cost: number;
   // Currently not all the establishments have an image
-  imageSrc: string | null;
+  imagePath: string | null;
+  imageSrc?: string;
 };
 
 export type Landmark = CommonEstablishmentFields & {

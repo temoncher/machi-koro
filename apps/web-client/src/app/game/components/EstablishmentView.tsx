@@ -1,33 +1,12 @@
 import { Establishment } from '@machikoro/game-server-contracts';
 import { Box, SxProps, Typography } from '@mui/material';
-import React, { useMemo } from 'react';
+import React from 'react';
 
+import { CardIconView } from './CardIconView';
 import { CoinView } from './CoinView';
 import { cardTypeToColorMap } from './cardTypeToColorMap';
-import defaultImageSrc from './images/MachiCoro_Bakery_TP_256px.png';
+import notFoundSrc from './images/not-found.png';
 import { tagToEmblemSrcMap } from './tagToEmblemSrcMap';
-
-type CardIconViewProps = {
-  sx?: SxProps;
-};
-
-const CardIconView: React.FC<CardIconViewProps> = (props) => (
-  <Box
-    sx={{
-      width: 24,
-      height: 32,
-      textAlign: 'center',
-      borderWidth: 4,
-      borderRadius: 1,
-      borderStyle: 'solid',
-      borderColor: (theme) => theme.palette.grey[400],
-      bgcolor: (theme) => theme.palette.grey[200],
-      ...props.sx,
-    }}
-  >
-    {props.children}
-  </Box>
-);
 
 type CardNameWithEmblemProps = {
   sx?: SxProps;
@@ -38,7 +17,6 @@ type CardNameWithEmblemProps = {
 const CardNameWithEmblem: React.FC<CardNameWithEmblemProps> = (props) => (
   <Typography
     sx={{
-      pb: 1,
       '&::before': {
         mr: 1,
         display: 'inline-block',
@@ -67,12 +45,12 @@ const maxDescritionLength = 45;
 type CommonEstablishmentViewProps = {
   sx?: SxProps;
   className?: string;
-  cardInfo: Establishment;
+  establishment: Establishment;
   quantity?: number;
   onClick?: () => void;
 };
 
-export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => {
+export const EstablishmentView: React.FC<CommonEstablishmentViewProps> = (props) => {
   const {
     activation,
     name,
@@ -81,23 +59,22 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
     descriptionText,
     domain,
     tag,
-  } = props.cardInfo;
+  } = props.establishment;
 
-  const activationDiceRange = useMemo((): string => activation.join('-'), [activation]);
-  const cardColor = useMemo(() => cardTypeToColorMap[domain], [domain]);
+  const cardColor = cardTypeToColorMap[domain];
 
   return (
     <Box
       component="article"
       sx={{
         position: 'relative',
+        overflow: 'hidden',
         minWidth: 200,
         width: 200,
         maxWidth: 200,
         minHeight: 300,
         height: 300,
         maxHeight: 300,
-        overflow: 'hidden',
         ...props.sx,
       }}
       className={props.className}
@@ -107,6 +84,8 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
       <Box
         sx={{
           p: 1.5,
+          position: 'relative',
+          overflow: 'hidden',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -114,11 +93,67 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
           alignItems: 'stretch',
           backgroundSize: 'cover',
           borderRadius: 2,
-          bgcolor: (theme) => theme.palette[cardColor].light,
+          bgcolor: (theme) => theme.palette.backgroundBlue.main,
         }}
       >
-        <Box sx={{ position: 'relative ' }}>
-          {props.quantity && (<CardIconView sx={{ position: 'absolute' }}>{props.quantity}</CardIconView>)}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            overflow: 'hidden',
+            lineHeight: 0,
+            '> svg': {
+              position: 'relative',
+              display: 'block',
+              widht: '100%',
+              height: 64,
+            },
+            '.light-fill': {
+              fill: (theme) => theme.palette[cardColor].light,
+            },
+            '.main-fill': {
+              fill: (theme) => theme.palette[cardColor].main,
+            },
+          }}
+        >
+          <svg width="100%" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+            <path className="light-fill" d="M0 0 L300 0 L300 120 C250 80 50 80 0 120 L0 0" />
+            <path className="main-fill" d="M0 0 L300 0 L300 100 C250 70 50 70 0 100 L0 0" />
+          </svg>
+        </Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            overflow: 'hidden',
+            lineHeight: 0,
+            transform: 'rotate(180deg)',
+            '> svg': {
+              position: 'relative',
+              display: 'block',
+              widht: '100%',
+              height: 80,
+            },
+            '.light-fill': {
+              fill: (theme) => theme.palette[cardColor].light,
+            },
+            '.main-fill': {
+              fill: (theme) => theme.palette[cardColor].main,
+            },
+          }}
+        >
+          {/* TODO: do the cool curves */}
+          <svg width="100%" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+            <path className="light-fill" d="M0 0 L300 0 L300 120 L0 120 L0 0" />
+            <path className="main-fill" d="M0 0 L300 0 L300 105 L0 105 L0 0" />
+          </svg>
+        </Box>
+
+        <Box sx={{ position: 'relative' }}>
           <Typography
             pb={3}
             fontFamily="lithos"
@@ -127,7 +162,7 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
             lineHeight={0.8}
             color={(theme) => theme.palette.common.white}
           >
-            {activationDiceRange}
+            {activation.join('-')}
           </Typography>
         </Box>
 
@@ -160,24 +195,25 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
             maxHeight: '45%',
             display: 'flex',
             justifyContent: 'center',
+            zIndex: 2,
           }}
         >
           <img
             style={{ objectFit: 'contain' }}
             alt="card"
-            src={imageSrc ?? defaultImageSrc}
+            src={imageSrc ?? notFoundSrc}
           />
         </Box>
 
         <Box
           sx={{
+            position: 'relative',
             minHeight: '25%',
             height: '25%',
             maxHeight: '25%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            position: 'relative',
           }}
         >
           <Typography
@@ -207,6 +243,8 @@ export const CommonEstablishmentView: React.FC<CommonEstablishmentViewProps> = (
               {cost}
             </CoinView>
           )}
+
+          {props.quantity && (<CardIconView sx={{ position: 'absolute', bottom: 0, right: 0 }}>{props.quantity}</CardIconView>)}
         </Box>
       </Box>
     </Box>
